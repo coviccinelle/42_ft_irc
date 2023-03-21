@@ -11,6 +11,7 @@
 !_TAG_PROGRAM_VERSION	5.9.0	//
 $(NAME)	Makefile	/^$(NAME): $(OBJ)$/;"	t
 ${OBJDIR}/%.o	Makefile	/^${OBJDIR}\/%.o:${SRCDIR}%.cpp$/;"	t
+AwaitingConnectionLoop	server/Server.cpp	/^void	Server::AwaitingConnectionLoop()$/;"	f	class:Server	typeref:typename:void
 B	Makefile	/^B 	=	$(shell tput bold)$/;"	m
 CBLUE	Makefile	/^CBLUE 	= \\033[0;34m$/;"	m
 CC	Makefile	/^CC		=	c++$/;"	m
@@ -37,6 +38,7 @@ TITLE	Makefile	/^TITLE:$/;"	t
 _nick	include/Server.hpp	/^		std::string _nick;$/;"	m	class:Server	typeref:typename:std::string
 _password	include/Server.hpp	/^		std::string _password;$/;"	m	class:Server	typeref:typename:std::string
 _portNumber	include/Server.hpp	/^		int 		_portNumber;$/;"	m	class:Server	typeref:typename:int
+_sockfd	include/Server.hpp	/^		int 		_sockfd;$/;"	m	class:Server	typeref:typename:int
 all	Makefile	/^all: TITLE launch $(NAME)$/;"	t
 clean	Makefile	/^clean:$/;"	t
 fclean	Makefile	/^fclean:			clean$/;"	t

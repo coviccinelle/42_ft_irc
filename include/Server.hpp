@@ -64,8 +64,8 @@ class Server
 		int 		_portNumber;
 		std::string _password;
 		std::string _nick;
+		int 		_sockfd;
 //		const char *_portNumberChar;
-//		int 		_sockfd;
 //		int 		_ClientsOnline;
 //		int 		_MaxClientsOnline;
 //		struct pollfd						*_fds;

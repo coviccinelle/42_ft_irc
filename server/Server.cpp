@@ -3,7 +3,8 @@
 Server::Server(int port, const std::string &pass) :
 	_portNumber(port),
 	_password(pass),
-	_nick("")
+	_nick(""),
+	_sockfd(0)
 /*,  _ClientsOnline(0), _MaxClientsOnline(50),  _fds(NULL), _operUsername("admin"), _operPwd("admin42")*/
 {
 //    _fds = new struct pollfd[MAX_LISTEN]; // http://manpagesfr.free.fr/man/man2/poll.2.html a free 
@@ -15,6 +16,33 @@ Server::~Server()
     //close(_sockfd);
 }
 
+/*
+ * man socket(2), setsockopt(2), bind(2), listen(2)
+*/
+
+void	Server::AwaitingConnectionLoop()
+{
+	struct protoent	*protocol = getprotobyname("tcp");
+	int	opt = 1;
+	_sockfd = socket(AF_INET, SOCK_STREAM | SOCK_NONBLOCK, protocol->p_proto)
+	if (_sockfd == -1)
+		throw system_error("socket");
+	if (setsockopt(_sockfd, SOL_SOCKET, SO_REUSEPORT, &opt, sizeof(opt)) == -1)
+		throw system_error("setsockopt");
+	struct sockaddr_in	sin;
+	if (memset(&sin, 0, sizeof(sin)) == -1)
+		throw system_error("memset");
+	sin.sin_family = AF_INET;
+	sin.sin_addr.s_addr = INADDR_ANY;
+	sin.sin_port = htons(_portNumber);
+
+	if (bind(_sockfd, (sockaddr *)&sin, sizeof(sin)) == -1)
+		throw system_error("bind");
+	if (listen(_sockfd, MAX_LISTEN) == -1)
+		throw system_error("listen");
+	addClientToPoll(_sockfd);
+		
+}
 //#define MAX_LISTEN	50
 //
 //#include <ctype.h>
@@ -235,43 +263,9 @@ std::vector<std::pair(int, string)> _CmdsWaitingLine; // std::pair(int, string) 
 
 */
 
-//
-//
-//
-///*
-////L'argument sockfd est une socket qui a été créée avec la fonction socket(2), attachée à une adresse
-//// avec bind(2), et attend des connextions après un appel listen(2)
-//Une socket SOCK_STREAM doit être dans un état connecté avant que des données puisse y être lues ou écrites. 
-//Les protocoles de communication qui implémentent les sockets SOCK_STREAM garantissent qu'aucune donnée n'est perdue ou dupliquée. Si un bloc de données, pour lequel le correspondant a suffisamment de place dans son tampon, n'est pas transmis correctement dans un délai raisonnable, la connexion est considérée comme inutilisable. PF_INET protocole internet ipv4
-//bind() It’s a socket identification like a telephone number to contact
-//*/
-//void	Server::AwaitingConnectionLoop()
-//{
-//	struct protoent	*p = getprotobyname("tcp");
-//	int	opt = 1;
-//#ifdef __APPLE__
-//	if ((_sockfd = socket(AF_INET, SOCK_STREAM, p->p_proto)) == -1)
-//		throw system_error("socket");
-//	fcntl(_sockfd, F_SETFL, O_NONBLOCK);
-//	if (setsockopt(_sockfd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(int)) == -1)
-//		throw system_error("setsockopt");
-//#else
-//	if ((_sockfd = socket(AF_INET, SOCK_STREAM | SOCK_NONBLOCK, p->p_proto)) == -1)
-//		throw system_error("socket");
-//	if (setsockopt(_sockfd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof(int)) == -1)
-//		throw system_error("setsockopt");
-//#endif
-//	sockaddr_in	sin;
-//	sin.sin_family = AF_INET;
-//	sin.sin_addr.s_addr = INADDR_ANY;
-//	sin.sin_port = htons(_portNumber);
-//	if (bind(_sockfd, (sockaddr *)&sin, sizeof(sin)) == -1)
-//		throw system_error("bind");
-//	if (listen(_sockfd, MAX_LISTEN) == -1)
-//		throw system_error("listen");
-//	addClientToPoll(_sockfd);
-//		
-//}
+
+
+
 //
 //
 //void	Server::addClientToPoll(int newClientfd)
