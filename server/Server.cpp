@@ -64,10 +64,23 @@ void Server::AcceptClientConnection()
 		new_fd = accept(_sockfd, (struct sockaddr *)&addr, &addrSize);
 		if (new_fd != -1)
 		{
-			_connectedClients->push_back(Client(new_fd, addr, addrSize));
 			std::cout << "New client accepted" << std::endl;
-			break ;
+			if (!fork())
+			{
+				close(_sockfd);
+				while (1)
+				{
+					if (send(new_fd, "001 thi-phng :Welcome to the Internet Relay Network!\r\n", 55, 0) == -1)
+						std::cout << "message not sent" << std::endl;
+					std::cout << "I'm sending" << std::endl;
+					sleep(1);
+				}
+				std::cout << "Hugh you don't love me :(" << std::endl;
+				close(new_fd);
+				exit(0);
+			}
+			break; 
 		}
+	//	close(new_fd);
 	}
-	std::cout << "fd : " << (*_connectedClients)[0].getSockfd() << std::endl;
 }
