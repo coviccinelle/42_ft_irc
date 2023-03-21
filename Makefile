@@ -6,7 +6,7 @@
 #    By: thi-phng <thi-phng@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/10/18 10:58:05 by thi-phng          #+#    #+#              #
-#    Updated: 2023/03/21 11:00:16 by thi-phng         ###   ########.fr        #
+#    Updated: 2023/03/21 14:02:33 by thi-phng         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -16,6 +16,7 @@ CFLAGS	=	-Wall -Wextra -Werror -std=c++98
 RM		=	rm -rf
 SRC		=	main.cpp \
 			server/Server.cpp \
+			server/Client.cpp \
 			utils/system_error.cpp
 
 SRC_PARSED	=	main_test.cpp 

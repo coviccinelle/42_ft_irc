@@ -1,7 +1,5 @@
 #include  "include/Server.hpp"
-#include <cstring>
-
-typedef std::string string;
+#include "utils/utils.hpp"
 
 const string& parsePort(const string &port)
 {
@@ -39,7 +37,8 @@ int main(int ac, char **av)
 	try
 	{
 		std::cout << "Step 2: Server is setting up : Awaitting Connection Loop ..." << std::endl;
-		server.AwaitingConnectionLoop();
+		server.AwaitingConnectionQueue();
+		server.AcceptClientConnection();
 	}
 	catch (std::exception &e)
 	{

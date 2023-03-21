@@ -2,23 +2,22 @@
 #define SERVER_HPP
 
 #include <iostream>
-#include  <cstdlib>
 
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netdb.h>
-#include <cstring>
 #include <fcntl.h> // pour les flags F_SETFL et O_NONBLOCK
-
-#include <unistd.h>
-#include "../include/system_error.hpp"
-
 #include <poll.h>
-#include <map>
+
+#include <cstring>
+#include <cstdlib>
+#include <unistd.h>
 
 #include <vector>
-//#include "Client.hpp"
-//#include "Server.hpp"
+
+#include "../utils/utils.hpp"
+#include "../include/system_error.hpp"
+#include "../include/Client.hpp"
 
 #define MAX_LISTEN	5
 
@@ -29,55 +28,16 @@ class Server
 		Server(const std::string &port, const std::string &pass);
 		~Server();
 
-		void		AwaitingConnectionLoop();
-		//std::string getPassword(){return _password;};
-		//std::string getUsername(){return _username;};
-		//void		setup();
-		//int			getPortNumber(){return _portNumber;};
-		//int			parsing(std::string recvline, int fd);
-		//int 		check_password(std::string recvline, int fd);
-		//void 		setPassword(std::string password){_password = password;};
-		//void 		setUsername(std::string username){_username = username;};
-		//void 		setPortNumber(int portnumber){_portNumber = portnumber;};
-		//void    	AcceptNewClient();
-		//void    	addClientToPoll(int newClientfd);
-		//void    	removeClientFromPoll(int i);
-		//void 		FdMultithreading(void);
-		//void 		execCmd(std::string cmd, int fd);
-		//std::string	_message;
-		////waitingLine();
-
-		//std::string	recv_all(int fd);
-		////commandes
-		//void cmd_nick(int fd, std::vector<std::string> cmd);
-		//void cmd_pass(int fd, std::vector<std::string> cmd);
-		//void cmd_user(int fd, std::vector<std::string> cmd);
-		//void cmd_oper(int fd, std::vector<std::string> cmd);
-		//void recvCmd(int fd);
+		void		AwaitingConnectionQueue();
+		void 		AcceptClientConnection();
 
 	private:
 		Server();
-		//typedef std::pair<int, std::string> WhoOrderedWhat;
 
-		 //std::vector<WhoOrderedWhat> _CmdsWaitingLine; // std::pair(int, string) = who/which fd ordered what/cmd //_CmdsWaitingLine.push_back(std::make_pair(fd, cmd));
 
-		//std::map<int, std::string>	_CmdsWaitingLine;
-		std::string _portNumber;
-		std::string _password;
-		std::string _nick;
-		int 		_sockfd;
-//		const char *_portNumberChar;
-//		int 		_ClientsOnline;
-//		int 		_MaxClientsOnline;
-//		struct pollfd						*_fds;
-//		std::map<int, Client> clients;
-
-//		std::map<int, Client *>				_clients;
-//
-//		std::string _operUsername;
-//		std::string _operPwd;
-//		typedef std::vector<std::make_pair(int, cmd)> waitingcmds;
-
+		std::string 			_portNumber;
+		std::string 			_password;
+		std::string 			_nick;
+		int 					_sockfd;
+		std::vector< Client > 	*_connectedClients;
 };
-
-#endif
