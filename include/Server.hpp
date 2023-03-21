@@ -10,9 +10,8 @@
 #include <cstring>
 #include <fcntl.h> // pour les flags F_SETFL et O_NONBLOCK
 
-
 #include <unistd.h>
-//#include "SystemError.hpp"
+#include "../include/system_error.hpp"
 
 #include <poll.h>
 #include <map>
@@ -21,13 +20,16 @@
 //#include "Client.hpp"
 //#include "Server.hpp"
 
+#define MAX_LISTEN	5
+
 class Client;
 class Server
 {
 	public:
-		Server(int port, const std::string &pass);
+		Server(const std::string &port, const std::string &pass);
 		~Server();
 
+		void		AwaitingConnectionLoop();
 		//std::string getPassword(){return _password;};
 		//std::string getUsername(){return _username;};
 		//void		setup();
@@ -37,7 +39,6 @@ class Server
 		//void 		setPassword(std::string password){_password = password;};
 		//void 		setUsername(std::string username){_username = username;};
 		//void 		setPortNumber(int portnumber){_portNumber = portnumber;};
-		//void		AwaitingConnectionLoop();
 		//void    	AcceptNewClient();
 		//void    	addClientToPoll(int newClientfd);
 		//void    	removeClientFromPoll(int i);
@@ -61,7 +62,7 @@ class Server
 		 //std::vector<WhoOrderedWhat> _CmdsWaitingLine; // std::pair(int, string) = who/which fd ordered what/cmd //_CmdsWaitingLine.push_back(std::make_pair(fd, cmd));
 
 		//std::map<int, std::string>	_CmdsWaitingLine;
-		int 		_portNumber;
+		std::string _portNumber;
 		std::string _password;
 		std::string _nick;
 		int 		_sockfd;

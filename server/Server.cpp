@@ -1,6 +1,6 @@
 #include "../include/Server.hpp"
 
-Server::Server(int port, const std::string &pass) :
+Server::Server(const std::string &port, const std::string &pass) :
 	_portNumber(port),
 	_password(pass),
 	_nick(""),
@@ -17,33 +17,40 @@ Server::~Server()
 }
 
 /*
+ *
  * man socket(2), setsockopt(2), bind(2), listen(2)
+ *
+ * Only waiting for ipv4 connection now
+ *
 */
 
 void	Server::AwaitingConnectionLoop()
 {
-	struct protoent	*protocol = getprotobyname("tcp");
-	int	opt = 1;
-	_sockfd = socket(AF_INET, SOCK_STREAM | SOCK_NONBLOCK, protocol->p_proto)
-	if (_sockfd == -1)
-		throw system_error("socket");
-	if (setsockopt(_sockfd, SOL_SOCKET, SO_REUSEPORT, &opt, sizeof(opt)) == -1)
-		throw system_error("setsockopt");
-	struct sockaddr_in	sin;
-	if (memset(&sin, 0, sizeof(sin)) == -1)
-		throw system_error("memset");
-	sin.sin_family = AF_INET;
-	sin.sin_addr.s_addr = INADDR_ANY;
-	sin.sin_port = htons(_portNumber);
+	struct addrinfo hints;
+	struct addrinfo *res;
+	int	sockopt = 1;
+	int new_fd;
 
-	if (bind(_sockfd, (sockaddr *)&sin, sizeof(sin)) == -1)
+	memset(&hints, 0, sizeof(hints));
+	hints.ai_family = AF_UNSPEC;
+	hints.ai_socktype = SOCK_STREAM;
+	hints.ai_flags = AI_PASSIVE;
+
+	getaddrinfo(NULL, _portNumber.c_str(), &hints, &res);
+
+	if ((_sockfd = socket(res->ai_family, res->ai_socktype, res->ai_protocol)) == -1)
+		throw system_error("socket");
+	if (fcntl(_sockfd, F_SETFL, O_NONBLOCK) == -1)
+		throw system_error("fcntl");
+	if (setsockopt(_sockfd, SOL_SOCKET, SO_REUSEPORT, &sockopt, sizeof(sockopt)) == -1)
+		throw system_error("setsockopt");
+	if (bind(_sockfd, res->ai_addr, res->ai_addrlen) == -1)
 		throw system_error("bind");
 	if (listen(_sockfd, MAX_LISTEN) == -1)
 		throw system_error("listen");
-	addClientToPoll(_sockfd);
-		
+	if ((new_fd = accept(_sockfd, (struct sockaddr *)&client.getAddr(), &client.getAddrSize())) == -1)
+		throw system_error("accept");
 }
-//#define MAX_LISTEN	50
 //
 //#include <ctype.h>
 //#define MAX 512

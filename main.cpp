@@ -3,20 +3,19 @@
 
 typedef std::string string;
 
-int parsePort(const string &port)
+const string& parsePort(const string &port)
 {
 	for (string::const_iterator it = port.begin(); it != port.end(); ++it)
 		if (isdigit(*it) == 0)
 			throw std::invalid_argument("Invalid Port Number: only positive digits accepted");
 
-	int portNumber = std::atoi(port.c_str());
-	if (portNumber  <= 0 || portNumber > 65535)
+	if (std::atoi(port.c_str()) > 65535)
 		throw std::invalid_argument("Invalid Port Number : portNumber must be between 1 and 65535");
 
-	return (portNumber);
+	return (port);
 }
 
-int	parseArgs(int ac, char **av)
+const string&	parseArgs(int ac, char **av)
 {
 	std::cout << "Step 1: Server is starting : Parsing arguments" << std::endl;
 	if (ac != 3)
@@ -26,7 +25,7 @@ int	parseArgs(int ac, char **av)
 
 int main(int ac, char **av)
 {
-	int portNumber;
+	string portNumber;
 	try
 	{
 		portNumber = parseArgs(ac, av);
@@ -37,7 +36,6 @@ int main(int ac, char **av)
 		return (-1);
 	}
 	Server server(portNumber, string(av[2]));
-	/*
 	try
 	{
 		std::cout << "Step 2: Server is setting up : Awaitting Connection Loop ..." << std::endl;
@@ -49,6 +47,7 @@ int main(int ac, char **av)
 		std::cerr << e.what() << std::endl;
 		return (-1);
 	}
+	/*
 	try
 	{
 		std::cout << "Step 3: Server is setting up : FdMultithreading ..." << std::endl;
