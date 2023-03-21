@@ -45,16 +45,20 @@ void	Server::AwaitingConnectionQueue()
 		throw system_error("setsockopt");
 	if (bind(_sockfd, res->ai_addr, res->ai_addrlen) == -1)
 		throw system_error("bind");
+	freeaddrinfo(res);
 	if (listen(_sockfd, MAX_LISTEN) == -1)
 		throw system_error("listen");
 }
 
 void Server::AcceptClientConnection()
 {
-	int 					new_fd = -1;
+	int 					new_fd;
 	struct sockaddr_storage	addr;
 	socklen_t				addrSize;
 
+	new_fd = 0;
+	addrSize = 0;
+	memset(&addr, 0, sizeof(addr));
 	while (1)
 	{
 		new_fd = accept(_sockfd, (struct sockaddr *)&addr, &addrSize);

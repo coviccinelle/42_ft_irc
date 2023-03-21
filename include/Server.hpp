@@ -41,3 +41,5 @@ class Server
 		int 					_sockfd;
 		std::vector< Client > 	*_connectedClients;
 };
+
+#endif
