@@ -65,38 +65,49 @@ void	Server::AwaitingConnectionQueue()
 		throw system_error("listen failed");
 }
 
-void Server::ConnectionLoop()
+void Server::_AcceptNewConnection(const struct pollfd &pfd)
 {
+	socklen_t				addrSize;
 	struct pollfd 			new_fd;
 	struct sockaddr_storage	addr;
-	socklen_t				addrSize;
-
-	_pollfds[0].fd = _sockfd;
-	_pollfds[0].events = POLLIN;
 
 	addrSize = 0;
 	memset(&addr, 0, sizeof(addr));
 	memset(&new_fd, 0, sizeof(new_fd));
+	if (pfd.fd == _sockfd)
+	{
+		if ((new_fd.fd = accept(_sockfd, (struct sockaddr *)&addr, &addrSize)) == -1)
+			std::cerr << "warning: accept failed" << std::endl;
+		else
+		{
+			_pollfds.push_back(new_fd);
+			std::cout << "connection from "<< "ip (TODO) " << "accepted ! fd: " << new_fd.fd << std::endl;
+		}
+	}
+}
+
+void Server::InitConnectionLoop()
+{
+	_pollfds[0].fd = _sockfd;
+	_pollfds[0].events = POLLIN;
+
+}
+
+void Server::ConnectionLoop()
+{
+	int count;
+
 	while (1)
 	{
 		if ((_poll_count = poll(_pollfds.data(), _pollfds.size(), -1)) == -1)
 			throw system_error("poll failed");
-		int count = _pollfds.size();
+		count = _pollfds.size();
 		for (int i = 0; i < count; ++i)
 		{
 			if (_pollfds[i].revents & POLLIN)
-			{
-				if (_pollfds[i].fd == _sockfd)
-				{
-					if ((new_fd.fd = accept(_sockfd, (struct sockaddr *)&addr, &addrSize)) == -1)
-						std::cerr << "warning: accept failed" << std::endl;
-					else
-					{
-						_pollfds.push_back(new_fd);
-						std::cout << "connection from "<< "ip (TODO) " << "accepted ! fd: " << new_fd.fd << std::endl;
-					}
-				}
-			}
+				_AcceptNewConnection(_pollfds[i]);
+			else
+				std::cout << "awaiting" << std::endl;
 		}
 		std::cout << "listening" << std::endl;
 		sleep(1);

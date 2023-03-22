@@ -30,10 +30,12 @@ class Server
 		~Server();
 
 		void		AwaitingConnectionQueue();
+		void		InitConnectionLoop();
 		void 		ConnectionLoop();
 
 	private:
 		Server();
+		void _AcceptNewConnection(const struct pollfd &pfd);
 
 
 		std::string 					_portNumber;
