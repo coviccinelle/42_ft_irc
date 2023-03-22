@@ -30,7 +30,7 @@ int main(int ac, char **av)
 
 		std::cout << "Step 2: Server is setting up : Awaitting Connection Loop ..." << std::endl;
 		server.AwaitingConnectionQueue();
-		server.AcceptClientConnection();
+		server.ConnectionLoop();
 	}
 	catch (std::exception &e)
 	{

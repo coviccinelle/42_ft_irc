@@ -3,9 +3,9 @@
 Server::Server(const std::string &port, const std::string &pass) :
 	_portNumber(port),
 	_password(pass),
-	_nick(""),
 	_sockfd(0),
-	_connectedClients(new std::vector< Client >)
+	_pollfds(1),
+	_poll_count(0)
 {
 }
 
@@ -13,7 +13,6 @@ Server::Server(const std::string &port, const std::string &pass) :
 Server::~Server()
 {
     close(_sockfd);
-	delete _connectedClients;
 }
 
 /*
@@ -30,19 +29,21 @@ void	Server::AwaitingConnectionQueue()
 	struct addrinfo *res;
 	struct addrinfo *p;
 	int	sockopt = 1;
+	int ret_value;
 
 	memset(&hints, 0, sizeof(hints));
 	hints.ai_family = AF_UNSPEC;
 	hints.ai_socktype = SOCK_STREAM;
 	hints.ai_flags = AI_PASSIVE;
 
-	getaddrinfo(NULL, _portNumber.c_str(), &hints, &res);
+	if ((ret_value = getaddrinfo(NULL, _portNumber.c_str(), &hints, &res)) != 0)
+		throw system_error("getaddrinfo error");
 
 	for (p = res; p != NULL; p = p->ai_next)
 	{
 		if ((_sockfd = socket(res->ai_family, res->ai_socktype, res->ai_protocol)) == -1)
 		{
-			std::cerr << "server: socket" << std::endl;
+			std::cerr << "warning: server socket creation failed" << std::endl;
 			continue;
 		}
 		if (fcntl(_sockfd, F_SETFL, O_NONBLOCK) == -1)
@@ -52,47 +53,47 @@ void	Server::AwaitingConnectionQueue()
 		if (bind(_sockfd, res->ai_addr, res->ai_addrlen) == -1)
 		{
 			close(_sockfd);
-			std::cerr << "server: bind" << std::endl;
+			std::cerr << "warning: server bind failed" << std::endl;
 			continue;
 		}
 		break;
 	}
+	if (p == NULL)
+		throw system_error("fatal: socket binding failed");
 	freeaddrinfo(res);
 	if (listen(_sockfd, MAX_LISTEN) == -1)
-		throw system_error("listen");
+		throw system_error("listen failed");
 }
 
-void Server::AcceptClientConnection()
+void Server::ConnectionLoop()
 {
 	int 					new_fd;
 	struct sockaddr_storage	addr;
 	socklen_t				addrSize;
+
+	_pollfds[0].fd = _sockfd;
+	_pollfds[0].events = POLLIN;
 
 	new_fd = 0;
 	addrSize = 0;
 	memset(&addr, 0, sizeof(addr));
 	while (1)
 	{
-		new_fd = accept(_sockfd, (struct sockaddr *)&addr, &addrSize);
-		if (new_fd != -1)
+		if ((_poll_count = poll(_pollfds.data(), _pollfds.size(), -1)) == -1)
+			throw system_error("poll failed");
+		for (std::vector< struct pollfd >::iterator pfd = _pollfds.begin(); pfd != _pollfds.end(); ++pfd)
 		{
-			std::cout << "New client accepted" << std::endl;
-			if (!fork())
+			if (pfd->revents & POLLIN)
 			{
-				close(_sockfd);
-				while (1)
+				if (pfd->fd == _sockfd)
 				{
-					if (send(new_fd, "001 thi-phng :Welcome to the Internet Relay Network!\r\n", 55, 0) == -1)
-						std::cout << "message not sent" << std::endl;
-					std::cout << "I'm sending" << std::endl;
-					sleep(1);
+					if ((new_fd = accept(_sockfd, (struct sockaddr *)&addr, &addrSize)) == -1)
+						throw system_error("accept failed");
+					std::cout << "connection accepted ! fd: " << new_fd << std::endl;
 				}
-				std::cout << "Hugh you don't love me :(" << std::endl;
-				close(new_fd);
-				exit(0);
 			}
-			break; 
 		}
-	//	close(new_fd);
+		std::cout << "listening" << std::endl;
+		sleep(1);
 	}
 }
