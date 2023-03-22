@@ -28,6 +28,7 @@ void	Server::AwaitingConnectionQueue()
 {
 	struct addrinfo hints;
 	struct addrinfo *res;
+	struct addrinfo *p;
 	int	sockopt = 1;
 
 	memset(&hints, 0, sizeof(hints));
@@ -37,14 +38,25 @@ void	Server::AwaitingConnectionQueue()
 
 	getaddrinfo(NULL, _portNumber.c_str(), &hints, &res);
 
-	if ((_sockfd = socket(res->ai_family, res->ai_socktype, res->ai_protocol)) == -1)
-		throw system_error("socket");
-	if (fcntl(_sockfd, F_SETFL, O_NONBLOCK) == -1)
-		throw system_error("fcntl");
-	if (setsockopt(_sockfd, SOL_SOCKET, SO_REUSEPORT, &sockopt, sizeof(sockopt)) == -1)
-		throw system_error("setsockopt");
-	if (bind(_sockfd, res->ai_addr, res->ai_addrlen) == -1)
-		throw system_error("bind");
+	for (p = res; p != NULL; p = p->ai_next)
+	{
+		if ((_sockfd = socket(res->ai_family, res->ai_socktype, res->ai_protocol)) == -1)
+		{
+			std::cerr << "server: socket" << std::endl;
+			continue;
+		}
+		if (fcntl(_sockfd, F_SETFL, O_NONBLOCK) == -1)
+			throw system_error("fcntl");
+		if (setsockopt(_sockfd, SOL_SOCKET, SO_REUSEPORT, &sockopt, sizeof(sockopt)) == -1)
+			throw system_error("setsockopt");
+		if (bind(_sockfd, res->ai_addr, res->ai_addrlen) == -1)
+		{
+			close(_sockfd);
+			std::cerr << "server: bind" << std::endl;
+			continue;
+		}
+		break;
+	}
 	freeaddrinfo(res);
 	if (listen(_sockfd, MAX_LISTEN) == -1)
 		throw system_error("listen");
