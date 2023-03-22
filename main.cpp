@@ -15,7 +15,6 @@ const string& parsePort(const string &port)
 
 const string&	parseArgs(int ac, char **av)
 {
-	std::cout << "Step 1: Server is starting : Parsing arguments" << std::endl;
 	if (ac != 3)
 		throw std::invalid_argument("Invalid Args: How to use: ./ircserv portNumber password.");
 	return (parsePort(string(av[1])));
@@ -23,26 +22,18 @@ const string&	parseArgs(int ac, char **av)
 
 int main(int ac, char **av)
 {
-	string portNumber;
 	try
 	{
-		portNumber = parseArgs(ac, av);
-	}
-	catch (std::exception &e)
-	{
-		std::cerr << e.what() << std::endl;
-		return (-1);
-	}
-	Server server(portNumber, string(av[2]));
-	try
-	{
+		std::cout << "Step 1: Server is starting : Parsing arguments" << std::endl;
+		string portNumber(parseArgs(ac, av));
+		Server server(portNumber, string(av[2]));
+
 		std::cout << "Step 2: Server is setting up : Awaitting Connection Loop ..." << std::endl;
 		server.AwaitingConnectionQueue();
 		server.AcceptClientConnection();
 	}
 	catch (std::exception &e)
 	{
-		std::cout << "AwaitingConnectionLoop Error: " << std::endl;
 		std::cerr << e.what() << std::endl;
 		return (-1);
 	}
