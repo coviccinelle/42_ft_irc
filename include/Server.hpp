@@ -35,12 +35,13 @@ class Server
 
 	private:
 		Server();
-		void _AcceptNewConnection(const struct pollfd &pfd);
+		void _AcceptNewConnection();
+		void _ReceiveData(const std::vector< struct pollfd >::iterator &pos);
 
 
 		std::string 					_portNumber;
 		std::string 					_password;
-		int 							_sockfd;
+		int 							_listener;
 		std::vector< Client > 			_connectedClients;
 		std::vector< struct pollfd > 	_pollfds;
 		int								_poll_count;
