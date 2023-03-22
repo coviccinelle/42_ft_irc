@@ -67,29 +67,34 @@ void	Server::AwaitingConnectionQueue()
 
 void Server::ConnectionLoop()
 {
-	int 					new_fd;
+	struct pollfd 			new_fd;
 	struct sockaddr_storage	addr;
 	socklen_t				addrSize;
 
 	_pollfds[0].fd = _sockfd;
 	_pollfds[0].events = POLLIN;
 
-	new_fd = 0;
 	addrSize = 0;
 	memset(&addr, 0, sizeof(addr));
+	memset(&new_fd, 0, sizeof(new_fd));
 	while (1)
 	{
 		if ((_poll_count = poll(_pollfds.data(), _pollfds.size(), -1)) == -1)
 			throw system_error("poll failed");
-		for (std::vector< struct pollfd >::iterator pfd = _pollfds.begin(); pfd != _pollfds.end(); ++pfd)
+		int count = _pollfds.size();
+		for (int i = 0; i < count; ++i)
 		{
-			if (pfd->revents & POLLIN)
+			if (_pollfds[i].revents & POLLIN)
 			{
-				if (pfd->fd == _sockfd)
+				if (_pollfds[i].fd == _sockfd)
 				{
-					if ((new_fd = accept(_sockfd, (struct sockaddr *)&addr, &addrSize)) == -1)
-						throw system_error("accept failed");
-					std::cout << "connection accepted ! fd: " << new_fd << std::endl;
+					if ((new_fd.fd = accept(_sockfd, (struct sockaddr *)&addr, &addrSize)) == -1)
+						std::cerr << "warning: accept failed" << std::endl;
+					else
+					{
+						_pollfds.push_back(new_fd);
+						std::cout << "connection from "<< "ip (TODO) " << "accepted ! fd: " << new_fd.fd << std::endl;
+					}
 				}
 			}
 		}
