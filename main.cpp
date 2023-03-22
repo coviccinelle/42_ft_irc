@@ -15,7 +15,6 @@ const string& parsePort(const string &port)
 
 const string&	parseArgs(int ac, char **av)
 {
-	std::cout << "Step 1: Server is starting : Parsing arguments" << std::endl;
 	if (ac != 3)
 		throw std::invalid_argument("Invalid Args: How to use: ./ircserv portNumber password.");
 	return (parsePort(string(av[1])));
@@ -25,8 +24,10 @@ int main(int ac, char **av)
 {
 	try
 	{
+		std::cout << "Step 1: Server is starting : Parsing arguments" << std::endl;
 		string portNumber(parseArgs(ac, av));
 		Server server(portNumber, string(av[2]));
+
 		std::cout << "Step 2: Server is setting up : Awaitting Connection Loop ..." << std::endl;
 		server.AwaitingConnectionQueue();
 		server.AcceptClientConnection();
