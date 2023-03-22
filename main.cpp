@@ -23,26 +23,16 @@ const string&	parseArgs(int ac, char **av)
 
 int main(int ac, char **av)
 {
-	string portNumber;
 	try
 	{
-		portNumber = parseArgs(ac, av);
-	}
-	catch (std::exception &e)
-	{
-		std::cerr << e.what() << std::endl;
-		return (-1);
-	}
-	Server server(portNumber, string(av[2]));
-	try
-	{
+		string portNumber(parseArgs(ac, av));
+		Server server(portNumber, string(av[2]));
 		std::cout << "Step 2: Server is setting up : Awaitting Connection Loop ..." << std::endl;
 		server.AwaitingConnectionQueue();
 		server.AcceptClientConnection();
 	}
 	catch (std::exception &e)
 	{
-		std::cout << "AwaitingConnectionLoop Error: " << std::endl;
 		std::cerr << e.what() << std::endl;
 		return (-1);
 	}
