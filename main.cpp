@@ -22,13 +22,12 @@ const string&	parseArgs(int ac, char **av)
 
 int main(int ac, char **av)
 {
+	system("clear");
+	std::cout << "----------[ IRC ]---------" << std::endl;
 	try
 	{
-		std::cout << "Step 1: Server is starting : Parsing arguments" << std::endl;
 		string portNumber(parseArgs(ac, av));
 		Server server(portNumber, string(av[2]));
-
-		std::cout << "Step 2: Server is setting up : Awaitting Connection Loop ..." << std::endl;
 		server.AwaitingConnectionQueue();
 		server.InitConnectionLoop();
 		server.ConnectionLoop();

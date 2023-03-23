@@ -88,21 +88,19 @@ void	Server::_parseRecv(char *buffer)
 	if (buf.find("CAP LS") != i && buf.find("PASS") != i && buf.find("NICK") != i && buf.find("USER") != i)
 	{
 		std::cout << "buf = \n[" << buf << "]\n" << "Parsing Recv done ✅ --- Ready to registrer" << std::endl;
-		sleep(8);
 	}
 	else
 	{
 		std::cout << "not enough data, should wait more, for now : " << buf << std::endl;
-		sleep(8);
 	}
 }
 
 void	Server::_CloseConnection(struct pollfd &pfd)
 {
-	std::cout << "ℹ️  irc server:\033[0;31m connection close \033[0;37mfrom" << _clients[pfd.fd].getIp() << " on socket " << pfd.fd << std::endl;
+	std::cout << "ℹ️  irc server:\033[0;31m connection close \033[0;37mfrom " << _clients[pfd.fd].getIp() << " on socket " << pfd.fd << std::endl;
+	_clients.erase(pfd.fd);
 	close(pfd.fd);
 	_pollfds.erase(std::vector< struct pollfd >::iterator(&pfd));
-	_clients.erase(pfd.fd);
 }
 
 void	Server::_ReceiveData(struct pollfd &pfd)
@@ -179,6 +177,8 @@ void Server::ConnectionLoop()
 	{
 		if ((_poll_count = poll(_pollfds.data(), _pollfds.size(), -1)) == -1)
 			throw system_error("poll failed");
+		system("clear");
+		std::cout << "----------[ IRC ]---------" << std::endl;
 		for (size_t i = 0; i < _pollfds.size(); ++i)
 		{
 			if (_pollfds[i].revents & POLLIN)
