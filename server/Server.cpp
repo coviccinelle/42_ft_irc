@@ -83,8 +83,17 @@ void Server::_AcceptNewConnection()
 void	Server::_ParseRecv(char *buffer, const struct pollfd &pfd)
 {
 	_clients[pfd.fd].SplitCmds(string(buffer));
+	if (_clients[pfd.fd].GetCmds().empty())
+	{
+		std::cerr << "⚠️  warning : empty commands" << std::endl;
+		return ;
+	}
 	for (std::vector<string>::const_iterator it = _clients[pfd.fd].GetCmds().begin(); it != _clients[pfd.fd].GetCmds().end(); ++it)
-		std::cout << "cmd : " << *it << std::endl;
+		std::cout << "cmd : " << "[" << *it << "]" << std::endl;
+	if (_clients[pfd.fd].GetCmds()[1] == string("PASS " + _password))
+		std::cout << "success" << std::endl;
+	else
+		std::cout << "refused connection" << std::endl;
 	std::cout << "Parsing Recv done ✅ --- Ready to registrer" << std::endl;
 }
 

@@ -25,7 +25,7 @@ class Client
 		Client	&operator=(Client const &rhs);
 
 		int							AcceptClient(int listener);
-		void						SplitCmds(const string &str, const string delimiter = "\n");
+		void						SplitCmds(const string &str, const string delimiter = "\r\n");
 
 		const struct pollfd			&GetPfd(void) const;
 		const string				&GetIp() const;
