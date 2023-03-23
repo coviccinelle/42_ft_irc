@@ -84,24 +84,22 @@ void	Server::_parseRecv(char *buffer)
 {
 	string buf(buffer);
 	std::cout << buf;
-	while (1)
+	size_t i = -1;
+	if (buf.find("CAP LS") != i && buf.find("PASS") != i && buf.find("NICK") != i && buf.find("USER") != i)
 	{
-		if (buf.find("CAP LS") && buf.find("PASS") && buf.find("NICK") && buf.find("USER"))
-		{
-			std::cout << "Parsing Recv done ✅\nReady to registrer" << std::endl;
-			break ;
-		}
-		else
-		{
-			std::cout << "aaahahahha" << std::endl;
-			sleep(3);
-		}
+		std::cout << "buf = \n[" << buf << "]\n" << "Parsing Recv done ✅ --- Ready to registrer" << std::endl;
+		sleep(8);
+	}
+	else
+	{
+		std::cout << "not enough data, should wait more, for now : " << buf << std::endl;
+		sleep(8);
 	}
 }
 
 void	Server::_CloseConnection(struct pollfd &pfd)
 {
-	std::cout << "ℹ️  irc server: connection close from " << _clients[pfd.fd].getIp() << " on socket " << pfd.fd << std::endl;
+	std::cout << "ℹ️  irc server:\033[0;31m connection close \033[0;37mfrom" << _clients[pfd.fd].getIp() << " on socket " << pfd.fd << std::endl;
 	close(pfd.fd);
 	_pollfds.erase(std::vector< struct pollfd >::iterator(&pfd));
 	_clients.erase(pfd.fd);
@@ -124,7 +122,7 @@ void	Server::_ReceiveData(struct pollfd &pfd)
 			std::cerr << "⚠️  warning : recv err" << std::endl;
 		else
 		{
-			std::cout << "Hello recv buf = " << buf << std::endl;
+			std::cout << "Hello recv buf = \n" << buf << std::endl;
 			_parseRecv(buf);
 		}
 	}
