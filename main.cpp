@@ -38,19 +38,6 @@ int main(int ac, char **av)
 		std::cerr << e.what() << std::endl;
 		return (-1);
 	}
-	/*
-	try
-	{
-		std::cout << "Step 3: Server is setting up : FdMultithreading ..." << std::endl;
-		server.FdMultithreading();
-	}
-	catch (std::exception &e)
-	{
-		std::cout << "FdMultithreading Error: " << std::endl;
-		std::cerr << e.what() << std::endl;
-		return (-1);
-	}
-	*/
 	std::cout << "Server is closed. Byeee 👋👋👋" << std::endl;
 	return (0);
 }

@@ -15,6 +15,7 @@
 #include <unistd.h>
 
 #include <vector>
+#include <map>
 
 #include "../utils/utils.hpp"
 #include "../include/system_error.hpp"
@@ -35,18 +36,19 @@ class Server
 
 	private:
 		Server();
-		void _AcceptNewConnection();
-		void _ReceiveData(struct pollfd &pfd);
-		void _SendData(struct pollfd &pfd);
-		void _parseRecv(char *buf);
-		int	 _sender(int fd, char *buf);
+		void	_AcceptNewConnection();
+		void	_ReceiveData(struct pollfd &pfd);
+		void	_SendData(struct pollfd &pfd);
+		void	_parseRecv(char *buf);
+		int		_sender(int fd, char *buf);
+		void	_CloseConnection(struct pollfd &pfd);
 
 
 		std::string 					_portNumber;
 		std::string 					_password;
 		int 							_listener;
-		std::vector< Client > 			_clients;
-		std::vector< struct pollfd > 	_pollfds;
+		std::map< int, Client > 		_clients;
+		std::vector< struct pollfd >	_pollfds;
 		int								_poll_count;
 };
 

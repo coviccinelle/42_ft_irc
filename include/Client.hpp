@@ -22,16 +22,17 @@ class Client
 		Client(Client const &src);
 		Client	&operator=(Client const &rhs);
 
-		struct pollfd	getPfd(void) const;
-		int				acceptClient(int listener);
-		const string 	getStringIpAddress() const;
+		const struct pollfd		&getPfd(void) const;
+		int						AcceptClient(int listener);
+		const string			&getIp() const;
+
 	private:
 		struct pollfd			_pfd;
 		struct sockaddr_storage	_addr;
 		socklen_t				_addrSize;
-
+		string					_ip;
 };
 
-void	*getInAddr(struct sockaddr *sa);
+void			*getInAddr(struct sockaddr *sa);
 
 #endif

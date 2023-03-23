@@ -70,13 +70,13 @@ void Server::_AcceptNewConnection()
 {
 	Client client;
 
-	if (client.acceptClient(_listener) == -1)
+	if (client.AcceptClient(_listener) == -1)
 			std::cerr << "⚠️  warning: accept failed" << std::endl;
 	else
 	{
 		_pollfds.push_back(client.getPfd());
-		_clients.push_back(client);
-		std::cout << "ℹ️  irc server: connection from " << client.getStringIpAddress() << " on socket " << client.getPfd().fd << std::endl;
+		_clients.insert(std::make_pair(client.getPfd().fd, client));
+		std::cout << "ℹ️  irc server: connection from " << client.getIp() << " on socket " << client.getPfd().fd << std::endl;
 	}
 }
 
@@ -99,6 +99,14 @@ void	Server::_parseRecv(char *buffer)
 	}
 }
 
+void	Server::_CloseConnection(struct pollfd &pfd)
+{
+	std::cout << "ℹ️  irc server: connection close from " << _clients[pfd.fd].getIp() << " on socket " << pfd.fd << std::endl;
+	close(pfd.fd);
+	_pollfds.erase(std::vector< struct pollfd >::iterator(&pfd));
+	_clients.erase(pfd.fd);
+}
+
 void	Server::_ReceiveData(struct pollfd &pfd)
 {
 	pfd.revents = 0;
@@ -111,11 +119,7 @@ void	Server::_ReceiveData(struct pollfd &pfd)
 		memset(&buf, 0, sizeof(buf));
 		ret = recv(pfd.fd, buf, sizeof buf, 0); 
 		if (ret == 0)
-		{
-			std::cout << "Connection closed" << std::endl;
-			close(pfd.fd);
-			_pollfds.erase(std::vector< struct pollfd >::iterator(&pfd));
-		}
+			_CloseConnection(pfd);
 		else if (ret < 0)
 			std::cerr << "⚠️  warning : recv err" << std::endl;
 		else
@@ -162,6 +166,13 @@ void Server::ConnectionLoop()
 {
 	while (1)
 	{
+		std::cout << "Connected Logs:" << std::endl;
+		for (std::map< int, Client >::iterator it = _clients.begin(); it != _clients.end(); ++it)
+		{
+			std::cout << "clients info:" << std::endl;
+			std::cout << "	IP: " << it->second.getIp() << std::endl;
+			std::cout << "	Socket: " << it->second.getPfd().fd << std::endl;
+		}
 		if ((_poll_count = poll(_pollfds.data(), _pollfds.size(), -1)) == -1)
 			throw system_error("poll failed");
 		for (size_t i = 0; i < _pollfds.size(); ++i)
