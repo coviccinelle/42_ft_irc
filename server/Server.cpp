@@ -74,30 +74,23 @@ void Server::_AcceptNewConnection()
 			std::cerr << "⚠️  warning: accept failed" << std::endl;
 	else
 	{
-		_pollfds.push_back(client.getPfd());
-		_clients.insert(std::make_pair(client.getPfd().fd, client));
-		std::cout << "ℹ️  irc server: connection from " << client.getIp() << " on socket " << client.getPfd().fd << std::endl;
+		_pollfds.push_back(client.GetPfd());
+		_clients.insert(std::make_pair(client.GetPfd().fd, client));
+		std::cout << "ℹ️  irc server: connection from " << client.GetIp() << " on socket " << client.GetPfd().fd << std::endl;
 	}
 }
 
-void	Server::_parseRecv(char *buffer)
+void	Server::_ParseRecv(char *buffer, const struct pollfd &pfd)
 {
-	string buf(buffer);
-	std::cout << buf;
-	size_t i = -1;
-	if (buf.find("CAP LS") != i && buf.find("PASS") != i && buf.find("NICK") != i && buf.find("USER") != i)
-	{
-		std::cout << "buf = \n[" << buf << "]\n" << "Parsing Recv done ✅ --- Ready to registrer" << std::endl;
-	}
-	else
-	{
-		std::cout << "not enough data, should wait more, for now : " << buf << std::endl;
-	}
+	_clients[pfd.fd].SplitCmds(string(buffer));
+	for (std::vector<string>::const_iterator it = _clients[pfd.fd].GetCmds().begin(); it != _clients[pfd.fd].GetCmds().end(); ++it)
+		std::cout << "cmd : " << *it << std::endl;
+	std::cout << "Parsing Recv done ✅ --- Ready to registrer" << std::endl;
 }
 
 void	Server::_CloseConnection(struct pollfd &pfd)
 {
-	std::cout << "ℹ️  irc server:\033[0;31m connection close \033[0;37mfrom " << _clients[pfd.fd].getIp() << " on socket " << pfd.fd << std::endl;
+	std::cout << "ℹ️  irc server:\033[0;31m connection close \033[0;37mfrom " << _clients[pfd.fd].GetIp() << " on socket " << pfd.fd << std::endl;
 	_clients.erase(pfd.fd);
 	close(pfd.fd);
 	_pollfds.erase(std::vector< struct pollfd >::iterator(&pfd));
@@ -119,14 +112,11 @@ void	Server::_ReceiveData(struct pollfd &pfd)
 		else if (ret < 0)
 			std::cerr << "⚠️  warning : recv err" << std::endl;
 		else
-		{
-			std::cout << "Hello recv buf = \n" << buf << std::endl;
-			_parseRecv(buf);
-		}
+			_ParseRecv(buf, pfd);
 	}
 }
 
-int Server::_sender(int fd, char *buf)
+int Server::_Sender(int fd, char *buf)
 {
 	int ret;
 	memset(&buf, 0, sizeof(buf));
@@ -144,7 +134,7 @@ void Server::_SendData(struct pollfd &pfd)
 	{
 		int ret;
 		char buf[512] = "Coucou from server\n";
-		if ((ret = _sender(pfd.fd, buf)) == -1)
+		if ((ret = _Sender(pfd.fd, buf)) == -1)
 			std::cerr << "⚠️ warning : send err" << std::endl;
 	}
 	else
@@ -165,8 +155,8 @@ void Server::Logs() const
 	for (std::map< int, Client >::const_iterator it = _clients.begin(); it != _clients.end(); ++it)
 	{
 		std::cout << "	clients info:" << std::endl;
-		std::cout << "		IP: " << it->second.getIp() << std::endl;
-		std::cout << "		Socket: " << it->second.getPfd().fd << std::endl;
+		std::cout << "		IP: " << it->second.GetIp() << std::endl;
+		std::cout << "		Socket: " << it->second.GetPfd().fd << std::endl;
 	}
 	std::cout << "=======================" << std::endl;
 }

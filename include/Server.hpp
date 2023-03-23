@@ -40,8 +40,8 @@ class Server
 		void	_AcceptNewConnection();
 		void	_ReceiveData(struct pollfd &pfd);
 		void	_SendData(struct pollfd &pfd);
-		void	_parseRecv(char *buf);
-		int		_sender(int fd, char *buf);
+		void	_ParseRecv(char *buffer, const struct pollfd &pfd);
+		int		_Sender(int fd, char *buf);
 		void	_CloseConnection(struct pollfd &pfd);
 
 
@@ -51,7 +51,6 @@ class Server
 		std::map< int, Client > 		_clients;
 		std::vector< struct pollfd >	_pollfds;
 		int								_poll_count;
-		Client							_client;
 };
 
 #endif

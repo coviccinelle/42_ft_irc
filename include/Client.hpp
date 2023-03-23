@@ -12,6 +12,8 @@
 #include <unistd.h>
 #include <cstring>
 
+#include <vector>
+
 #include "../utils/utils.hpp"
 
 class Client
@@ -22,17 +24,21 @@ class Client
 		Client(Client const &src);
 		Client	&operator=(Client const &rhs);
 
-		const struct pollfd		&getPfd(void) const;
-		int						AcceptClient(int listener);
-		const string			&getIp() const;
+		int							AcceptClient(int listener);
+		void						SplitCmds(const string &str, const string delimiter = "\n");
+
+		const struct pollfd			&GetPfd(void) const;
+		const string				&GetIp() const;
+		const std::vector<string>	&GetCmds() const;
 
 	private:
 		struct pollfd			_pfd;
 		struct sockaddr_storage	_addr;
 		socklen_t				_addrSize;
 		string					_ip;
+		std::vector< string >	_cmds;
 };
 
-void			*getInAddr(struct sockaddr *sa);
+void			*GetInAddr(struct sockaddr *sa);
 
 #endif
