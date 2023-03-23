@@ -9,7 +9,6 @@
 #include <fcntl.h> // pour les flags F_SETFL et O_NONBLOCK
 #include <signal.h>
 #include <poll.h>
-#include <arpa/inet.h>
 
 #include <cstring>
 #include <cstdlib>
@@ -38,12 +37,15 @@ class Server
 		Server();
 		void _AcceptNewConnection();
 		void _ReceiveData(struct pollfd &pfd);
+		void _SendData(struct pollfd &pfd);
+		void _parseRecv(char *buf);
+		int	 _sender(int fd, char *buf);
 
 
 		std::string 					_portNumber;
 		std::string 					_password;
 		int 							_listener;
-		std::vector< Client > 			_connectedClients;
+		std::vector< Client > 			_clients;
 		std::vector< struct pollfd > 	_pollfds;
 		int								_poll_count;
 };

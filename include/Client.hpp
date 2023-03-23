@@ -5,26 +5,33 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netdb.h>
+#include <signal.h>
+#include <poll.h>
+#include <arpa/inet.h>
 
 #include <unistd.h>
+#include <cstring>
 
 #include "../utils/utils.hpp"
 
 class Client
 {
 	public:
-		Client(int fd, const struct sockaddr_storage &addr, const socklen_t &size);
-		~Client(void);
+		Client();
+		~Client();
 		Client(Client const &src);
 		Client	&operator=(Client const &rhs);
-		int	getSockfd(void) const;
+
+		struct pollfd	getPfd(void) const;
+		int				acceptClient(int listener);
+		const string 	getStringIpAddress() const;
 	private:
-		Client(void);
-		int			 			_sockfd;
+		struct pollfd			_pfd;
 		struct sockaddr_storage	_addr;
 		socklen_t				_addrSize;
-//		std::string 	_nick;
 
 };
+
+void	*getInAddr(struct sockaddr *sa);
 
 #endif

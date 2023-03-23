@@ -43,7 +43,7 @@ void	Server::AwaitingConnectionQueue()
 	{
 		if ((_listener = socket(res->ai_family, res->ai_socktype, res->ai_protocol)) == -1)
 		{
-			std::cerr << "warning: server socket creation failed" << std::endl;
+			std::cerr << "⚠️  warning: server socket creation failed" << std::endl;
 			continue;
 		}
 		if (fcntl(_listener, F_SETFL, O_NONBLOCK) == -1)
@@ -53,7 +53,7 @@ void	Server::AwaitingConnectionQueue()
 		if (bind(_listener, res->ai_addr, res->ai_addrlen) == -1)
 		{
 			close(_listener);
-			std::cerr << "warning: server bind failed" << std::endl;
+			std::cerr << "⚠️   warning: server bind failed" << std::endl;
 			continue;
 		}
 		break;
@@ -65,42 +65,41 @@ void	Server::AwaitingConnectionQueue()
 		throw system_error("listen failed");
 }
 
-void	*get_in_addr(struct sockaddr *sa)
-{
-	if (sa->sa_family == AF_INET)
-		return &(((struct sockaddr_in*)sa)->sin_addr);
-	return &(((struct sockaddr_in6*)sa)->sin6_addr);
-}
-
-const string get_str_ip(const struct sockaddr_storage &addr)
-{
-	char ip[INET6_ADDRSTRLEN];
-
-	memset(&ip, 0, INET6_ADDRSTRLEN);
-	inet_ntop(addr.ss_family, get_in_addr((struct sockaddr *)&addr), ip, INET6_ADDRSTRLEN);
-	return (string(ip));
-}
 
 void Server::_AcceptNewConnection()
 {
-	socklen_t				addrSize;
-	struct pollfd 			new_pfd;
-	struct sockaddr_storage	addr;
+	Client client;
 
-	addrSize = sizeof(addr);
-	memset(&addr, 0, sizeof(addr));
-	memset(&new_pfd, 0, sizeof(new_pfd));
-	new_pfd.events = POLLIN;
-	if ((new_pfd.fd = accept(_listener, (struct sockaddr *)&addr, &addrSize)) == -1)
-			std::cerr << "warning: accept failed" << std::endl;
+	if (client.acceptClient(_listener) == -1)
+			std::cerr << "⚠️  warning: accept failed" << std::endl;
 	else
 	{
-		_pollfds.push_back(new_pfd);
-		std::cout << "info: irc server: connection from "<< get_str_ip(addr) << " on socket " << new_pfd.fd << std::endl;
+		_pollfds.push_back(client.getPfd());
+		_clients.push_back(client);
+		std::cout << "ℹ️  irc server: connection from " << client.getStringIpAddress() << " on socket " << client.getPfd().fd << std::endl;
 	}
 }
 
-void Server::_ReceiveData(struct pollfd &pfd)
+void	Server::_parseRecv(char *buffer)
+{
+	string buf(buffer);
+	std::cout << buf;
+	while (1)
+	{
+		if (buf.find("CAP LS") && buf.find("PASS") && buf.find("NICK") && buf.find("USER"))
+		{
+			std::cout << "Parsing Recv done ✅\nReady to registrer" << std::endl;
+			break ;
+		}
+		else
+		{
+			std::cout << "aaahahahha" << std::endl;
+			sleep(3);
+		}
+	}
+}
+
+void	Server::_ReceiveData(struct pollfd &pfd)
 {
 	pfd.revents = 0;
 	if (pfd.fd == _listener)
@@ -111,7 +110,6 @@ void Server::_ReceiveData(struct pollfd &pfd)
 		char buf[512];
 		memset(&buf, 0, sizeof(buf));
 		ret = recv(pfd.fd, buf, sizeof buf, 0); 
-		std::cout << "Hello recv buf = " << buf << std::endl;
 		if (ret == 0)
 		{
 			std::cout << "Connection closed" << std::endl;
@@ -119,8 +117,39 @@ void Server::_ReceiveData(struct pollfd &pfd)
 			_pollfds.erase(std::vector< struct pollfd >::iterator(&pfd));
 		}
 		else if (ret < 0)
-			std::cerr << "warning : recv err" << std::endl;
+			std::cerr << "⚠️  warning : recv err" << std::endl;
+		else
+		{
+			std::cout << "Hello recv buf = " << buf << std::endl;
+			_parseRecv(buf);
+		}
 	}
+}
+
+int Server::_sender(int fd, char *buf)
+{
+	int ret;
+	memset(&buf, 0, sizeof(buf));
+	std::cout << "Sending buf = " << buf << std::endl;
+	ret = send(fd, buf, sizeof buf, 0);
+	return (ret);
+}
+
+
+void Server::_SendData(struct pollfd &pfd)
+{
+	pfd.revents = 0;
+	pfd.events = POLLOUT;
+	if (pfd.fd != _listener)
+	{
+		int ret;
+		char buf[512] = "Coucou from server\n";
+		if ((ret = _sender(pfd.fd, buf)) == -1)
+			std::cerr << "⚠️ warning : send err" << std::endl;
+	}
+	else
+		std::cerr << "⚠️  warning: euhhh it's the POLLOUT listener fd " << std::endl;
+
 }
 
 void Server::InitConnectionLoop()
@@ -137,10 +166,13 @@ void Server::ConnectionLoop()
 			throw system_error("poll failed");
 		for (size_t i = 0; i < _pollfds.size(); ++i)
 		{
-			if (_pollfds[i].revents & POLLIN || _pollfds[i].revents & POLLRDHUP)
+			if (_pollfds[i].revents & POLLIN)
 				_ReceiveData(_pollfds[i]);
 			else
+			{
 				std::cout << "ready for pollout" << std::endl;
+//				_SendData(_pollfds[i]);
+			}
 		}
 		std::cout << "listening" << std::endl;
 	}

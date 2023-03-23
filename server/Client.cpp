@@ -1,35 +1,54 @@
 #include "../include/Client.hpp"
 
-Client::Client(int fd, const struct sockaddr_storage &addr, const socklen_t &size) :
-	_sockfd(fd),
-	_addr(addr),
-	_addrSize(size)
+Client::Client() :
+	_addrSize(sizeof(_addr))
 {
-	std::cout << "construct" << std::endl;
+	_pfd.events = POLLIN;
 	return ;
 }
 
 Client::~Client(void)
 {
 	std::cout << "Client destroyed" << std::endl;
-	close(_sockfd);
 	return ;
 }
 
 Client::Client(Client const &src)
 {
-	_sockfd = src._sockfd;
+	_pfd = src._pfd;
 
 	return ;
 }
 
 Client &Client::operator=(Client const &rhs)
 {
-	_sockfd = rhs._sockfd;
+	_pfd = rhs._pfd;
 	return (*this);
 }
 
-int	Client::getSockfd(void) const
+int Client::acceptClient(int listener)
 {
-	return (_sockfd);
+	return (_pfd.fd = accept(listener, (struct sockaddr *)&_addr, &_addrSize));
+}
+
+struct pollfd	Client::getPfd(void) const
+{
+	return (_pfd);
+}
+
+void	*getInAddr(struct sockaddr *sa)
+{
+	if (sa->sa_family == AF_INET)
+		return &(((struct sockaddr_in*)sa)->sin_addr);
+	return &(((struct sockaddr_in6*)sa)->sin6_addr);
+}
+
+
+const string Client::getStringIpAddress() const
+{
+	char ip[INET6_ADDRSTRLEN];
+
+	memset(&ip, 0, INET6_ADDRSTRLEN);
+	inet_ntop(_addr.ss_family, getInAddr((struct sockaddr *)&_addr), ip, INET6_ADDRSTRLEN);
+	return (string(ip));
 }
