@@ -36,7 +36,7 @@ class Server
 	private:
 		Server();
 		void _AcceptNewConnection();
-		void _ReceiveData(const std::vector< struct pollfd >::iterator &pos);
+		void _ReceiveData(struct pollfd &pfd);
 
 
 		std::string 					_portNumber;

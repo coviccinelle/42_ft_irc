@@ -68,36 +68,39 @@ void	Server::AwaitingConnectionQueue()
 void Server::_AcceptNewConnection()
 {
 	socklen_t				addrSize;
-	struct pollfd 			new_fd;
+	struct pollfd 			new_pfd;
 	struct sockaddr_storage	addr;
 
 	addrSize = 0;
 	memset(&addr, 0, sizeof(addr));
-	memset(&new_fd, 0, sizeof(new_fd));
-	if ((new_fd.fd = accept(_listener, (struct sockaddr *)&addr, &addrSize)) == -1)
+	memset(&new_pfd, 0, sizeof(new_pfd));
+	if ((new_pfd.fd = accept(_listener, (struct sockaddr *)&addr, &addrSize)) == -1)
 			std::cerr << "warning: accept failed" << std::endl;
 	else
 	{
-		_pollfds.push_back(new_fd);
-		std::cout << "connection from "<< "ip (TODO) " << "accepted ! fd: " << new_fd.fd << std::endl;
+		new_pfd.events = POLLIN;
+		_pollfds.push_back(new_pfd);
+		std::cout << "connection from "<< "ip (TODO) " << "accepted ! fd: " << new_pfd.fd << std::endl;
 	}
 }
 
-void Server::_ReceiveData(const std::vector< struct pollfd >::iterator &pos)
+void Server::_ReceiveData(struct pollfd &pfd)
 {
-	if (pos->fd == _listener)
+	pfd.revents = 0;
+	if (pfd.fd == _listener)
 		_AcceptNewConnection();
 	else
 	{
 		int ret;
 		char buf[512];
-		ret = recv(pos->fd, buf, sizeof buf, 0); 
+		memset(&buf, 0, sizeof(buf));
+		ret = recv(pfd.fd, buf, sizeof buf, 0); 
 		std::cout << "Hello recv buf = " << buf << std::endl;
 		if (ret == 0)
 		{
 			std::cout << "Connection closed" << std::endl;
-			close(pos->fd);
-			_pollfds.erase(pos);
+			close(pfd.fd);
+			_pollfds.erase(std::vector< struct pollfd >::iterator(&pfd));
 		}
 		else if (ret < 0)
 			std::cerr << "warning : recv err" << std::endl;
@@ -116,23 +119,12 @@ void Server::ConnectionLoop()
 	{
 		if ((_poll_count = poll(_pollfds.data(), _pollfds.size(), -1)) == -1)
 			throw system_error("poll failed");
-		for (std::vector< struct pollfd >::iterator it = _pollfds.begin(); it != _pollfds.end(); ++it)
+		for (size_t i = 0; i < _pollfds.size(); ++i)
 		{
-			if (it->revents & POLLIN)
-				_ReceiveData(it);
-			else if (it->revents & POLLOUT)
-			{
-				std::cout << "pollout" << std::endl;
-			}
+			if (_pollfds[i].revents & POLLIN || _pollfds[i].revents & POLLRDHUP)
+				_ReceiveData(_pollfds[i]);
 			else
-			{
-//				if (it->fd != _listener)
-//				{
-//					std::cout << "Connection closed" << std::endl;
-//					close(it->fd);
-//					it = _pollfds.erase(it);
-//				}
-			}
+				std::cout << "ready for pollout" << std::endl;
 		}
 		std::cout << "listening" << std::endl;
 	}
