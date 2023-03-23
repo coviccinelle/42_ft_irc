@@ -160,17 +160,23 @@ void Server::InitConnectionLoop()
 	_pollfds[0].events = POLLIN;
 }
 
+void Server::Logs() const
+{
+	std::cout << "=======================" << std::endl;
+	std::cout << "Connection Logs:" << std::endl;
+	for (std::map< int, Client >::const_iterator it = _clients.begin(); it != _clients.end(); ++it)
+	{
+		std::cout << "	clients info:" << std::endl;
+		std::cout << "		IP: " << it->second.getIp() << std::endl;
+		std::cout << "		Socket: " << it->second.getPfd().fd << std::endl;
+	}
+	std::cout << "=======================" << std::endl;
+}
+
 void Server::ConnectionLoop()
 {
 	while (1)
 	{
-		std::cout << "Connected Logs:" << std::endl;
-		for (std::map< int, Client >::iterator it = _clients.begin(); it != _clients.end(); ++it)
-		{
-			std::cout << "clients info:" << std::endl;
-			std::cout << "	IP: " << it->second.getIp() << std::endl;
-			std::cout << "	Socket: " << it->second.getPfd().fd << std::endl;
-		}
 		if ((_poll_count = poll(_pollfds.data(), _pollfds.size(), -1)) == -1)
 			throw system_error("poll failed");
 		for (size_t i = 0; i < _pollfds.size(); ++i)
@@ -183,6 +189,6 @@ void Server::ConnectionLoop()
 //				_SendData(_pollfds[i]);
 			}
 		}
-		std::cout << "listening" << std::endl;
+		Logs();
 	}
 }

@@ -32,6 +32,7 @@ class Server
 
 		void		AwaitingConnectionQueue();
 		void		InitConnectionLoop();
+		void 		Logs() const;
 		void 		ConnectionLoop();
 
 	private:
@@ -50,6 +51,7 @@ class Server
 		std::map< int, Client > 		_clients;
 		std::vector< struct pollfd >	_pollfds;
 		int								_poll_count;
+		Client							_client;
 };
 
 #endif
