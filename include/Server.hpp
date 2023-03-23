@@ -9,6 +9,7 @@
 #include <fcntl.h> // pour les flags F_SETFL et O_NONBLOCK
 #include <signal.h>
 #include <poll.h>
+#include <arpa/inet.h>
 
 #include <cstring>
 #include <cstdlib>

@@ -65,22 +65,38 @@ void	Server::AwaitingConnectionQueue()
 		throw system_error("listen failed");
 }
 
+void	*get_in_addr(struct sockaddr *sa)
+{
+	if (sa->sa_family == AF_INET)
+		return &(((struct sockaddr_in*)sa)->sin_addr);
+	return &(((struct sockaddr_in6*)sa)->sin6_addr);
+}
+
+const string get_str_ip(const struct sockaddr_storage &addr)
+{
+	char ip[INET6_ADDRSTRLEN];
+
+	memset(&ip, 0, INET6_ADDRSTRLEN);
+	inet_ntop(addr.ss_family, get_in_addr((struct sockaddr *)&addr), ip, INET6_ADDRSTRLEN);
+	return (string(ip));
+}
+
 void Server::_AcceptNewConnection()
 {
 	socklen_t				addrSize;
 	struct pollfd 			new_pfd;
 	struct sockaddr_storage	addr;
 
-	addrSize = 0;
+	addrSize = sizeof(addr);
 	memset(&addr, 0, sizeof(addr));
 	memset(&new_pfd, 0, sizeof(new_pfd));
+	new_pfd.events = POLLIN;
 	if ((new_pfd.fd = accept(_listener, (struct sockaddr *)&addr, &addrSize)) == -1)
 			std::cerr << "warning: accept failed" << std::endl;
 	else
 	{
-		new_pfd.events = POLLIN;
 		_pollfds.push_back(new_pfd);
-		std::cout << "connection from "<< "ip (TODO) " << "accepted ! fd: " << new_pfd.fd << std::endl;
+		std::cout << "info: irc server: connection from "<< get_str_ip(addr) << " on socket " << new_pfd.fd << std::endl;
 	}
 }
 
