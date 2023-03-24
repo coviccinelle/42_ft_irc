@@ -27,18 +27,23 @@ class Client
 		int							AcceptClient(int listener);
 		void						SplitCmds(const string &str, const string delimiter = "\r\n");
 
-		const struct pollfd			&GetPfd(void) const;
+		int							GetFd(void) const;
 		const string				&GetIp() const;
-		const std::vector<string>	&GetCmds() const;
+		cst_vec_vec_str				&GetCmds() const;
+		bool						IsConnected() const;
+		int							ParseRecv(const string &buf);
+
+		void						SetConnected(bool b);
 
 	private:
-		struct pollfd			_pfd;
-		struct sockaddr_storage	_addr;
-		socklen_t				_addrSize;
-		string					_ip;
-		std::vector< string >	_cmds;
+		int							_fd;
+		struct sockaddr_storage		_addr;
+		socklen_t					_addrSize;
+		string						_ip;
+		vec_vec_str					_cmds;
 };
 
-void			*GetInAddr(struct sockaddr *sa);
+void								*GetInAddr(struct sockaddr *sa);
+vec_str								Split(const string &str, const string delimiter = " ");
 
 #endif

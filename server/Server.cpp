@@ -68,33 +68,24 @@ void	Server::AwaitingConnectionQueue()
 
 void Server::_AcceptNewConnection()
 {
-	Client client;
+	Client			client;
+	int				new_fd;
 
-	if (client.AcceptClient(_listener) == -1)
-			std::cerr << "⚠️  warning: accept failed" << std::endl;
+	new_fd = client.AcceptClient(_listener);
+	if (new_fd == -1)
+		std::cerr << "⚠️  warning: accept failed" << std::endl;
 	else
 	{
-		_pollfds.push_back(client.GetPfd());
-		_clients.insert(std::make_pair(client.GetPfd().fd, client));
-		std::cout << "ℹ️  irc server: connection from " << client.GetIp() << " on socket " << client.GetPfd().fd << std::endl;
-	}
-}
+		struct pollfd	new_pfd;
 
-void	Server::_ParseRecv(char *buffer, const struct pollfd &pfd)
-{
-	_clients[pfd.fd].SplitCmds(string(buffer));
-	if (_clients[pfd.fd].GetCmds().empty())
-	{
-		std::cerr << "⚠️  warning : empty commands" << std::endl;
-		return ;
+		new_pfd.revents = 0;
+		new_pfd.fd = new_fd;
+		new_pfd.events = POLLIN;
+
+		_pollfds.push_back(new_pfd);
+		_clients.insert(std::make_pair(new_fd, client));
+		std::cout << "ℹ️  irc server: connection from " << client.GetIp() << " on socket " << client.GetFd() << std::endl;
 	}
-	for (std::vector<string>::const_iterator it = _clients[pfd.fd].GetCmds().begin(); it != _clients[pfd.fd].GetCmds().end(); ++it)
-		std::cout << "cmd : " << "[" << *it << "]" << std::endl;
-	if (_clients[pfd.fd].GetCmds()[1] == string("PASS " + _password))
-		std::cout << "success" << std::endl;
-	else
-		std::cout << "refused connection" << std::endl;
-	std::cout << "Parsing Recv done ✅ --- Ready to registrer" << std::endl;
 }
 
 void	Server::_CloseConnection(struct pollfd &pfd)
@@ -102,7 +93,7 @@ void	Server::_CloseConnection(struct pollfd &pfd)
 	std::cout << "ℹ️  irc server:\033[0;31m connection close \033[0;37mfrom " << _clients[pfd.fd].GetIp() << " on socket " << pfd.fd << std::endl;
 	_clients.erase(pfd.fd);
 	close(pfd.fd);
-	_pollfds.erase(std::vector< struct pollfd >::iterator(&pfd));
+	_pollfds.erase(vec_pfd::iterator(&pfd));
 }
 
 void	Server::_ReceiveData(struct pollfd &pfd)
@@ -114,6 +105,7 @@ void	Server::_ReceiveData(struct pollfd &pfd)
 	{
 		int ret;
 		char buf[512];
+
 		memset(&buf, 0, sizeof(buf));
 		ret = recv(pfd.fd, buf, sizeof buf, 0); 
 		if (ret == 0)
@@ -121,7 +113,12 @@ void	Server::_ReceiveData(struct pollfd &pfd)
 		else if (ret < 0)
 			std::cerr << "⚠️  warning : recv err" << std::endl;
 		else
-			_ParseRecv(buf, pfd);
+		{
+			Client client(_clients[pfd.fd]);
+
+			if (client.ParseRecv(buf) == -1)
+				return ;
+		}
 	}
 }
 
@@ -155,6 +152,7 @@ void Server::InitConnectionLoop()
 {
 	_pollfds[0].fd = _listener;
 	_pollfds[0].events = POLLIN;
+	_pollfds[0].revents = 0;
 }
 
 void Server::Logs() const
@@ -165,7 +163,7 @@ void Server::Logs() const
 	{
 		std::cout << "	clients info:" << std::endl;
 		std::cout << "		IP: " << it->second.GetIp() << std::endl;
-		std::cout << "		Socket: " << it->second.GetPfd().fd << std::endl;
+		std::cout << "		Socket: " << it->second.GetFd() << std::endl;
 	}
 	std::cout << "=======================" << std::endl;
 }
@@ -182,11 +180,6 @@ void Server::ConnectionLoop()
 		{
 			if (_pollfds[i].revents & POLLIN)
 				_ReceiveData(_pollfds[i]);
-			else
-			{
-				std::cout << "ready for pollout" << std::endl;
-//				_SendData(_pollfds[i]);
-			}
 		}
 		Logs();
 	}
