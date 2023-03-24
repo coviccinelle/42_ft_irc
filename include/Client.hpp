@@ -31,7 +31,7 @@ class Client
 		const string				&GetIp() const;
 		cst_vec_vec_str				&GetCmds() const;
 		bool						IsConnected() const;
-		int							ParseRecv(const string &buf);
+		int							ParseRecv(const string &buf, const string &pass);
 
 		void						SetConnected(bool b);
 

@@ -116,7 +116,7 @@ void	Server::_ReceiveData(struct pollfd &pfd)
 		{
 			Client client(_clients[pfd.fd]);
 
-			if (client.ParseRecv(buf) == -1)
+			if (client.ParseRecv(buf, _password) == -1)
 				return ;
 		}
 	}
@@ -170,12 +170,14 @@ void Server::Logs() const
 
 void Server::ConnectionLoop()
 {
+	std::cout << "port [" << _portNumber << "] password [" << _password << "]" << std::endl;
 	while (1)
 	{
 		if ((_poll_count = poll(_pollfds.data(), _pollfds.size(), -1)) == -1)
 			throw system_error("poll failed");
 		system("clear");
-		std::cout << "----------[ IRC ]---------" << std::endl;
+		std::cout << "------------[ IRC ]------------" << std::endl;
+		std::cout << "port [" << _portNumber << "] password [" << _password << "]" << std::endl;
 		for (size_t i = 0; i < _pollfds.size(); ++i)
 		{
 			if (_pollfds[i].revents & POLLIN)

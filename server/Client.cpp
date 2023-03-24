@@ -78,7 +78,7 @@ void Client::SplitCmds(const string &str, const string delimiter)
 		_cmds.push_back(Split(*it));
 }
 
-int	Client::ParseRecv(const string &buf)
+int	Client::ParseRecv(const string &buf, const string &pass)
 {
 	SplitCmds(buf);
 
@@ -87,10 +87,12 @@ int	Client::ParseRecv(const string &buf)
 		std::cerr << "⚠️  warning : empty commands" << std::endl;
 		return (-1);
 	}
-	for (size_t i = 0; i < _cmds.size(); ++i)
+
+	while (_cmds.empty() == 0)
 	{
-		vec_str::const_iterator start = _cmds[i].begin();
-		vec_str::const_iterator end = _cmds[i].end();
+		vec_str::const_iterator start = _cmds[0].begin();
+		vec_str::const_iterator end = _cmds[0].end();
+
 		for (vec_str::const_iterator j = start; j != end; ++j)
 		{
 			if (*j == string("CAP") &&
@@ -101,13 +103,23 @@ int	Client::ParseRecv(const string &buf)
 				std::cout << "CAP LS checked" << std::endl;
 				break ;
 			}
+			else if (*j == string("PASS") &&
+				j + 1 != end &&
+				j + 2 == end)
+			{
+				if (*(j + 1) == pass)
+					std::cout << "correct pass" << std::endl;
+				else
+					std::cout << "invalid pass" << std::endl;
+				break ;
+			}
 			else
 			{
 				std::cout << "CAP LS failed" << std::endl;
 				break ;
 			}
 		}
-		_cmds.erase(_cmds.begin() + i);
+		_cmds.erase(_cmds.begin());
 	}
 	return (0);
 }

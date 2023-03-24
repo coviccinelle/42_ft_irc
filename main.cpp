@@ -23,7 +23,7 @@ const string&	parseArgs(int ac, char **av)
 int main(int ac, char **av)
 {
 	system("clear");
-	std::cout << "----------[ IRC ]---------" << std::endl;
+	std::cout << "------------[ IRC ]------------" << std::endl;
 	try
 	{
 		string portNumber(parseArgs(ac, av));
