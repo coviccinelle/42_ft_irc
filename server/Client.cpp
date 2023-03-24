@@ -4,7 +4,8 @@ Client::Client() :
 	_fd(0),
 	_addrSize(sizeof(_addr)),
 	_ip(""),
-	_cmds(0)
+	_cmds(0),
+	_validpass(false)
 {
 	memset(&_addr, 0, sizeof(_addr));
 	return ;
@@ -22,6 +23,7 @@ Client::Client(Client const &src)
 	_fd = src._fd;
 	_ip = src._ip;
 	_cmds = src._cmds;
+	_validpass = src._validpass;
 	return ;
 }
 
@@ -34,6 +36,7 @@ Client &Client::operator=(Client const &rhs)
 	_fd = rhs._fd;
 	_ip = rhs._ip;
 	_cmds = rhs._cmds;
+	_validpass = rhs._validpass;
 
 	return (*this);
 }
@@ -95,27 +98,28 @@ int	Client::ParseRecv(const string &buf, const string &pass)
 
 		for (vec_str::const_iterator j = start; j != end; ++j)
 		{
-			if (*j == string("CAP") &&
-				j + 1 != end &&
-				*(j + 1) == string("LS") &&
-				j + 2 == end)
+			if (_cmds[0].size() == 2 &&
+				*j == string("CAP") &&
+				*(j + 1) == string("LS"))
 			{
 				std::cout << "CAP LS checked" << std::endl;
 				break ;
 			}
-			else if (*j == string("PASS") &&
-				j + 1 != end &&
-				j + 2 == end)
+			else if (_cmds[0].size() == 2 &&
+				*j == string("PASS"))
 			{
 				if (*(j + 1) == pass)
-					std::cout << "correct pass" << std::endl;
+				{
+					std::cout << "PASS valid password" << std::endl;
+					_validpass = true;
+				}
 				else
-					std::cout << "invalid pass" << std::endl;
+					std::cout << "wrong password" << std::endl;
 				break ;
 			}
 			else
 			{
-				std::cout << "CAP LS failed" << std::endl;
+				std::cout << "unknow command" << std::endl;
 				break ;
 			}
 		}

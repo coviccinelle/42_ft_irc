@@ -41,6 +41,7 @@ class Client
 		socklen_t					_addrSize;
 		string						_ip;
 		vec_vec_str					_cmds;
+		bool						_validpass;
 };
 
 void								*GetInAddr(struct sockaddr *sa);
