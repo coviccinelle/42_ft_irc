@@ -59,7 +59,7 @@ void	Server::AwaitingConnectionQueue()
 		break;
 	}
 	if (p == NULL)
-		throw system_error("fatal: socket binding failed");
+		throw system_error("💀 fatal: socket binding failed");
 	freeaddrinfo(res);
 	if (listen(_listener, MAX_LISTEN) == -1)
 		throw system_error("listen failed");
@@ -76,7 +76,7 @@ void Server::_AcceptNewConnection()
 	{
 		_pollfds.push_back(client.GetPfd());
 		_clients.insert(std::make_pair(client.GetPfd().fd, client));
-		std::cout << "ℹ️  irc server: connection from " << client.GetIp() << " on socket " << client.GetPfd().fd << std::endl;
+		std::cout << "ℹ️  irc server: \033[0;32mconnection etablished\033[0;37m from " << client.GetIp() << " on socket " << client.GetPfd().fd << std::endl;
 	}
 }
 
