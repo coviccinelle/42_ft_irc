@@ -68,7 +68,7 @@ void	Server::AwaitingConnectionQueue()
 
 void Server::_AcceptNewConnection()
 {
-	Client			client;
+	Client			client(_password);
 	int				new_fd;
 
 	new_fd = client.AcceptClient(_listener);
@@ -116,7 +116,7 @@ void	Server::_ReceiveData(struct pollfd &pfd)
 		{
 			Client client(_clients[pfd.fd]);
 
-			if (client.ParseRecv(buf, _password) == -1)
+			if (client.ParseRecv(buf) == -1)
 				return ;
 		}
 	}

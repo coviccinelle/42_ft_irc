@@ -1,13 +1,15 @@
 #include "../include/Client.hpp"
 
-Client::Client() :
+Client::Client(const string &pass) :
 	_fd(0),
 	_addrSize(sizeof(_addr)),
 	_ip(""),
 	_cmds(0),
-	_validpass(false)
+	_validPass(false),
+	_servPass(pass)
 {
 	memset(&_addr, 0, sizeof(_addr));
+	_mapCmd["PASS"] = PASS;
 	return ;
 }
 
@@ -23,7 +25,7 @@ Client::Client(Client const &src)
 	_fd = src._fd;
 	_ip = src._ip;
 	_cmds = src._cmds;
-	_validpass = src._validpass;
+	_validPass = src._validPass;
 	return ;
 }
 
@@ -36,7 +38,7 @@ Client &Client::operator=(Client const &rhs)
 	_fd = rhs._fd;
 	_ip = rhs._ip;
 	_cmds = rhs._cmds;
-	_validpass = rhs._validpass;
+	_validPass = rhs._validPass;
 
 	return (*this);
 }
@@ -93,10 +95,21 @@ void Client::SplitCmds(const string &str, const string delimiter)
 	}
 }
 
-int	Client::ParseRecv(const string &buf, const string &pass)
+void	Client::ExecCommand(cst_vec_str &cmd)
+{
+	switch (_mapCmd[cmd[0]])
+	{
+		case PASS:
+			std::cout << cmd[1] << std::endl;
+			break ;
+		default :
+			std::cout << "Unknow command" << std::endl;
+	}
+}
+
+int	Client::ParseRecv(const string &buf)
 {
 	SplitCmds(buf);
-	(void) pass;
 
 	if (_cmds.empty())
 	{
@@ -106,40 +119,13 @@ int	Client::ParseRecv(const string &buf, const string &pass)
 
 	while (_cmds.empty() == 0)
 	{
-		vec_str::const_iterator start = _cmds[0].begin();
-		vec_str::const_iterator end = _cmds[0].end();
+		ExecCommand(_cmds[0]);
 
-		for (vec_str::const_iterator j = start; j != end; ++j)
-		{
-			std::cout <<  "[" << *j << "]";
-			/*
-			if (_cmds[0].size() == 2 &&
-				*j == string("CAP") &&
-				*(j + 1) == string("LS"))
-			{
-				std::cout << "CAP LS checked" << std::endl;
-				break ;
-			}
-			else if (_cmds[0].size() == 2 &&
-				*j == string("PASS"))
-			{
-				if (*(j + 1) == pass)
-				{
-					std::cout << "PASS valid password" << std::endl;
-					_validpass = true;
-				}
-				else
-					std::cout << "wrong password" << std::endl;
-				break ;
-			}
-			else
-			{
-				std::cout << "unknow command" << std::endl;
-				break ;
-			}
-			*/
-		}
-		std::cout << std::endl;
+//		for (vec_str::const_iterator j = start; j != end; ++j)
+//		{
+//			std::cout <<  "[" << *j << "]";
+//		}
+//		std::cout << std::endl;
 		_cmds.erase(_cmds.begin());
 	}
 	return (0);

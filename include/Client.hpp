@@ -4,10 +4,15 @@
 #include "../utils/utils.hpp"
 #include "../include/system_error.hpp"
 
+enum CmdVal {
+	UNKNOWN = 0,
+	PASS
+};
+
 class Client
 {
 	public:
-		Client();
+		Client(const string &pass = "");
 		~Client();
 		Client(Client const &src);
 		Client	&operator=(Client const &rhs);
@@ -19,7 +24,8 @@ class Client
 		const string				&GetIp() const;
 		cst_vec_vec_str				&GetCmds() const;
 		bool						IsConnected() const;
-		int							ParseRecv(const string &buf, const string &pass);
+		void						ExecCommand(cst_vec_str &cmd);
+		int							ParseRecv(const string &buf);
 
 		void						SetConnected(bool b);
 
@@ -29,7 +35,9 @@ class Client
 		socklen_t					_addrSize;
 		string						_ip;
 		vec_vec_str					_cmds;
-		bool						_validpass;
+		bool						_validPass;
+		string						_servPass;
+		std::map< string, CmdVal >	_mapCmd;
 };
 
 void								*GetInAddr(struct sockaddr *sa);
