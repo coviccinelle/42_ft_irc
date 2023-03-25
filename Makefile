@@ -1,20 +1,9 @@
-# **************************************************************************** #
-#                                                                              #
-#                                                         :::      ::::::::    #
-#    Makefile                                           :+:      :+:    :+:    #
-#                                                     +:+ +:+         +:+      #
-#    By: thi-phng <thi-phng@student.42.fr>          +#+  +:+       +#+         #
-#                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2022/10/18 10:58:05 by thi-phng          #+#    #+#              #
-#    Updated: 2023/03/23 15:00:51 by thi-phng         ###   ########.fr        #
-#                                                                              #
-# **************************************************************************** #
-
 NAME	=	ircserv 
 CC		=	c++
 CFLAGS	=	-Wall -Wextra -Werror -std=c++98
 RM		=	rm -rf
 SRC		=	main.cpp \
+			utils/utils.cpp \
 			server/Server.cpp \
 			server/Client.cpp \
 			utils/system_error.cpp

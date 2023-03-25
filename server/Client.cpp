@@ -75,15 +75,28 @@ cst_vec_vec_str	&Client::GetCmds() const
 
 void Client::SplitCmds(const string &str, const string delimiter)
 {
-	vec_str	s(Split(str, delimiter));
+	vec_str	tmp(Split(trim(str), delimiter));
 
-	for (vec_str::iterator it = s.begin(); it != s.end(); ++it)
-		_cmds.push_back(Split(*it));
+	for (vec_str::iterator it = tmp.begin(); it != tmp.end(); ++it)
+	{
+		int		start(0);
+		int 	end(it->find(" "));
+		vec_str	v;
+		if (end != -1)
+		{
+			v.push_back(trim(it->substr(start, end - start)));
+			v.push_back(trim(it->substr(end, it->size())));
+		}
+		else
+			v.push_back(it->substr(start, str.size()));
+		_cmds.push_back(v);
+	}
 }
 
 int	Client::ParseRecv(const string &buf, const string &pass)
 {
 	SplitCmds(buf);
+	(void) pass;
 
 	if (_cmds.empty())
 	{
@@ -98,6 +111,8 @@ int	Client::ParseRecv(const string &buf, const string &pass)
 
 		for (vec_str::const_iterator j = start; j != end; ++j)
 		{
+			std::cout <<  "[" << *j << "]";
+			/*
 			if (_cmds[0].size() == 2 &&
 				*j == string("CAP") &&
 				*(j + 1) == string("LS"))
@@ -122,7 +137,9 @@ int	Client::ParseRecv(const string &buf, const string &pass)
 				std::cout << "unknow command" << std::endl;
 				break ;
 			}
+			*/
 		}
+		std::cout << std::endl;
 		_cmds.erase(_cmds.begin());
 	}
 	return (0);

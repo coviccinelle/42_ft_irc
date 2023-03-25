@@ -1,20 +1,8 @@
 #ifndef CLIENT_HPP
 #define CLIENT_HPP
-#include <iostream>
-
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netdb.h>
-#include <signal.h>
-#include <poll.h>
-#include <arpa/inet.h>
-
-#include <unistd.h>
-#include <cstring>
-
-#include <vector>
 
 #include "../utils/utils.hpp"
+#include "../include/system_error.hpp"
 
 class Client
 {

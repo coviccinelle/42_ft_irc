@@ -1,3 +1,5 @@
+#ifndef SYSTEM_ERROR_HPP
+#define SYSTEM_ERROR_HPP
 #include <exception>
 #include <iostream>
 #include <cerrno>
@@ -20,3 +22,5 @@ class system_error: public std::exception
 	private:
 		string _str;
 };
+
+#endif
