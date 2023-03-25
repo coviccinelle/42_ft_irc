@@ -99,21 +99,35 @@ void Client::SplitCmds(const string &str, const string delimiter)
 	}
 }
 
-void	Client::_Path(const string &param)
+void	Client::_Pass(cst_vec_str &cmd)
 {
+	if (cmd.size() == 1)
+	{
+		std::cout << "no param" << std::endl;
+		return ;
+	}
+	const string &param(cmd[1]);
 	vec_str p(Split(param));
 	if (p.size() != 1)
 	{
 		//handle invalid nb of args here
+		std::cout << "Invalid param" << std::endl;
 		return ;
 	}
 	std::cout << p[0] << std::endl;
 	if (p[0] == _servPass)
+	{
+		std::cout << "Valid PASS" << std::endl;
 		_validPass = true;
+	}
+	else
+		std::cout << "Invalid PASS" << std::endl;
 }
 
 CmdVal	Client::ResolveOption(const string &input)
 {
+	if (input.empty())
+		return (UNKNOWN);
 	std::map<string, CmdVal >::const_iterator it(_mapCmd.find(input));
 	if(it != _mapCmd.end())
 		return (it->second);
@@ -125,8 +139,10 @@ void	Client::ExecCommand(cst_vec_str &cmd)
 	switch (ResolveOption(cmd[0]))
 	{
 		case PASS:
-			_Path(cmd[1]);
+		{
+			_Pass(cmd);
 			break ;
+		}
 		default :
 			std::cout << "Unknow command" << std::endl;
 	}
@@ -171,6 +187,8 @@ vec_str	Split(const string &str, const string delimiter)
 	int 	end(str.find(delimiter));
 	vec_str	res;
 
+	if (str.empty())
+		return (res);
 	while (end != -1)
 	{
 		if (str.substr(start, end - start) != string(""))
