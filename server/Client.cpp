@@ -2,14 +2,19 @@
 
 Client::Client(const string &pass) :
 	_fd(0),
+	_addr(),
 	_addrSize(sizeof(_addr)),
 	_ip(""),
+	_servPass(pass),
 	_cmds(0),
+	_mapCmd(),
 	_validPass(false),
-	_servPass(pass)
+	_nick(""),
+	_username("")
 {
 	memset(&_addr, 0, sizeof(_addr));
 	_mapCmd.insert(std::make_pair(string("PASS"), PASS));
+	_mapCmd.insert(std::make_pair(string("NICK"), NICK));
 	return ;
 }
 
@@ -20,14 +25,18 @@ Client::~Client(void)
 
 Client::Client(Client const &src)
 {
+	_fd = src._fd;
 	memcpy(&_addr, &src._addr, sizeof(src._addr));
 	memcpy(&_addrSize, &src._addrSize, sizeof(src._addrSize));
-	_fd = src._fd;
 	_ip = src._ip;
-	_cmds = src._cmds;
-	_validPass = src._validPass;
 	_servPass = src._servPass;
+
+	_cmds = src._cmds;
 	_mapCmd = src._mapCmd;
+
+	_validPass = src._validPass;
+	_nick = src._nick;
+	_username = src._username;
 	return ;
 }
 
@@ -35,14 +44,18 @@ Client &Client::operator=(Client const &rhs)
 {
 	if (this == &rhs)
 		return (*this);
+	_fd = rhs._fd;
 	memcpy(&_addr, &rhs._addr, sizeof(rhs._addr));
 	memcpy(&_addrSize, &rhs._addrSize, sizeof(rhs._addrSize));
-	_fd = rhs._fd;
 	_ip = rhs._ip;
-	_cmds = rhs._cmds;
-	_validPass = rhs._validPass;
 	_servPass = rhs._servPass;
+
+	_cmds = rhs._cmds;
 	_mapCmd = rhs._mapCmd;
+
+	_validPass = rhs._validPass;
+	_nick = rhs._nick;
+	_username = rhs._username;
 
 	return (*this);
 }
@@ -99,6 +112,30 @@ void Client::SplitCmds(const string &str, const string delimiter)
 	}
 }
 
+void	Client::_Nick(cst_vec_str &cmd)
+{
+	if (cmd.size() == 1)
+	{
+		std::cout << "no param" << std::endl;
+		return ;
+	}
+	const string &param(cmd[1]);
+	vec_str p(Split(param));
+	if (p.size() != 1  || _validPass == false)
+	{
+		//TODO: WARNINGGGGG : Check if NICK is unique
+		// Idea : Pass a pointer to a vector of 
+		// clients from the server to each Client
+		std::cout << "Invalid param" << std::endl;
+		return ;
+	}
+	else
+	{
+		_nick = p[0];
+		std::cout << "NICK has been set to " << _nick << std::endl;
+	}
+}
+
 void	Client::_Pass(cst_vec_str &cmd)
 {
 	if (cmd.size() == 1)
@@ -110,7 +147,6 @@ void	Client::_Pass(cst_vec_str &cmd)
 	vec_str p(Split(param));
 	if (p.size() != 1)
 	{
-		//handle invalid nb of args here
 		std::cout << "Invalid param" << std::endl;
 		return ;
 	}
@@ -141,6 +177,11 @@ void	Client::ExecCommand(cst_vec_str &cmd)
 		case PASS:
 		{
 			_Pass(cmd);
+			break ;
+		}
+		case NICK:
+		{
+			_Nick(cmd);
 			break ;
 		}
 		default :

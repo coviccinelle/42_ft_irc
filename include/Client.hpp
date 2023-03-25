@@ -6,7 +6,8 @@
 
 enum CmdVal {
 	UNKNOWN = 0,
-	PASS
+	PASS,
+	NICK
 };
 
 class Client
@@ -32,14 +33,20 @@ class Client
 
 	private:
 		void						_Pass(cst_vec_str &cmd);
+		void						_Nick(cst_vec_str &cmd);
+
 		int							_fd;
 		struct sockaddr_storage		_addr;
 		socklen_t					_addrSize;
 		string						_ip;
-		vec_vec_str					_cmds;
-		bool						_validPass;
 		string						_servPass;
+
+		vec_vec_str					_cmds;
 		std::map< string, CmdVal >	_mapCmd;
+
+		bool						_validPass;
+		string						_nick;
+		string						_username;
 };
 
 void								*GetInAddr(struct sockaddr *sa);

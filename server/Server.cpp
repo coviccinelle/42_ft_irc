@@ -114,8 +114,8 @@ void	Server::_ReceiveData(struct pollfd &pfd)
 			std::cerr << "⚠️  warning : recv err" << std::endl;
 		else
 		{
-			Client client(_clients[pfd.fd]);
-
+			Client &client(_clients[pfd.fd]);
+			
 			if (client.ParseRecv(buf) == -1)
 				return ;
 		}
