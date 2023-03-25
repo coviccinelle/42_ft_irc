@@ -110,6 +110,8 @@ void Client::SplitCmds(const string &str, const string delimiter)
 	}
 }
 
+# define RPL_WELCOME(nick, user, host) ("001 " + nick + " :Welcome to the Internet Relay Network " + nick + "!" + user + "@" + host + "\r\n")
+
 void	Client::_User(cst_vec_str &cmd)
 {
 	if (cmd.size() == 1)
@@ -139,6 +141,7 @@ void	Client::_User(cst_vec_str &cmd)
 		std::cout << "hostname : " << _uinfo[hostname] << std::endl;
 		std::cout << "servername : " << _uinfo[servername] << std::endl;
 		std::cout << "realname : " << _uinfo[realname] << std::endl;
+		SendData(RPL_WELCOME(_uinfo[nickname], _uinfo[username], _uinfo[hostname]));
 	}
 }
 
@@ -244,6 +247,15 @@ int	Client::ParseRecv(const string &buf)
 	}
 	return (0);
 }
+
+void Client::SendData(const string &msg) const
+{
+	std::cout << msg << std::endl;
+	ssize_t ret = send(_fd, msg.data(), msg.size() + 1, 0);
+	if (ret == -1)
+		std::cerr << "⚠️ warning : send err" << std::endl;
+}
+
 
 // Non-member Function
 

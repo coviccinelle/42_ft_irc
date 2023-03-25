@@ -23,9 +23,7 @@ class Server
 		Server();
 		void	_AcceptNewConnection();
 		void	_ReceiveData(struct pollfd &pfd);
-		void	_SendData(struct pollfd &pfd);
 		void	_ParseRecv(const string &buf, Client &client);
-		int		_Sender(int fd, char *buf);
 		void	_CloseConnection(struct pollfd &pfd);
 
 

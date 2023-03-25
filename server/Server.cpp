@@ -122,32 +122,6 @@ void	Server::_ReceiveData(struct pollfd &pfd)
 	}
 }
 
-int Server::_Sender(int fd, char *buf)
-{
-	int ret;
-	memset(&buf, 0, sizeof(buf));
-	std::cout << "Sending buf = " << buf << std::endl;
-	ret = send(fd, buf, sizeof buf, 0);
-	return (ret);
-}
-
-
-void Server::_SendData(struct pollfd &pfd)
-{
-	pfd.revents = 0;
-	pfd.events = POLLOUT;
-	if (pfd.fd != _listener)
-	{
-		int ret;
-		char buf[512] = "Coucou from server\n";
-		if ((ret = _Sender(pfd.fd, buf)) == -1)
-			std::cerr << "⚠️ warning : send err" << std::endl;
-	}
-	else
-		std::cerr << "⚠️  warning: euhhh it's the POLLOUT listener fd " << std::endl;
-
-}
-
 void Server::InitConnectionLoop()
 {
 	_pollfds[0].fd = _listener;

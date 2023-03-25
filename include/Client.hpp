@@ -31,6 +31,7 @@ class Client
 
 		int							AcceptClient(int listener);
 		void						SplitCmds(const string &str, const string delimiter = "\r\n");
+		void 						SendData(const string &msg) const;
 
 		int							GetFd(void) const;
 		const string				&GetIp() const;
