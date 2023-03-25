@@ -26,6 +26,7 @@ Client::Client(Client const &src)
 	_ip = src._ip;
 	_cmds = src._cmds;
 	_validPass = src._validPass;
+	_servPass = src._servPass;
 	_mapCmd = src._mapCmd;
 	return ;
 }
@@ -40,6 +41,7 @@ Client &Client::operator=(Client const &rhs)
 	_ip = rhs._ip;
 	_cmds = rhs._cmds;
 	_validPass = rhs._validPass;
+	_servPass = rhs._servPass;
 	_mapCmd = rhs._mapCmd;
 
 	return (*this);
@@ -97,6 +99,19 @@ void Client::SplitCmds(const string &str, const string delimiter)
 	}
 }
 
+void	Client::_Path(const string &param)
+{
+	vec_str p(Split(param));
+	if (p.size() != 1)
+	{
+		//handle invalid nb of args here
+		return ;
+	}
+	std::cout << p[0] << std::endl;
+	if (p[0] == _servPass)
+		_validPass = true;
+}
+
 CmdVal	Client::ResolveOption(const string &input)
 {
 	std::map<string, CmdVal >::const_iterator it(_mapCmd.find(input));
@@ -110,7 +125,7 @@ void	Client::ExecCommand(cst_vec_str &cmd)
 	switch (ResolveOption(cmd[0]))
 	{
 		case PASS:
-			std::cout << cmd[1] << std::endl;
+			_Path(cmd[1]);
 			break ;
 		default :
 			std::cout << "Unknow command" << std::endl;

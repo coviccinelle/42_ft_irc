@@ -31,6 +31,7 @@ class Client
 		void						SetConnected(bool b);
 
 	private:
+		void						_Path(const string &param);
 		int							_fd;
 		struct sockaddr_storage		_addr;
 		socklen_t					_addrSize;
