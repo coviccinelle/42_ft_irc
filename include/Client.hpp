@@ -4,10 +4,21 @@
 #include "../utils/utils.hpp"
 #include "../include/system_error.hpp"
 
+#define INF_CLI_SIZE 5
+
+enum InfoClient {
+	nickname = 0,
+	username,
+	hostname,
+	servername,
+	realname
+};
+
 enum CmdVal {
 	UNKNOWN = 0,
 	PASS,
-	NICK
+	NICK,
+	USER
 };
 
 class Client
@@ -34,6 +45,7 @@ class Client
 	private:
 		void						_Pass(cst_vec_str &cmd);
 		void						_Nick(cst_vec_str &cmd);
+		void						_User(cst_vec_str &cmd);
 
 		int							_fd;
 		struct sockaddr_storage		_addr;
@@ -45,8 +57,7 @@ class Client
 		std::map< string, CmdVal >	_mapCmd;
 
 		bool						_validPass;
-		string						_nick;
-		string						_username;
+		vec_str						_uinfo;
 };
 
 void								*GetInAddr(struct sockaddr *sa);

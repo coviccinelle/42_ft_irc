@@ -9,12 +9,12 @@ Client::Client(const string &pass) :
 	_cmds(0),
 	_mapCmd(),
 	_validPass(false),
-	_nick(""),
-	_username("")
+	_uinfo(INF_CLI_SIZE)
 {
 	memset(&_addr, 0, sizeof(_addr));
 	_mapCmd.insert(std::make_pair(string("PASS"), PASS));
 	_mapCmd.insert(std::make_pair(string("NICK"), NICK));
+	_mapCmd.insert(std::make_pair(string("USER"), USER));
 	return ;
 }
 
@@ -35,8 +35,7 @@ Client::Client(Client const &src)
 	_mapCmd = src._mapCmd;
 
 	_validPass = src._validPass;
-	_nick = src._nick;
-	_username = src._username;
+	_uinfo = src._uinfo;
 	return ;
 }
 
@@ -54,8 +53,7 @@ Client &Client::operator=(Client const &rhs)
 	_mapCmd = rhs._mapCmd;
 
 	_validPass = rhs._validPass;
-	_nick = rhs._nick;
-	_username = rhs._username;
+	_uinfo = rhs._uinfo;
 
 	return (*this);
 }
@@ -112,6 +110,38 @@ void Client::SplitCmds(const string &str, const string delimiter)
 	}
 }
 
+void	Client::_User(cst_vec_str &cmd)
+{
+	if (cmd.size() == 1)
+	{
+		std::cout << "no param" << std::endl;
+		return ;
+	}
+	vec_str p(Split(cmd[1]));
+	if (p.size() < 4 || _uinfo[nickname].empty() || cmd[1].rfind(":") == string::npos)
+	{
+		std::cout << "Invalid param" << std::endl;
+		return ;
+	}
+	else
+	{
+		string rn(cmd[1].substr(cmd[1].rfind(":") + 1));
+		if (rn.empty())
+		{
+			std::cout << "empty realname" << std::endl;
+			return ;
+		}
+		_uinfo[username] = p[0];
+		_uinfo[hostname] = p[1];
+		_uinfo[servername] = p[2];
+		_uinfo[realname] = rn;
+		std::cout << "username : " <<_uinfo[username] << std::endl;
+		std::cout << "hostname : " << _uinfo[hostname] << std::endl;
+		std::cout << "servername : " << _uinfo[servername] << std::endl;
+		std::cout << "realname : " << _uinfo[realname] << std::endl;
+	}
+}
+
 void	Client::_Nick(cst_vec_str &cmd)
 {
 	if (cmd.size() == 1)
@@ -119,8 +149,7 @@ void	Client::_Nick(cst_vec_str &cmd)
 		std::cout << "no param" << std::endl;
 		return ;
 	}
-	const string &param(cmd[1]);
-	vec_str p(Split(param));
+	vec_str p(Split(cmd[1]));
 	if (p.size() != 1  || _validPass == false)
 	{
 		//TODO: WARNINGGGGG : Check if NICK is unique
@@ -131,8 +160,8 @@ void	Client::_Nick(cst_vec_str &cmd)
 	}
 	else
 	{
-		_nick = p[0];
-		std::cout << "NICK has been set to " << _nick << std::endl;
+		_uinfo[nickname] = p[0];
+		std::cout << "NICK has been set to " << _uinfo[nickname] << std::endl;
 	}
 }
 
@@ -143,14 +172,12 @@ void	Client::_Pass(cst_vec_str &cmd)
 		std::cout << "no param" << std::endl;
 		return ;
 	}
-	const string &param(cmd[1]);
-	vec_str p(Split(param));
+	vec_str p(Split(cmd[1]));
 	if (p.size() != 1)
 	{
 		std::cout << "Invalid param" << std::endl;
 		return ;
 	}
-	std::cout << p[0] << std::endl;
 	if (p[0] == _servPass)
 	{
 		std::cout << "Valid PASS" << std::endl;
@@ -182,6 +209,11 @@ void	Client::ExecCommand(cst_vec_str &cmd)
 		case NICK:
 		{
 			_Nick(cmd);
+			break ;
+		}
+		case USER:
+		{
+			_User(cmd);
 			break ;
 		}
 		default :
