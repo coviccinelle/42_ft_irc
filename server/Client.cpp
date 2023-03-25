@@ -9,7 +9,7 @@ Client::Client(const string &pass) :
 	_servPass(pass)
 {
 	memset(&_addr, 0, sizeof(_addr));
-	_mapCmd["PASS"] = PASS;
+	_mapCmd.insert(std::make_pair(string("PASS"), PASS));
 	return ;
 }
 
@@ -26,6 +26,7 @@ Client::Client(Client const &src)
 	_ip = src._ip;
 	_cmds = src._cmds;
 	_validPass = src._validPass;
+	_mapCmd = src._mapCmd;
 	return ;
 }
 
@@ -39,6 +40,7 @@ Client &Client::operator=(Client const &rhs)
 	_ip = rhs._ip;
 	_cmds = rhs._cmds;
 	_validPass = rhs._validPass;
+	_mapCmd = rhs._mapCmd;
 
 	return (*this);
 }
@@ -95,9 +97,17 @@ void Client::SplitCmds(const string &str, const string delimiter)
 	}
 }
 
+CmdVal	Client::ResolveOption(const string &input)
+{
+	std::map<string, CmdVal >::const_iterator it(_mapCmd.find(input));
+	if(it != _mapCmd.end())
+		return (it->second);
+	return (UNKNOWN); 
+}
+
 void	Client::ExecCommand(cst_vec_str &cmd)
 {
-	switch (_mapCmd[cmd[0]])
+	switch (ResolveOption(cmd[0]))
 	{
 		case PASS:
 			std::cout << cmd[1] << std::endl;

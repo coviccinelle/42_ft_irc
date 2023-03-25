@@ -26,6 +26,7 @@ class Client
 		bool						IsConnected() const;
 		void						ExecCommand(cst_vec_str &cmd);
 		int							ParseRecv(const string &buf);
+		CmdVal						ResolveOption(const string &input);
 
 		void						SetConnected(bool b);
 
