@@ -262,7 +262,6 @@ void Client::SendData(const string &msg) const
 		std::cerr << "⚠️ warning : send err" << std::endl;
 }
 
-
 // Non-member Function
 
 void	*GetInAddr(struct sockaddr *sa)

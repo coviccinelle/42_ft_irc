@@ -7,11 +7,16 @@
 
 #define MAX_LISTEN	5
 
-class Client;
+/*
+ *
+ * Manage Client connections and Chanels
+ *
+ */
 class Server
 {
 	public:
-		Server(const std::string &port, const std::string &pass);
+		/* Coplien */
+		Server(const std::string &port = "5555", const std::string &pass = "admin");
 		~Server();
 
 		void		AwaitingConnectionQueue();
@@ -19,8 +24,7 @@ class Server
 		void 		Logs() const;
 		void 		ConnectionLoop();
 
-	private:
-		Server();
+	private: 
 		void		_AcceptNewConnection();
 		void		_ReceiveData(struct pollfd &pfd);
 		void		_ParseRecv(const string &buf, Client &client);

@@ -8,8 +8,10 @@
 # define ERR_NEEDMOREPARAMS(command) (std::string("461 ") + command + " :Not enough parameters\r\n")
 # define ERR_ALREADYREGISTERED "462 :You may not reregister\r\n"
 
+// Size of InfoClient enum below
 #define INF_CLI_SIZE 5
 
+// List of infos on a client
 enum InfoClient {
 	nickname = 0,
 	username,
@@ -18,6 +20,9 @@ enum InfoClient {
 	realname
 };
 
+/*
+ * Used for switch case evaluation
+ */
 enum CmdVal {
 	UNKNOWN = 0,
 	PASS,
@@ -25,49 +30,62 @@ enum CmdVal {
 	USER
 };
 
+/* 
+ * 
+ * This class hold all information about a connected client.
+ *
+ * Client objected are created at connection time by the server
+ * and destroyed when connection is lost.
+ * 
+ */
 class Client
 {
 	public:
+		/* Coplien */
 		Client(const string &pass = "");
 		~Client();
 		Client(Client const &src);
 		Client	&operator=(Client const &rhs);
 
-		int							AcceptClient(int listener);
-		void						SplitCmds(const string &str, const string delimiter = "\r\n");
-		void 						SendData(const string &msg) const;
+		/* Public Methods */
+		int							AcceptClient(int listener); // Return socket fd for socker communication
+		void						SplitCmds(const string &str, const string delimiter = "\r\n"); // Split string to : [string("CMD"), string("args")]; Also trim "\r\n"
+		void 						SendData(const string &msg) const; // Use send(2) method to send data back to client
 
+		void						ExecCommand(cst_vec_str &cmd); // Switch case
+		int							ParseRecv(const string &buf); // Parse the cmd received by the server
+		CmdVal						ResolveOption(const string &input); // Return a enum code for switch case eval
+
+		/* Getters */
 		int							GetFd(void) const;
 		const string				&GetIp() const;
 		cst_vec_str					&GetUinfo() const;
-
 		cst_vec_vec_str				&GetCmds() const;
-		bool						IsConnected() const;
-		void						ExecCommand(cst_vec_str &cmd);
-		int							ParseRecv(const string &buf);
-		CmdVal						ResolveOption(const string &input);
-
-		void						SetConnected(bool b);
 
 	private:
-		void						_Pass(cst_vec_str &cmd);
-		void						_Nick(cst_vec_str &cmd);
-		void						_User(cst_vec_str &cmd);
+		/* Private Methods */
+		void						_Pass(cst_vec_str &cmd); // Parse PASS cmd
+		void						_Nick(cst_vec_str &cmd); // Parse NICK cmd
+		void						_User(cst_vec_str &cmd); // Parse USER cmd
 
-		int							_fd;
+		/* Connection Info */
+		int							_fd; // Connection socket
 		struct sockaddr_storage		_addr;
 		socklen_t					_addrSize;
 		string						_ip;
-		string						_servPass;
+		string						_servPass; // Server Password (should be a string ref)
 
-		vec_vec_str					_cmds;
-		std::map< string, CmdVal >	_mapCmd;
+		/* Commands */
+		vec_vec_str					_cmds; // Commands that need to be process
+		std::map< string, CmdVal >	_mapCmd; // mapping between cmd names and integer; used for switch case.
 
-		bool						_validPass;
-		vec_str						_uinfo;
+		/* Client info */
+		bool						_validPass; // tell if PASS authentification has been done
+		vec_str						_uinfo; // nickname, username, hostname ... See InfoClient above for all available field.
 };
 
-void								*GetInAddr(struct sockaddr *sa);
-vec_str								Split(const string &str, const string delimiter = " ");
+// Non-Member function
+void								*GetInAddr(struct sockaddr *sa); // Return sin_addr (IpV4) or sin6_addr (IpV6)
+vec_str								Split(const string &str, const string delimiter = " "); // Split string using delimiter
 
 #endif
