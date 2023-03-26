@@ -115,9 +115,10 @@ void	Client::_User(cst_vec_str &cmd)
 {
 	if (cmd.size() == 1)
 	{
-		std::cout << "no param" << std::endl;
+		SendData(ERR_NEEDMOREPARAMS(cmd[0]));
 		return ;
 	}
+	//TODO: SendData(ERR_ALREADYREGISTERED);
 	vec_str p(Split(cmd[1]));
 	if (p.size() < 4 || _uinfo[nickname].empty() || cmd[1].rfind(":") == string::npos)
 	{
@@ -146,9 +147,11 @@ void	Client::_User(cst_vec_str &cmd)
 
 void	Client::_Nick(cst_vec_str &cmd)
 {
+	//TODO: check for invalid characters in NICK NAME
+	//Return : ERR_ERRONEUSNICKNAME
 	if (cmd.size() == 1)
 	{
-		std::cout << "no param" << std::endl;
+		SendData(ERR_NONICKNAMEGIVEN);
 		return ;
 	}
 	vec_str p(Split(cmd[1]));
@@ -160,6 +163,8 @@ void	Client::_Nick(cst_vec_str &cmd)
 		std::cout << "Invalid param" << std::endl;
 		return ;
 	}
+	//TODO: 
+	//SendData(ERR_NICKNAMEINUSE);
 	else
 	{
 		_uinfo[nickname] = p[0];
