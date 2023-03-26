@@ -21,10 +21,10 @@ class Server
 
 	private:
 		Server();
-		void	_AcceptNewConnection();
-		void	_ReceiveData(struct pollfd &pfd);
-		void	_ParseRecv(const string &buf, Client &client);
-		void	_CloseConnection(struct pollfd &pfd);
+		void		_AcceptNewConnection();
+		void		_ReceiveData(struct pollfd &pfd);
+		void		_ParseRecv(const string &buf, Client &client);
+		void		_CloseConnection(struct pollfd &pfd);
 
 
 		std::string 					_portNumber;
