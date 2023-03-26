@@ -76,7 +76,6 @@ void Server::_AcceptNewConnection()
 	{
 		struct pollfd	new_pfd;
 
-		//new_pfd.revents = 0;
 		new_pfd.fd = new_fd;
 		new_pfd.events = POLLIN;
 
@@ -96,7 +95,6 @@ void	Server::_CloseConnection(struct pollfd &pfd)
 
 void	Server::_ReceiveData(struct pollfd &pfd)
 {
-	//pfd.revents = 0;
 	if (pfd.fd == _listener)
 		_AcceptNewConnection();
 	else
