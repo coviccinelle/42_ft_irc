@@ -85,6 +85,11 @@ const string	&Client::GetIp() const
 	return (_ip);
 }
 
+cst_vec_str	&Client::GetUinfo() const
+{
+	return (_uinfo);
+}
+
 cst_vec_vec_str	&Client::GetCmds() const
 {
 	return (_cmds);

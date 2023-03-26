@@ -39,6 +39,8 @@ class Client
 
 		int							GetFd(void) const;
 		const string				&GetIp() const;
+		cst_vec_str					&GetUinfo() const;
+
 		cst_vec_vec_str				&GetCmds() const;
 		bool						IsConnected() const;
 		void						ExecCommand(cst_vec_str &cmd);

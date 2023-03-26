@@ -9,7 +9,6 @@ Server::Server(const std::string &port, const std::string &pass) :
 {
 }
 
-
 Server::~Server()
 {
     close(_listener);
@@ -65,7 +64,6 @@ void	Server::AwaitingConnectionQueue()
 		throw system_error("listen failed");
 }
 
-
 void Server::_AcceptNewConnection()
 {
 	Client			client(_password);
@@ -78,7 +76,7 @@ void Server::_AcceptNewConnection()
 	{
 		struct pollfd	new_pfd;
 
-		new_pfd.revents = 0;
+		//new_pfd.revents = 0;
 		new_pfd.fd = new_fd;
 		new_pfd.events = POLLIN;
 
@@ -98,7 +96,7 @@ void	Server::_CloseConnection(struct pollfd &pfd)
 
 void	Server::_ReceiveData(struct pollfd &pfd)
 {
-	pfd.revents = 0;
+	//pfd.revents = 0;
 	if (pfd.fd == _listener)
 		_AcceptNewConnection();
 	else
@@ -138,6 +136,16 @@ void Server::Logs() const
 		std::cout << "	clients info:" << std::endl;
 		std::cout << "		IP: " << it->second.GetIp() << std::endl;
 		std::cout << "		Socket: " << it->second.GetFd() << std::endl;
+		if (it->second.GetUinfo()[nickname].empty() == false)
+			std::cout << "		Nick: " << it->second.GetUinfo()[nickname] << std::endl;
+		if (it->second.GetUinfo()[username].empty() == false)
+			std::cout << "		User: " << it->second.GetUinfo()[username] << std::endl;
+		if (it->second.GetUinfo()[hostname].empty() == false)
+			std::cout << "		Host: " << it->second.GetUinfo()[hostname] << std::endl;
+		if (it->second.GetUinfo()[servername].empty() == false)
+			std::cout << "		Server: " << it->second.GetUinfo()[servername] << std::endl;
+		if (it->second.GetUinfo()[realname].empty() == false)
+			std::cout << "		Realname: " << it->second.GetUinfo()[realname] << std::endl;
 	}
 	std::cout << "=======================" << std::endl;
 }
