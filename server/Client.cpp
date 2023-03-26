@@ -116,13 +116,15 @@ void Client::SplitCmds(const string &str, const string delimiter)
 }
 
 
+
 void	Client::_User(cst_vec_str &cmd)
 {
 	if (cmd.size() == 1)
 	{
-		std::cout << "no param" << std::endl;
+		SendData(ERR_NEEDMOREPARAMS(cmd[0]));
 		return ;
 	}
+	//TODO: SendData(ERR_ALREADYREGISTERED);
 	vec_str p(Split(cmd[1]));
 	if (p.size() < 4 || _uinfo[nickname].empty() || cmd[1].rfind(":") == string::npos)
 	{
@@ -153,7 +155,7 @@ void	Client::_Nick(cst_vec_str &cmd)
 {
 	if (cmd.size() == 1)
 	{
-		std::cout << "no param" << std::endl;
+		SendData(ERR_NONICKNAMEGIVEN);
 		return ;
 	}
 	vec_str p(Split(cmd[1]));
@@ -165,6 +167,13 @@ void	Client::_Nick(cst_vec_str &cmd)
 		std::cout << "Invalid param" << std::endl;
 		return ;
 	}
+	if (ValidNickname(cmd[1]) == 0)
+	{
+		SendData(ERR_ERRONEUSNICKNAME(cmd[1]));
+		return ;
+	}
+	//TODO: 
+	//SendData(ERR_NICKNAMEINUSE);
 	else
 	{
 		_uinfo[nickname] = p[0];
@@ -260,6 +269,22 @@ void Client::SendData(const string &msg) const
 	ssize_t ret = send(_fd, msg.data(), msg.size() + 1, 0);
 	if (ret == -1)
 		std::cerr << "⚠️ warning : send err" << std::endl;
+}
+
+int	Client::ValidNickname(const string &nick)
+{
+	if (nick.size() > 9)
+	{
+		std::cout << "ERR: Nickname is longer than 9" << std::endl;
+		return 0;
+	}
+	string s("-_[]{}\\`|");
+	for (string::const_iterator i = nick.begin(); i != nick.end(); ++i)
+	{
+		if (std::isalnum(*i) == 0 && s.find(*i) == string::npos)
+			return (0);
+	}
+	return (1);
 }
 
 // Non-member Function

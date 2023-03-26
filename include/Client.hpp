@@ -5,8 +5,11 @@
 #include "../include/system_error.hpp"
 
 # define RPL_WELCOME(nick, user, host) ("001 " + nick + " :Welcome to the Internet Relay Network " + nick + "!" + user + "@" + host + "\r\n")
-# define ERR_NEEDMOREPARAMS(command) (std::string("461 ") + command + " :Not enough parameters\r\n")
+# define ERR_NEEDMOREPARAMS(command) ("461 " + command + " :Not enough parameters\r\n")
 # define ERR_ALREADYREGISTERED "462 :You may not reregister\r\n"
+# define ERR_NONICKNAMEGIVEN "431 :No nickname given\r\n"
+# define ERR_NICKNAMEINUSE(nick) ("433 " + nick + ":Nickname is already in use\r\n")
+# define ERR_ERRONEUSNICKNAME(nick) ("432 " + nick + " :Erroneous nickname\r\n")
 
 // Size of InfoClient enum below
 #define INF_CLI_SIZE 5
@@ -67,6 +70,7 @@ class Client
 		void						_Pass(cst_vec_str &cmd); // Parse PASS cmd
 		void						_Nick(cst_vec_str &cmd); // Parse NICK cmd
 		void						_User(cst_vec_str &cmd); // Parse USER cmd
+		int							ValidNickname(const string &nick);
 
 		/* Connection Info */
 		int							_fd; // Connection socket
