@@ -116,6 +116,7 @@ void Client::SplitCmds(const string &str, const string delimiter)
 }
 
 
+
 void	Client::_User(cst_vec_str &cmd)
 {
 	if (cmd.size() == 1)
@@ -152,8 +153,6 @@ void	Client::_User(cst_vec_str &cmd)
 
 void	Client::_Nick(cst_vec_str &cmd)
 {
-	//TODO: check for invalid characters in NICK NAME
-	//Return : ERR_ERRONEUSNICKNAME
 	if (cmd.size() == 1)
 	{
 		SendData(ERR_NONICKNAMEGIVEN);
@@ -166,6 +165,11 @@ void	Client::_Nick(cst_vec_str &cmd)
 		// Idea : Pass a pointer to a vector of 
 		// clients from the server to each Client
 		std::cout << "Invalid param" << std::endl;
+		return ;
+	}
+	if (ValidNickname(cmd[1]) == 0)
+	{
+		SendData(ERR_ERRONEUSNICKNAME(cmd[1]));
 		return ;
 	}
 	//TODO: 
@@ -267,6 +271,21 @@ void Client::SendData(const string &msg) const
 		std::cerr << "⚠️ warning : send err" << std::endl;
 }
 
+int	Client::ValidNickname(const string &nick)
+{
+	if (nick.size() > 9)
+	{
+		std::cout << "ERR: Nickname is longer than 9" << std::endl;
+		return 0;
+	}
+	string s("-_[]{}\\`|");
+	for (string::const_iterator i = nick.begin(); i != nick.end(); ++i)
+	{
+		if (std::isalnum(*i) == 0 && s.find(*i) == string::npos)
+			return (0);
+	}
+	return (1);
+}
 
 // Non-member Function
 

@@ -5,6 +5,7 @@
 #include <unistd.h>
 #include <cstring>
 #include <cstdlib>
+#include <cctype>
 
 #include <string>
 #include <vector>
@@ -30,8 +31,8 @@ typedef std::vector< struct pollfd >		vec_pfd;
 typedef const std::vector< struct pollfd >	cst_vec_pfd;
 
 
-string ltrim(const string &s);
-string rtrim(const string &s);
-string trim(const string &s);
+string	ltrim(const string &s);
+string	rtrim(const string &s);
+string 	trim(const string &s);
 
 #endif

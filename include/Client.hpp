@@ -9,6 +9,7 @@
 # define ERR_ALREADYREGISTERED "462 :You may not reregister\r\n"
 # define ERR_NONICKNAMEGIVEN "431 :No nickname given\r\n"
 # define ERR_NICKNAMEINUSE(nick) ("433 " + nick + ":Nickname is already in use\r\n")
+# define ERR_ERRONEUSNICKNAME(nick) ("432 " + nick + " :Erroneous nickname\r\n")
 
 #define INF_CLI_SIZE 5
 
@@ -55,6 +56,7 @@ class Client
 		void						_Pass(cst_vec_str &cmd);
 		void						_Nick(cst_vec_str &cmd);
 		void						_User(cst_vec_str &cmd);
+		int							ValidNickname(const string &nick);
 
 		int							_fd;
 		struct sockaddr_storage		_addr;
