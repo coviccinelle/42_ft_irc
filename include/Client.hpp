@@ -4,6 +4,10 @@
 #include "../utils/utils.hpp"
 #include "../include/system_error.hpp"
 
+# define RPL_WELCOME(nick, user, host) ("001 " + nick + " :Welcome to the Internet Relay Network " + nick + "!" + user + "@" + host + "\r\n")
+# define ERR_NEEDMOREPARAMS(command) (std::string("461 ") + command + " :Not enough parameters\r\n")
+# define ERR_ALREADYREGISTERED "462 :You may not reregister\r\n"
+
 #define INF_CLI_SIZE 5
 
 enum InfoClient {

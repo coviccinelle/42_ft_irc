@@ -110,7 +110,6 @@ void Client::SplitCmds(const string &str, const string delimiter)
 	}
 }
 
-# define RPL_WELCOME(nick, user, host) ("001 " + nick + " :Welcome to the Internet Relay Network " + nick + "!" + user + "@" + host + "\r\n")
 
 void	Client::_User(cst_vec_str &cmd)
 {
@@ -172,24 +171,26 @@ void	Client::_Pass(cst_vec_str &cmd)
 {
 	if (cmd.size() == 1)
 	{
-		std::cout << "no param" << std::endl;
+		SendData(ERR_NEEDMOREPARAMS(cmd[0]));
+		return ;
+	}
+	if (_validPass)
+	{
+		SendData(ERR_ALREADYREGISTERED);
 		return ;
 	}
 	vec_str p(Split(cmd[1]));
-	if (p.size() != 1)
-	{
-		std::cout << "Invalid param" << std::endl;
-		return ;
-	}
 	if (p[0] == _servPass)
 	{
-		std::cout << "Valid PASS" << std::endl;
+		std::cout << "ℹ️  irc server:\033[0;32m valid pass \033[0;37mfrom " << _ip << " on socket " << _fd << std::endl;
 		_validPass = true;
 	}
 	else
-		std::cout << "Invalid PASS" << std::endl;
+		std::cout << "ℹ️  irc server:\033[0;31m invalid pass \033[0;37mfrom " << _ip << " on socket " << _fd << std::endl;
 }
 
+// Mapping between string comands name and enum type ex: "PASS" (string) -> PASS (int)
+// Used for switch case
 CmdVal	Client::ResolveOption(const string &input)
 {
 	if (input.empty())

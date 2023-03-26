@@ -84,7 +84,7 @@ void Server::_AcceptNewConnection()
 
 		_pollfds.push_back(new_pfd);
 		_clients.insert(std::make_pair(new_fd, client));
-		std::cout << "ℹ️  irc server: \033[0;32mconnection etablished\033[0;37m from " << client.GetIp() << " on socket " << client.GetFd() << std::endl;
+		std::cout << "ℹ️  irc server:\033[0;32m connection etablished\033[0;37m from " << client.GetIp() << " on socket " << client.GetFd() << std::endl;
 	}
 }
 
