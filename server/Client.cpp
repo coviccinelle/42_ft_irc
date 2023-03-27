@@ -181,15 +181,11 @@ void	Client::_Nick(cst_vec_str &cmd)
 	vec_str p(Split(cmd[1]));
 	if (p.size() != 1  || _validPass == false)
 	{
-		//TODO: WARNINGGGGG : Check if NICK is unique
-		// Idea : Pass a pointer to a vector of 
-		// clients from the server to each Client
 		std::cout << "Invalid param" << std::endl;
 		return ;
 	}
 	if (ValidNickname(cmd[1]) == 0)
 		return ;
-	//TODO: 
 	else
 	{
 		_uinfo[nickname] = p[0];
@@ -291,7 +287,7 @@ int	Client::ValidNickname(const string &nick)
 {
 	if (nick.size() > 9)
 	{
-		std::cout << "ERR: Nickname is longer than 9" << std::endl;
+		std::cout << "ERR: Nickname is longer than 9 characters" << std::endl;
 		SendData(ERR_ERRONEUSNICKNAME(nick));
 		return 0;
 	}
@@ -304,8 +300,14 @@ int	Client::ValidNickname(const string &nick)
 			return (0);
 		}
 	}
-	// if (NickInUse(nick))
-		//SendData(ERR_NICKNAMEINUSE);
+	for (std::map< int, Client >::const_iterator it = _clients->begin(); it != _clients->end(); ++it)
+	{
+		if (it->second.GetUinfo()[nickname] == nick)
+		{
+			SendData(ERR_NICKNAMEINUSE(nick));
+			return (0);
+		}
+	}
 	return (1);
 }
 
