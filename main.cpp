@@ -12,7 +12,7 @@ const string& parsePort(const string &port)
 	return (port);
 }
 
-const string&	parseArgs(int ac, char **av)
+const string	parseArgs(int ac, char **av)
 {
 	if (ac != 3)
 		throw std::invalid_argument("Invalid Args: How to use: ./ircserv portNumber password.");

@@ -6,6 +6,7 @@ Client::Client() :
 	_addrSize(sizeof(_addr)),
 	_ip(""),
 	_servPass(""),
+	_buf(""),
 	_cmds(0),
 	_mapCmd(),
 	_validPass(false),
@@ -22,6 +23,7 @@ Client::Client(const string &pass, const std::map< int, Client > &clients) :
 	_addrSize(sizeof(_addr)),
 	_ip(""),
 	_servPass(pass),
+	_buf(""),
 	_cmds(0),
 	_mapCmd(),
 	_validPass(false),
@@ -48,6 +50,7 @@ Client::Client(Client const &src)
 	_ip = src._ip;
 	_servPass = src._servPass;
 
+	_buf = src._buf;
 	_cmds = src._cmds;
 	_mapCmd = src._mapCmd;
 
@@ -68,6 +71,7 @@ Client &Client::operator=(Client const &rhs)
 	_ip = rhs._ip;
 	_servPass = rhs._servPass;
 
+	_buf = rhs._buf;
 	_cmds = rhs._cmds;
 	_mapCmd = rhs._mapCmd;
 
@@ -253,7 +257,20 @@ void	Client::ExecCommand(cst_vec_str &cmd)
 
 int	Client::ParseRecv(const string &buf)
 {
-	SplitCmds(buf);
+	size_t pos;
+//	std::cout << "_buf :" << _buf << std::endl;
+	_buf += buf;
+//	std::cout << "_buf :" << _buf << std::endl;
+	if ((pos = _buf.find_last_of("\n")) == string::npos)
+		return (0);
+	string tmp = _buf.substr(0, (_buf.begin() + pos) - _buf.begin());
+
+//	std::cout << "tmp :" << tmp << std::endl;
+	SplitCmds(trim(tmp));
+
+	tmp = _buf.substr(pos, _buf.end() - (_buf.begin() + pos));
+	_buf = tmp;
+//	std::cout << "_buf :" << _buf << std::endl;
 
 	if (_cmds.empty())
 	{
@@ -265,11 +282,10 @@ int	Client::ParseRecv(const string &buf)
 	{
 		ExecCommand(_cmds[0]);
 
-//		for (vec_str::const_iterator j = start; j != end; ++j)
-//		{
+
+//		for (vec_str::const_iterator j = _cmds[0].begin(); j != _cmds[0].end(); ++j)
 //			std::cout <<  "[" << *j << "]";
-//		}
-//		std::cout << std::endl;
+		std::cout << std::endl;
 		_cmds.erase(_cmds.begin());
 	}
 	return (0);
