@@ -66,7 +66,7 @@ void	Server::AwaitingConnectionQueue()
 
 void Server::_AcceptNewConnection()
 {
-	Client			client(_password);
+	Client			client(_password, _clients);
 	int				new_fd;
 
 	new_fd = client.AcceptClient(_listener);
@@ -87,7 +87,7 @@ void Server::_AcceptNewConnection()
 
 void	Server::_CloseConnection(struct pollfd &pfd)
 {
-	std::cout << "ℹ️  irc server:\033[0;31m connection close \033[0;37mfrom " << _clients[pfd.fd].GetIp() << " on socket " << pfd.fd << std::endl;
+	//std::cout << "ℹ️  irc server:\033[0;31m connection close \033[0;37mfrom " << _clients[pfd.fd].GetIp() << " on socket " << pfd.fd << std::endl;
 	_clients.erase(pfd.fd);
 	close(pfd.fd);
 	_pollfds.erase(vec_pfd::iterator(&pfd));

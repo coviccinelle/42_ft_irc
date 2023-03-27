@@ -1,6 +1,22 @@
 #include "../include/Client.hpp"
 
-Client::Client(const string &pass) :
+Client::Client() :
+	_fd(0),
+	_addr(),
+	_addrSize(sizeof(_addr)),
+	_ip(""),
+	_servPass(""),
+	_cmds(0),
+	_mapCmd(),
+	_validPass(false),
+	_uinfo(INF_CLI_SIZE),
+	_clients(NULL)
+{
+	// Containers are going to complain if not existing
+	std::cout << "Warning: Coplien only but should never be called" << std::endl;
+}
+
+Client::Client(const string &pass, const std::map< int, Client > &clients) :
 	_fd(0),
 	_addr(),
 	_addrSize(sizeof(_addr)),
@@ -9,7 +25,8 @@ Client::Client(const string &pass) :
 	_cmds(0),
 	_mapCmd(),
 	_validPass(false),
-	_uinfo(INF_CLI_SIZE)
+	_uinfo(INF_CLI_SIZE),
+	_clients(&clients)
 {
 	memset(&_addr, 0, sizeof(_addr));
 	_mapCmd.insert(std::make_pair(string("PASS"), PASS));
@@ -36,6 +53,8 @@ Client::Client(Client const &src)
 
 	_validPass = src._validPass;
 	_uinfo = src._uinfo;
+
+	_clients = src._clients;
 	return ;
 }
 
@@ -55,6 +74,7 @@ Client &Client::operator=(Client const &rhs)
 	_validPass = rhs._validPass;
 	_uinfo = rhs._uinfo;
 
+	_clients = rhs._clients;
 	return (*this);
 }
 
@@ -168,12 +188,8 @@ void	Client::_Nick(cst_vec_str &cmd)
 		return ;
 	}
 	if (ValidNickname(cmd[1]) == 0)
-	{
-		SendData(ERR_ERRONEUSNICKNAME(cmd[1]));
 		return ;
-	}
 	//TODO: 
-	//SendData(ERR_NICKNAMEINUSE);
 	else
 	{
 		_uinfo[nickname] = p[0];
@@ -276,14 +292,20 @@ int	Client::ValidNickname(const string &nick)
 	if (nick.size() > 9)
 	{
 		std::cout << "ERR: Nickname is longer than 9" << std::endl;
+		SendData(ERR_ERRONEUSNICKNAME(nick));
 		return 0;
 	}
 	string s("-_[]{}\\`|");
 	for (string::const_iterator i = nick.begin(); i != nick.end(); ++i)
 	{
 		if (std::isalnum(*i) == 0 && s.find(*i) == string::npos)
+		{
+			SendData(ERR_ERRONEUSNICKNAME(nick));
 			return (0);
+		}
 	}
+	// if (NickInUse(nick))
+		//SendData(ERR_NICKNAMEINUSE);
 	return (1);
 }
 

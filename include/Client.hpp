@@ -45,47 +45,51 @@ class Client
 {
 	public:
 		/* Coplien */
-		Client(const string &pass = "");
+		Client(); // Forbidden Client creation without Server clients list reference or no server pass
+		Client(const string &pass, const std::map< int, Client > &clients);
 		~Client();
 		Client(Client const &src);
 		Client	&operator=(Client const &rhs);
 
 		/* Public Methods */
-		int							AcceptClient(int listener); // Return socket fd for socker communication
-		void						SplitCmds(const string &str, const string delimiter = "\r\n"); // Split string to : [string("CMD"), string("args")]; Also trim "\r\n"
-		void 						SendData(const string &msg) const; // Use send(2) method to send data back to client
+		int								AcceptClient(int listener); // Return socket fd for socker communication
+		void							SplitCmds(const string &str, const string delimiter = "\r\n"); // Split string to : [string("CMD"), string("args")]; Also trim "\r\n"
+		void 							SendData(const string &msg) const; // Use send(2) method to send data back to client
 
-		void						ExecCommand(cst_vec_str &cmd); // Switch case
-		int							ParseRecv(const string &buf); // Parse the cmd received by the server
-		CmdVal						ResolveOption(const string &input); // Return a enum code for switch case eval
+		void							ExecCommand(cst_vec_str &cmd); // Switch case
+		int								ParseRecv(const string &buf); // Parse the cmd received by the server
+		CmdVal							ResolveOption(const string &input); // Return a enum code for switch case eval
 
 		/* Getters */
-		int							GetFd(void) const;
-		const string				&GetIp() const;
-		cst_vec_str					&GetUinfo() const;
-		cst_vec_vec_str				&GetCmds() const;
+		int								GetFd(void) const;
+		const string					&GetIp() const;
+		cst_vec_str						&GetUinfo() const;
+		cst_vec_vec_str					&GetCmds() const;
 
 	private:
 		/* Private Methods */
-		void						_Pass(cst_vec_str &cmd); // Parse PASS cmd
-		void						_Nick(cst_vec_str &cmd); // Parse NICK cmd
-		void						_User(cst_vec_str &cmd); // Parse USER cmd
-		int							ValidNickname(const string &nick);
+		void							_Pass(cst_vec_str &cmd); // Parse PASS cmd
+		void							_Nick(cst_vec_str &cmd); // Parse NICK cmd
+		void							_User(cst_vec_str &cmd); // Parse USER cmd
+		int								ValidNickname(const string &nick);
 
 		/* Connection Info */
-		int							_fd; // Connection socket
-		struct sockaddr_storage		_addr;
-		socklen_t					_addrSize;
-		string						_ip;
-		string						_servPass; // Server Password (should be a string ref)
+		int								_fd; // Connection socket
+		struct sockaddr_storage			_addr;
+		socklen_t						_addrSize;
+		string							_ip;
+		string							_servPass; // Server Password (should be a string ref)
 
 		/* Commands */
-		vec_vec_str					_cmds; // Commands that need to be process
-		std::map< string, CmdVal >	_mapCmd; // mapping between cmd names and integer; used for switch case.
+		vec_vec_str						_cmds; // Commands that need to be process
+		std::map< string, CmdVal >		_mapCmd; // mapping between cmd names and integer; used for switch case.
 
 		/* Client info */
-		bool						_validPass; // tell if PASS authentification has been done
-		vec_str						_uinfo; // nickname, username, hostname ... See InfoClient above for all available field.
+		bool							_validPass; // tell if PASS authentification has been done
+		vec_str							_uinfo; // nickname, username, hostname ... See InfoClient above for all available field.
+
+		/* Utils */
+		const std::map< int, Client >	*_clients;
 };
 
 // Non-Member function
