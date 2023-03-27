@@ -81,6 +81,7 @@ class Client
 		string							_servPass; // Server Password (should be a string ref)
 
 		/* Commands */
+		string							_buf;
 		vec_vec_str						_cmds; // Commands that need to be process
 		std::map< string, CmdVal >		_mapCmd; // mapping between cmd names and integer; used for switch case.
 
