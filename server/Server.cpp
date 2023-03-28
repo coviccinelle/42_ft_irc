@@ -117,9 +117,9 @@ void	Server::_ReceiveData(struct pollfd &pfd)
 			}
 			catch (irc_error &e)
 			{
-				if (e.code() == INVALID_PASS)
+				if (e.code() == CLOSE_CONNECTION)
 				{
-					std::cout << "ℹ️  irc server:\033[0;31m invalid pass \033[0;37mfrom " << client.GetIp() << " on socket " << client.GetFd() << std::endl;
+					std::cout << e.what() << std::endl;
 					return (_CloseConnection(pfd));
 				}
 				std::cerr << "⚠️  warning :" << e.what() << std::endl;

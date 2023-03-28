@@ -197,11 +197,11 @@ void	Client::_Nick(cst_vec_str &cmd)
 void	Client::_Pass(cst_vec_str &cmd)
 {
 	if (cmd.size() == 1)
-		throw std::invalid_argument(ERR_NEEDMOREPARAMS(cmd[0]));
+		throw irc_error(ERR_NEEDMOREPARAMS(cmd[0]), CLOSE_CONNECTION);
 	if (_validPass)
-		throw std::invalid_argument(ERR_ALREADYREGISTERED);
+		throw irc_error(ERR_ALREADYREGISTERED, CLOSE_CONNECTION);
 	if (cmd[1] != _servPass)
-		throw irc_error("invalid pass", INVALID_PASS);
+		throw irc_error("invalid pass", CLOSE_CONNECTION);
 	std::cout << "ℹ️  irc server:\033[0;32m valid pass \033[0;37mfrom " << _ip << " on socket " << _fd << std::endl;
 	_validPass = true;
 }
