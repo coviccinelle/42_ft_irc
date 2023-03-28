@@ -175,23 +175,11 @@ void	Client::_User(cst_vec_str &cmd)
 void	Client::_Nick(cst_vec_str &cmd)
 {
 	if (cmd.size() == 1)
-	{
-		SendData(ERR_NONICKNAMEGIVEN);
-		return ;
-	}
+		throw irc_error(ERR_NONICKNAMEGIVEN, SEND_ERROR);
 	vec_str p(Split(cmd[1]));
-	if (p.size() != 1  || _validPass == false)
-	{
-		std::cout << "Invalid param" << std::endl;
-		return ;
-	}
-	if (ValidNickname(cmd[1]) == 0)
-		throw std::invalid_argument("invalid nickname");
-	else
-	{
-		_uinfo[nickname] = p[0];
-		std::cout << "NICK has been set to " << _uinfo[nickname] << std::endl;
-	}
+	ValidNickname(cmd[1]);
+	_uinfo[nickname] = p[0];
+	std::cout << "NICK has been set to " << _uinfo[nickname] << std::endl;
 }
 
 void	Client::_Pass(cst_vec_str &cmd)
@@ -305,32 +293,25 @@ void Client::SendData(const string &msg) const
 		std::cerr << "⚠️ warning : send err" << std::endl;
 }
 
-int	Client::ValidNickname(const string &nick)
+void	Client::ValidNickname(const string &nick)
 {
 	if (nick.size() > 9)
-	{
-		std::cout << "ERR: Nickname is longer than 9 characters" << std::endl;
-		SendData(ERR_ERRONEUSNICKNAME(nick));
-		return 0;
-	}
+		throw irc_error(ERR_ERRONEUSNICKNAME(nick), SEND_ERROR);
 	string s("-_[]{}\\`|");
 	for (string::const_iterator i = nick.begin(); i != nick.end(); ++i)
 	{
 		if (std::isalnum(*i) == 0 && s.find(*i) == string::npos)
-		{
-			SendData(ERR_ERRONEUSNICKNAME(nick));
-			return (0);
-		}
+			throw irc_error(ERR_ERRONEUSNICKNAME(nick), SEND_ERROR);
 	}
 	for (std::map< int, Client >::const_iterator it = _clients->begin(); it != _clients->end(); ++it)
 	{
 		if (it->second.GetUinfo()[nickname] == nick)
 		{
-			SendData(ERR_NICKNAMEINUSE(nick));
-			return (0);
+			std::cout << "throw" << std::endl;
+			throw irc_error(ERR_NICKNAMEINUSE(nick), CLOSE_CONNECTION);
 		}
+		std::cout << "here" << std::endl;
 	}
-	return (1);
 }
 
 // Non-member Function

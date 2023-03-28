@@ -11,6 +11,8 @@ typedef std::string string;
 enum Errors {
 	SUCCESS = 0,
 	CLOSE_CONNECTION,
+	NO_SEND,
+	SEND_ERROR,
 };
 
 class irc_error: public std::exception

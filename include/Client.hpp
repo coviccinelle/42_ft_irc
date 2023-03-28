@@ -75,7 +75,7 @@ class Client
 		void							_Nick(cst_vec_str &cmd); // Parse NICK cmd
 		void							_User(cst_vec_str &cmd); // Parse USER cmd
 		void							_Ping(cst_vec_str &cmd); // Parse PING cmd
-		int								ValidNickname(const string &nick);
+		void							ValidNickname(const string &nick);
 
 		/* Connection Info */
 		int								_fd; // Connection socket

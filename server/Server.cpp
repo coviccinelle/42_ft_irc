@@ -122,8 +122,16 @@ void	Server::_ReceiveData(struct pollfd &pfd)
 					std::cout << e.what() << std::endl;
 					return (_CloseConnection(pfd));
 				}
-				std::cerr << "⚠️  warning :" << e.what() << std::endl;
-				client.SendData(e.what());
+				if (e.code() == NO_SEND)
+				{
+					std::cout << e.what() << std::endl;
+					return ;
+				}
+				if (e.code() == SEND_ERROR)
+				{
+					client.SendData(e.what());
+					return ;
+				}
 			}
 		}
 	}
