@@ -2,7 +2,7 @@
 #define SERVER_HPP
 
 #include "../utils/utils.hpp"
-#include "../include/system_error.hpp"
+#include "../include/irc_error.hpp"
 #include "../include/Client.hpp"
 
 #define MAX_LISTEN	5

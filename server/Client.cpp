@@ -168,10 +168,6 @@ void	Client::_User(cst_vec_str &cmd)
 		_uinfo[hostname] = p[1];
 		_uinfo[servername] = p[2];
 		_uinfo[realname] = rn;
-		std::cout << "username : " <<_uinfo[username] << std::endl;
-		std::cout << "hostname : " << _uinfo[hostname] << std::endl;
-		std::cout << "servername : " << _uinfo[servername] << std::endl;
-		std::cout << "realname : " << _uinfo[realname] << std::endl;
 		SendData(RPL_WELCOME(_uinfo[nickname], _uinfo[username], _uinfo[hostname]));
 	}
 }
@@ -190,7 +186,7 @@ void	Client::_Nick(cst_vec_str &cmd)
 		return ;
 	}
 	if (ValidNickname(cmd[1]) == 0)
-		return ;
+		throw std::invalid_argument("invalid nickname");
 	else
 	{
 		_uinfo[nickname] = p[0];
@@ -201,23 +197,19 @@ void	Client::_Nick(cst_vec_str &cmd)
 void	Client::_Pass(cst_vec_str &cmd)
 {
 	if (cmd.size() == 1)
-	{
-		SendData(ERR_NEEDMOREPARAMS(cmd[0]));
-		return ;
-	}
+		throw std::invalid_argument(ERR_NEEDMOREPARAMS(cmd[0]));
 	if (_validPass)
-	{
-		SendData(ERR_ALREADYREGISTERED);
-		return ;
-	}
-	vec_str p(Split(cmd[1]));
-	if (p[0] == _servPass)
-	{
-		std::cout << "ℹ️  irc server:\033[0;32m valid pass \033[0;37mfrom " << _ip << " on socket " << _fd << std::endl;
-		_validPass = true;
-	}
-	else
-		std::cout << "ℹ️  irc server:\033[0;31m invalid pass \033[0;37mfrom " << _ip << " on socket " << _fd << std::endl;
+		throw std::invalid_argument(ERR_ALREADYREGISTERED);
+	if (cmd[1] != _servPass)
+		throw irc_error("invalid pass", INVALID_PASS);
+	std::cout << "ℹ️  irc server:\033[0;32m valid pass \033[0;37mfrom " << _ip << " on socket " << _fd << std::endl;
+	_validPass = true;
+}
+
+void	Client::_Ping(cst_vec_str &cmd)
+{
+	(void)cmd;
+	std::cout << "ping command received" << std::endl;
 }
 
 void	Client::_CapLs(cst_vec_str &cmd)
@@ -275,40 +267,34 @@ void	Client::ExecCommand(cst_vec_str &cmd)
 	}
 }
 
-int	Client::ParseRecv(const string &buf)
+void	Client::ParseRecv(const string &buf)
 {
 	size_t pos;
-//	std::cout << "_buf :" << _buf << std::endl;
 	_buf += buf;
-//	std::cout << "_buf :" << _buf << std::endl;
 	if ((pos = _buf.find_last_of("\n")) == string::npos)
-		return (0);
+		return ;
 	string tmp = _buf.substr(0, (_buf.begin() + pos) - _buf.begin());
-
-//	std::cout << "tmp :" << tmp << std::endl;
 	SplitCmds(trim(tmp));
-
 	tmp = _buf.substr(pos, _buf.end() - (_buf.begin() + pos));
 	_buf = tmp;
-//	std::cout << "_buf :" << _buf << std::endl;
 
 	if (_cmds.empty())
 	{
 		std::cerr << "⚠️  warning : empty commands" << std::endl;
-		return (-1);
+		return ;
 	}
 
 	while (_cmds.empty() == 0)
 	{
 		ExecCommand(_cmds[0]);
-
-
-//		for (vec_str::const_iterator j = _cmds[0].begin(); j != _cmds[0].end(); ++j)
-//			std::cout <<  "[" << *j << "]";
+			// printer
+		for (vec_str::const_iterator j = _cmds[0].begin(); j != _cmds[0].end(); ++j)
+			std::cout <<  "[" << *j << "]";
 		std::cout << std::endl;
+			//
 		_cmds.erase(_cmds.begin());
 	}
-	return (0);
+	return ;
 }
 
 void Client::SendData(const string &msg) const
