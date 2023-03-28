@@ -28,6 +28,7 @@ enum InfoClient {
  */
 enum CmdVal {
 	UNKNOWN = 0,
+	CAP,
 	PASS,
 	NICK,
 	USER
@@ -68,6 +69,7 @@ class Client
 
 	private:
 		/* Private Methods */
+		void							_CapLs(cst_vec_str &cmd);// Parse CAP LS cmd
 		void							_Pass(cst_vec_str &cmd); // Parse PASS cmd
 		void							_Nick(cst_vec_str &cmd); // Parse NICK cmd
 		void							_User(cst_vec_str &cmd); // Parse USER cmd

@@ -31,6 +31,7 @@ Client::Client(const string &pass, const std::map< int, Client > &clients) :
 	_clients(&clients)
 {
 	memset(&_addr, 0, sizeof(_addr));
+	_mapCmd.insert(std::make_pair(string("CAP"), CAP));
 	_mapCmd.insert(std::make_pair(string("PASS"), PASS));
 	_mapCmd.insert(std::make_pair(string("NICK"), NICK));
 	_mapCmd.insert(std::make_pair(string("USER"), USER));
@@ -219,6 +220,20 @@ void	Client::_Pass(cst_vec_str &cmd)
 		std::cout << "ℹ️  irc server:\033[0;31m invalid pass \033[0;37mfrom " << _ip << " on socket " << _fd << std::endl;
 }
 
+void	Client::_CapLs(cst_vec_str &cmd)
+{
+	if (cmd.size() != 2 || cmd[1] != "LS")
+	{
+		std::cout << "CAP LS invalid" << std::endl;
+		return ;
+	}
+	else
+	{
+		std::cout << "CAP LS ok" << std::endl;
+		return ;
+	}
+}
+
 // Mapping between string comands name and enum type ex: "PASS" (string) -> PASS (int)
 // Used for switch case
 CmdVal	Client::ResolveOption(const string &input)
@@ -235,6 +250,11 @@ void	Client::ExecCommand(cst_vec_str &cmd)
 {
 	switch (ResolveOption(cmd[0]))
 	{
+		case CAP:
+		{
+			_CapLs(cmd);
+			break ;
+		}
 		case PASS:
 		{
 			_Pass(cmd);
