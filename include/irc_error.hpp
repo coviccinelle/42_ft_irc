@@ -10,8 +10,7 @@ typedef std::string string;
 
 enum Errors {
 	SUCCESS = 0,
-	INVALID_PASS,
-	INVALID_NICK,
+	CLOSE_CONNECTION,
 };
 
 class irc_error: public std::exception
@@ -22,7 +21,7 @@ class irc_error: public std::exception
 		irc_error &operator=(const irc_error &rhs);
 		irc_error(const irc_error &src);
 
-		irc_error(const string &error, int code = 0);
+		irc_error(const string &error, int code = SUCCESS);
 
 		virtual const char* what() const throw();
 		virtual int			code() const throw();
