@@ -6,8 +6,11 @@ const string& parsePort(const string &port)
 		if (isdigit(*it) == 0)
 			throw std::invalid_argument("Invalid Port Number: only positive digits accepted");
 
-	if (std::atoi(port.c_str()) > 65535)
-		throw std::invalid_argument("Invalid Port Number : portNumber must be between 1 and 65535");
+	int	res = std::atoi(port.c_str());
+
+	// The process need to run as root if port are in range 1-1023
+	if (res > 65535 && res < 1024) 
+		throw std::invalid_argument("Invalid Port Number : portNumber must be between 1024 and 65535");
 
 	return (port);
 }
