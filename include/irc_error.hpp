@@ -26,7 +26,7 @@ class irc_error: public std::exception
 		irc_error(const string &error, int code = SUCCESS);
 
 		virtual const char* what() const throw();
-		virtual int			code() const throw();
+		int					code() const throw();
 	private:
 		string	_str;
 		int		_code;

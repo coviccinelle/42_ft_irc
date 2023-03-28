@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   Server.cpp                                         :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: jfrancai <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/03/28 11:42:52 by jfrancai          #+#    #+#             */
+/*   Updated: 2023/03/28 11:49:58 by jfrancai         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../include/Server.hpp"
 
 Server::Server(const std::string &port, const std::string &pass) :
@@ -102,6 +114,7 @@ void	Server::_ReceiveData(struct pollfd &pfd)
 		int ret;
 		char buf[512];
 
+		pfd.events = POLLIN;
 		memset(&buf, 0, sizeof(buf));
 		ret = recv(pfd.fd, buf, sizeof buf, 0); 
 		if (ret == 0)

@@ -5,7 +5,7 @@ irc_error::irc_error() : _str(std::strerror(errno)), _code(errno)
 	return ;
 }
 
-irc_error::irc_error(const std::string &error, int code) : _str(error + ": " + std::strerror(errno)), _code(code)
+irc_error::irc_error(const std::string &error, int code) : _str(error), _code(code)
 {
 	return ;
 }
