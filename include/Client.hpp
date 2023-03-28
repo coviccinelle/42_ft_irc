@@ -2,7 +2,7 @@
 #define CLIENT_HPP
 
 #include "../utils/utils.hpp"
-#include "../include/system_error.hpp"
+#include "../include/irc_error.hpp"
 
 # define RPL_WELCOME(nick, user, host) ("001 " + nick + " :Welcome to the Internet Relay Network " + nick + "!" + user + "@" + host + "\r\n")
 # define ERR_NEEDMOREPARAMS(command) ("461 " + command + " :Not enough parameters\r\n")

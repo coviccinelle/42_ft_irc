@@ -36,7 +36,7 @@ void	Server::AwaitingConnectionQueue()
 	hints.ai_flags = AI_PASSIVE;
 
 	if ((ret_value = getaddrinfo(NULL, _portNumber.c_str(), &hints, &res)) != 0)
-		throw system_error("getaddrinfo error");
+		throw irc_error("getaddrinfo error");
 
 	for (p = res; p != NULL; p = p->ai_next)
 	{
@@ -46,9 +46,9 @@ void	Server::AwaitingConnectionQueue()
 			continue;
 		}
 		if (fcntl(_listener, F_SETFL, O_NONBLOCK) == -1)
-			throw system_error("fcntl");
+			throw irc_error("fcntl");
 		if (setsockopt(_listener, SOL_SOCKET, SO_REUSEPORT, &sockopt, sizeof(sockopt)) == -1)
-			throw system_error("setsockopt");
+			throw irc_error("setsockopt");
 		if (bind(_listener, res->ai_addr, res->ai_addrlen) == -1)
 		{
 			close(_listener);
@@ -58,10 +58,10 @@ void	Server::AwaitingConnectionQueue()
 		break;
 	}
 	if (p == NULL)
-		throw system_error("💀 fatal: socket binding failed");
+		throw irc_error("💀 fatal: socket binding failed");
 	freeaddrinfo(res);
 	if (listen(_listener, MAX_LISTEN) == -1)
-		throw system_error("listen failed");
+		throw irc_error("listen failed");
 }
 
 void Server::_AcceptNewConnection()
@@ -115,12 +115,14 @@ void	Server::_ReceiveData(struct pollfd &pfd)
 			try {
 				client.ParseRecv(buf);
 			}
-			catch (std::exception &e)
+			catch (irc_error &e)
 			{
-				if (e.what() == string("invalid pass"))
+				if (e.code() == INVALID_PASS)
+				{
+					std::cout << "ℹ️  irc server:\033[0;31m invalid pass \033[0;37mfrom " << client.GetIp() << " on socket " << client.GetFd() << std::endl;
 					return (_CloseConnection(pfd));
-
-				std::cerr << e.what() << std::endl;
+				}
+				std::cerr << "⚠️  warning :" << e.what() << std::endl;
 				client.SendData(e.what());
 			}
 		}
@@ -163,7 +165,7 @@ void Server::ConnectionLoop()
 	while (1)
 	{
 		if ((_poll_count = poll(_pollfds.data(), _pollfds.size(), -1)) == 10)
-			throw system_error("poll failed");
+			throw irc_error("poll failed");
 		//system("clear");
 		std::cout << "------------[ IRC ]------------" << std::endl;
 		std::cout << "port [" << _portNumber << "] password [" << _password << "]" << std::endl;

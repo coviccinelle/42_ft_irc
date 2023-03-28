@@ -6,7 +6,7 @@ SRC		=	main.cpp \
 			utils/utils.cpp \
 			server/Server.cpp \
 			server/Client.cpp \
-			utils/system_error.cpp
+			utils/irc_error.cpp
 
 SRC_PARSED	=	main_test.cpp 
 OBJ_PARSED	=	$(SRC_PARSED:.cpp=.o)

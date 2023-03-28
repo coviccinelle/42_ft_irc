@@ -198,21 +198,11 @@ void	Client::_Pass(cst_vec_str &cmd)
 	if (cmd.size() == 1)
 		throw std::invalid_argument(ERR_NEEDMOREPARAMS(cmd[0]));
 	if (_validPass)
-	{
-		SendData(ERR_ALREADYREGISTERED);
-		return ;
-	}
-	vec_str p(Split(cmd[1]));
-	if (p[0] == _servPass)
-	{
-		std::cout << "ℹ️  irc server:\033[0;32m valid pass \033[0;37mfrom " << _ip << " on socket " << _fd << std::endl;
-		_validPass = true;
-	}
-	else
-	{
-		std::cout << "ℹ️  irc server:\033[0;31m invalid pass \033[0;37mfrom " << _ip << " on socket " << _fd << std::endl;
-		throw std::invalid_argument("invalid pass");
-	}
+		throw std::invalid_argument(ERR_ALREADYREGISTERED);
+	if (cmd[1] != _servPass)
+		throw irc_error("invalid pass", INVALID_PASS);
+	std::cout << "ℹ️  irc server:\033[0;32m valid pass \033[0;37mfrom " << _ip << " on socket " << _fd << std::endl;
+	_validPass = true;
 }
 
 void	Client::_Ping(cst_vec_str &cmd)
