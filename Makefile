@@ -5,7 +5,7 @@ RM		=	rm -rf
 SRC		=	main.cpp \
 			server/Server.cpp \
 			server/Client.cpp \
-			parser/Token.cpp \
+			server/Parser.cpp \
 			utils/utils.cpp \
 			utils/irc_error.cpp 
 
