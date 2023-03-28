@@ -30,11 +30,6 @@ Client::Client(const string &pass, const std::map< int, Client > &clients) :
 	_uinfo(INF_CLI_SIZE),
 	_clients(&clients)
 {
-	_uinfo[nickname] = "default";
-	_uinfo[username] = "default";
-	_uinfo[hostname] = "default";
-	_uinfo[servername] = "default";
-	_uinfo[realname] = "default";
 	memset(&_addr, 0, sizeof(_addr));
 	_mapCmd.insert(std::make_pair(string("CAP"), CAP));
 	_mapCmd.insert(std::make_pair(string("PASS"), PASS));
@@ -185,6 +180,8 @@ void	Client::_Nick(cst_vec_str &cmd)
 		throw irc_error(ERR_NONICKNAMEGIVEN, SEND_ERROR);
 	vec_str p(Split(cmd[1]));
 	ValidNickname(cmd[1]);
+	string msg = ":" + _uinfo[nickname] + "!" + _uinfo[username] + "@" + _uinfo[hostname] + " NICK " + p[0] + "\r\n";
+	SendData(msg);
 	_uinfo[nickname] = p[0];
 	std::cout << "NICK has been set to " << _uinfo[nickname] << std::endl;
 }
@@ -287,8 +284,7 @@ void	Client::ParseRecv(const string &buf)
 		}
 		catch (irc_error &e)
 		{
-			while (_cmds.empty() == 0)
-				_cmds.erase(_cmds.begin());
+			_cmds.erase(_cmds.begin());
 			throw;
 		}
 			// printer
@@ -322,7 +318,10 @@ void	Client::ValidNickname(const string &nick)
 	for (std::map< int, Client >::const_iterator it = _clients->begin(); it != _clients->end(); ++it)
 	{
 		if (&it->second != this && it->second.GetUinfo()[nickname] == nick)
+		{
+			_uinfo[nickname] = "";
 			throw irc_error(ERR_NICKNAMEINUSE(nick), SEND_ERROR);
+		}
 	}
 }
 

@@ -3,10 +3,11 @@ CC		=	c++
 CFLAGS	=	-Wall -Wextra -Werror -std=c++98
 RM		=	rm -rf
 SRC		=	main.cpp \
-			utils/utils.cpp \
 			server/Server.cpp \
 			server/Client.cpp \
-			utils/irc_error.cpp
+			parser/Token.cpp \
+			utils/utils.cpp \
+			utils/irc_error.cpp 
 
 SRC_PARSED	=	main_test.cpp 
 OBJ_PARSED	=	$(SRC_PARSED:.cpp=.o)
