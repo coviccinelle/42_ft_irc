@@ -307,10 +307,8 @@ void	Client::ValidNickname(const string &nick)
 	{
 		if (it->second.GetUinfo()[nickname] == nick)
 		{
-			std::cout << "throw" << std::endl;
 			throw irc_error(ERR_NICKNAMEINUSE(nick), CLOSE_CONNECTION);
 		}
-		std::cout << "here" << std::endl;
 	}
 }
 
