@@ -23,4 +23,24 @@ namespace {
 		EXPECT_EQ(wit, res);
 	}
 
+	TEST(ParserClass, ParseServername) {
+		Parser p;
+		vec_tok res = p.Parse(":42MyServerName-TheBest42IRC PASS toto");
+
+		vec_tok wit;
+		wit.push_back(digit);
+		wit.push_back(letter);
+		wit.push_back(dash);
+		wit.push_back(letter);
+		wit.push_back(digit);
+		wit.push_back(letter);
+		wit.push_back(space);
+		wit.push_back(letter);
+		wit.push_back(space);
+		wit.push_back(letter);
+		wit.push_back(eoi);
+
+		EXPECT_EQ(wit, res);
+	}
+
 }  // namespace

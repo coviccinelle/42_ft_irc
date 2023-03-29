@@ -59,7 +59,6 @@ Token	Parser::_GetToken()
 				// letter
 				if (isalpha(*_it)) state = 1;
 				else if (_it == end || *_it == SPACE) return (letter);
-				else state = 6;
 				++_it;
 				break ;
 			case 2:
@@ -136,7 +135,6 @@ void Parser::_Wrapper()
 {
 	_current = _GetToken();
 	_tokens.push_back(_current);
-	/*
 	if (_current == space)
 		std::cout << "space" << std::endl;
 	else if (_current == nosp)
@@ -155,7 +153,6 @@ void Parser::_Wrapper()
 		std::cout << "@" << std::endl;
 	else
 		std::cout << "error" << std::endl;
-		*/
 }
 
 const std::vector< Token >	&Parser::Parse(const string &str)
