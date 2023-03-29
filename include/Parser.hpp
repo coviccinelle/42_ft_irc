@@ -38,14 +38,18 @@ class Parser
 		Parser(Parser const &src);
 		Parser	&operator=(Parser const &rhs);
 
-		void	Parse(const string &str);
-		void	wrap();
+		const std::vector< Token >	&Parse(const string &str);
 	private:
 		Token					_GetToken();
-		string					_input;
-		string::iterator		_it;
+		void					_Wrapper();
 		Token					_current;
-		std::vector< Token >			_tokens;
+		string					_input;
+		void					_Message();
+		void					_Command();
+		void					_Prefix();
+		void					_Param();
+		string::iterator		_it;
+		std::vector< Token >	_tokens;
 };
 
 int	isspecial(int ch);

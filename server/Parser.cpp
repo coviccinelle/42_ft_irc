@@ -2,21 +2,18 @@
 
 Parser::Parser(void)
 {
-	std::cout << "Parser default constructor called." << std::endl;
 
 	return ;
 }
 
 Parser::~Parser(void)
 {
-	std::cout << "Parser destructor called" << std::endl;
 
 	return ;
 }
 
 Parser::Parser(Parser const &src)
 {
-	std::cout << "Parser copy constructor called" << std::endl;
 	*this = src;
 
 	return ;
@@ -24,7 +21,6 @@ Parser::Parser(Parser const &src)
 
 Parser &Parser::operator=(Parser const &rhs)
 {
-	std::cout << "Parser copy assignment operator called" << std::endl;
 	if (&rhs == this)
 		return (*this);
 
@@ -100,9 +96,47 @@ Token	Parser::_GetToken()
 	return (eoi);
 }
 
-void Parser::wrap()
+void Parser::_Prefix()
+{
+	std::cout << "I'm prefix now" << std::endl;
+}
+
+void	Parser::_Command()
+{
+	std::cout << "I'm command" << std::endl;
+}
+
+void	Parser::_Param()
+{
+	std::cout << "I'm Param" << std::endl;
+}
+
+void Parser::_Message()
+{
+	_Wrapper();
+	if (_current == colon)
+	{
+		_Prefix();
+		_Wrapper();
+		if (_current != space)
+			throw ;
+	}
+	else if (_current == letter || _current == digit)
+	{
+		_Command();
+		_Wrapper();
+		_Param();
+		_Wrapper();
+		if (_current != eoi)
+			throw;
+	}
+}
+
+void Parser::_Wrapper()
 {
 	_current = _GetToken();
+	_tokens.push_back(_current);
+	/*
 	if (_current == space)
 		std::cout << "space" << std::endl;
 	else if (_current == nosp)
@@ -121,16 +155,18 @@ void Parser::wrap()
 		std::cout << "@" << std::endl;
 	else
 		std::cout << "error" << std::endl;
+		*/
 }
 
-void	Parser::Parse(const string &str)
+const std::vector< Token >	&Parser::Parse(const string &str)
 {
 	_input = str;
 	_it = _input.begin();
 
-	wrap();
+	_Wrapper();
 	while (_current != eoi)
 	{
-		wrap();
+		_Wrapper();
 	}
+	return (_tokens);
 }
