@@ -11,21 +11,12 @@
 
 enum Token {
 	colon,
-	prefix,
 	space,
-	command,
-	params,
-	crlf,
-	servername,
-	nickname,
 	exclamation_mark,
-	user,
 	at,
-	host,
+	command,
 	letter,
 	digit,
-	middle,
-	trailing,
 	nospcrlfcl,
 	eoi,
 	error
@@ -42,7 +33,6 @@ class Parser
 		void	Parse(const string &str);
 	private:
 		Token					_GetToken() const;
-		Token					_current;
 		string					_input;
 		string::const_iterator	_it;
 };
