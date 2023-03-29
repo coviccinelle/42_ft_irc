@@ -14,9 +14,11 @@ enum Token {
 	space,
 	exclamation_mark,
 	at,
+	nospcl,
+	nosp,
+	special,
 	letter,
 	digit,
-	nospcl,
 	eoi,
 	error
 };
@@ -31,9 +33,11 @@ class Parser
 
 		void	Parse(const string &str);
 	private:
-		Token					_GetToken() const;
+		Token					_GetToken();
 		string					_input;
-		string::const_iterator	_it;
+		string::iterator		_it;
 };
+
+int	isspecial(int ch);
 
 #endif
