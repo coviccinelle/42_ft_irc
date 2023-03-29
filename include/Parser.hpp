@@ -33,6 +33,8 @@ class Parser
 	private:
 		Token					_GetToken() const;
 		string					_input;
+		void					_Message();
+		void					_Prefix();
 		string::const_iterator	_it;
 };
 

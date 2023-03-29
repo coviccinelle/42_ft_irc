@@ -100,3 +100,25 @@ Token	Parser::_GetToken() const
 	}
 	return (eoi);
 }
+
+Token	wrapper()
+{
+	std::cout << "Bullshit" << std::endl;
+	return(_GetToken());
+}
+
+void Parser::_Prefix()
+{
+	std::cout << "I'm prefix now" << std::endl;
+}
+
+void Parser::_Message()
+{
+	if (wrapper() == colon)
+	{
+		_Prefix();
+		if (wrapper() != space)
+			throw ;
+	}
+	else if (wrapper() 
+}
