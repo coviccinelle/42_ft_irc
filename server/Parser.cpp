@@ -48,22 +48,45 @@ Token	Parser::_GetToken() const
 		{
 			case 0:
 				if (_it == end) return (eoi);
-				else if (isalpha(*_it)) state = 1;
-				else if (isdit(*_it)) state = 2;
 				else if (*_it == ':') return (colon);
 				else if (*_it == SPACE) return (space);
-				else if (isspace(*_it)) state = 3;
 				else if (*_it == '!') return (exclamation_mark);
 				else if (*_it == '*') return (at);
+				else if (isalpha(*_it)) state = 1;
+				else if (isdigit(*_it)) state = 2;
+				else state = 3;
 				++_it;
 				break ;
 			case 1:
+				if (isalpha(*_it)) state = 1;
+					s += *_it;
+				else
+				{
+					--_it;
+					return (letter);
+				}
 				break ;
 			case 2:
+				if (isdigit(*_it)) state = 2;
+					s += *_it;
+				else if (*_it == SPACE)
+				{
+					--_it;
+					return (digit);
+				}
+				else state =  6;
 				break ;
 			case 5:
+				if (_it != end) state = 3;
+					s += *_it;
+				else
+				{
+					--_it;
+					return (nospcl);
+				}
 				break ;
 			case 6:
+				// no spcrlfcl
 				break ;
 			case 7:
 				break ;

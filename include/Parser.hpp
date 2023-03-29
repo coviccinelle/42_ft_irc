@@ -14,10 +14,9 @@ enum Token {
 	space,
 	exclamation_mark,
 	at,
-	command,
 	letter,
 	digit,
-	nospcrlfcl,
+	nospcl,
 	eoi,
 	error
 };
