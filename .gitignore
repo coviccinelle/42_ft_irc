@@ -5,3 +5,5 @@ tags
 irrsi
 ircserv
 objs
+googletest_build
+googletest

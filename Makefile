@@ -1,13 +1,15 @@
 NAME	=	ircserv 
 CC		=	c++
-CFLAGS	=	-Wall -Wextra -Werror -std=c++98
+CFLAGS	=	-Wall -Wextra -Werror -std=c++98 -I include/ -I lib/googletest/include
+TESTFLAGS =  -L lib/googletest/lib -lgtest -lgtest_main -lgmock
 RM		=	rm -rf
 
 SRC		=	server/Server.cpp \
 			server/Client.cpp \
 			server/Parser.cpp \
 			utils/utils.cpp \
-			utils/irc_error.cpp 
+			utils/irc_error.cpp \
+			tests/parser_test.cpp
 
 OBJDIR	=	objs
 OBJ		=	$(addprefix $(OBJDIR)/, $(SRC:.cpp=.o))
@@ -51,7 +53,7 @@ endef
  # ******************************************************************************* #
 
 $(NAME): $(OBJ)
-	@$(CC) $(CFLAGS) $(OBJ) -o $(NAME)
+	@$(CC) $(CFLAGS) $(OBJ) $(TESTFLAGS) -o $(NAME)
 	@printf "${B}${CWHITE}]\n"
 
 ${OBJDIR}/%.o:${SRCDIR}%.cpp

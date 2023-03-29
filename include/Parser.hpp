@@ -4,22 +4,29 @@
 #include "../utils/utils.hpp"
 #include "../include/irc_error.hpp"
 
-#define CR 0x0D
-#define LF 0x0A
 #define NUL 0x00
 #define SPACE 0x20
 
 enum Token {
-	colon,
 	space,
-	exclamation_mark,
-	at,
-	nospcl,
 	nosp,
-	special,
+	nospcl,
 	letter,
 	digit,
+	colon,
+	at,
+	excl_mark,
+
+	special,
+	dash,
+	dot,
 	eoi,
+	comma,
+	percent,
+	plus,
+	sha,
+	amp,
+	dollar,
 	error
 };
 
@@ -32,10 +39,13 @@ class Parser
 		Parser	&operator=(Parser const &rhs);
 
 		void	Parse(const string &str);
+		void	wrap();
 	private:
 		Token					_GetToken();
 		string					_input;
 		string::iterator		_it;
+		Token					_current;
+		std::vector< Token >			_tokens;
 };
 
 int	isspecial(int ch);

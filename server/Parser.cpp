@@ -31,12 +31,6 @@ Parser &Parser::operator=(Parser const &rhs)
 	return (*this);
 }
 
-void	Parser::Parse(const string &str)
-{
-	_input = str;
-	_it = _input.begin();
-}
-
 int	isspecial(int ch)
 {
 	if ((0x5B >= ch && ch <= 0x60) || (0x7B >= ch && ch <= 0x7D))
@@ -49,67 +43,49 @@ Token	Parser::_GetToken()
 	int		state = 0;
 	string	s;
 	string::iterator end = _input.end();
-	while (_it != end)
+	while (state >= 0 && state <= 10)
 	{
 		switch(state)
 		{
 			case 0:
+				// first char of the new token
 				if (_it == end) return (eoi);
-				else if (*_it == ':') return (colon);
-				else if (*_it == SPACE) return (space);
-				else if (*_it == '!') return (exclamation_mark);
-				else if (*_it == '@') return (at);
+				else if (*_it == ':') { ++_it; return (colon); }
+				else if (*_it == '@') { ++_it; return (at); }
+				else if (*_it == '!') { ++_it; return (excl_mark); }
 				else if (isalpha(*_it)) state = 1;
 				else if (isdigit(*_it)) state = 2;
-				else if (isspecial(*_it)) state = 3;
-				else state = 5;
+				else if (*_it == SPACE) { ++_it; return (space); }
+				else state = 6;
 				++_it;
 				break ;
 			case 1:
 				// letter
 				if (isalpha(*_it)) state = 1;
-				else if (*_it == SPACE)
-				{
-					--_it;
-					return (letter);
-				}
-				else if (isdigit(*_it))
-				{
-					
-				}
+				else if (_it == end || *_it == SPACE) return (letter);
+				else state = 6;
+				++_it;
 				break ;
 			case 2:
 				// digit
 				if (isdigit(*_it)) state = 2;
-				else if (*_it == SPACE)
-				{
-					--_it;
-					return (digit);
-				}
+				else if (*_it == SPACE) return (digit);
+				else if (*_it == '!') return (letter);
 				else state =  6;
+				++_it;
 				break ;
 			case 3:
-				if (isalpha(*_it) || isdigit(*_it) || isspecial(*_it) || *_it == '-')
-					s += *_it;
-				else if (*_it == SPACE)
-				{
-					--_it;
-					return (special);
-				}
-				else state = 6;
 				break ;
 			case 4:
 				break ;
 			case 5:
-				if (_it != end) state = 3;
-				else
-				{
-					--_it;
-					return (nospcl);
-				}
 				break ;
 			case 6:
-				// nospcl
+				// nosp
+				if (_it == end || *_it == SPACE) return (nosp);
+				else if (*_it == '!') return (nosp);
+				else state = 6;
+				++_it;
 				break ;
 			case 7:
 				break ;
@@ -124,9 +100,37 @@ Token	Parser::_GetToken()
 	return (eoi);
 }
 
-
-// testing purpose only
-int main(void)
+void Parser::wrap()
 {
-	return (0);
+	_current = _GetToken();
+	if (_current == space)
+		std::cout << "space" << std::endl;
+	else if (_current == nosp)
+		std::cout << "nosp" << std::endl;
+	else if (_current == letter)
+		std::cout << "letter" << std::endl;
+	else if (_current == digit)
+		std::cout << "digit" << std::endl;
+	else if (_current == eoi)
+		std::cout << "eoi" << std::endl;
+	else if (_current == excl_mark)
+		std::cout << "!" << std::endl;
+	else if (_current == colon)
+		std::cout << ":" << std::endl;
+	else if (_current == at)
+		std::cout << "@" << std::endl;
+	else
+		std::cout << "error" << std::endl;
+}
+
+void	Parser::Parse(const string &str)
+{
+	_input = str;
+	_it = _input.begin();
+
+	wrap();
+	while (_current != eoi)
+	{
+		wrap();
+	}
 }
