@@ -37,11 +37,18 @@ void	Parser::Parse(const string &str)
 	_it = _input.begin();
 }
 
-Token	Parser::_GetToken() const
+int	isspecial(int ch)
+{
+	if ((0x5B >= ch && ch <= 0x60) || (0x7B >= ch && ch <= 0x7D))
+		return (ch);
+	return (0);
+}
+
+Token	Parser::_GetToken()
 {
 	int		state = 0;
 	string	s;
-	string::const_iterator end = _input.end();
+	string::iterator end = _input.end();
 	while (_it != end)
 	{
 		switch(state)
@@ -51,24 +58,29 @@ Token	Parser::_GetToken() const
 				else if (*_it == ':') return (colon);
 				else if (*_it == SPACE) return (space);
 				else if (*_it == '!') return (exclamation_mark);
-				else if (*_it == '*') return (at);
+				else if (*_it == '@') return (at);
 				else if (isalpha(*_it)) state = 1;
 				else if (isdigit(*_it)) state = 2;
-				else state = 3;
+				else if (isspecial(*_it)) state = 3;
+				else state = 5;
 				++_it;
 				break ;
 			case 1:
+				// letter
 				if (isalpha(*_it)) state = 1;
-					s += *_it;
-				else
+				else if (*_it == SPACE)
 				{
 					--_it;
 					return (letter);
 				}
+				else if (isdigit(*_it))
+				{
+					
+				}
 				break ;
 			case 2:
+				// digit
 				if (isdigit(*_it)) state = 2;
-					s += *_it;
 				else if (*_it == SPACE)
 				{
 					--_it;
@@ -76,9 +88,20 @@ Token	Parser::_GetToken() const
 				}
 				else state =  6;
 				break ;
+			case 3:
+				if (isalpha(*_it) || isdigit(*_it) || isspecial(*_it) || *_it == '-')
+					s += *_it;
+				else if (*_it == SPACE)
+				{
+					--_it;
+					return (special);
+				}
+				else state = 6;
+				break ;
+			case 4:
+				break ;
 			case 5:
 				if (_it != end) state = 3;
-					s += *_it;
 				else
 				{
 					--_it;
@@ -86,7 +109,7 @@ Token	Parser::_GetToken() const
 				}
 				break ;
 			case 6:
-				// no spcrlfcl
+				// nospcl
 				break ;
 			case 7:
 				break ;
@@ -101,10 +124,10 @@ Token	Parser::_GetToken() const
 	return (eoi);
 }
 
-Token	wrapper()
+void	wrapper()
 {
 	std::cout << "Bullshit" << std::endl;
-	return(_GetToken());
+	_current = _GetToken();
 }
 
 void Parser::_Prefix()
@@ -112,13 +135,41 @@ void Parser::_Prefix()
 	std::cout << "I'm prefix now" << std::endl;
 }
 
+void	Parser::_Command()
+{
+	std::cout << "I'm command" << std::endl;
+}
+
+void	Parser::_Param()
+{
+	std::cout << "I'm Param" << std::endl;
+}
+
 void Parser::_Message()
 {
-	if (wrapper() == colon)
+	wrapper();
+	if (_current == colon)
 	{
 		_Prefix();
-		if (wrapper() != space)
+		wrapper();
+		if (_current != space)
 			throw ;
 	}
-	else if (wrapper() 
+	else if (_current == letter || _current == digit)
+	{
+		_Command();
+		wrapper();
+		_Param();
+		wrapper();
+		if (_current != eoi)
+			throw;
+	}
+}
+
+
+
+// testing purpose only
+int main(void)
+{
+	return (0);
 }

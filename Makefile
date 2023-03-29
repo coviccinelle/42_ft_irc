@@ -2,15 +2,12 @@ NAME	=	ircserv
 CC		=	c++
 CFLAGS	=	-Wall -Wextra -Werror -std=c++98
 RM		=	rm -rf
-SRC		=	main.cpp \
-			server/Server.cpp \
+
+SRC		=	server/Server.cpp \
 			server/Client.cpp \
 			server/Parser.cpp \
 			utils/utils.cpp \
 			utils/irc_error.cpp 
-
-SRC_PARSED	=	main_test.cpp 
-OBJ_PARSED	=	$(SRC_PARSED:.cpp=.o)
 
 OBJDIR	=	objs
 OBJ		=	$(addprefix $(OBJDIR)/, $(SRC:.cpp=.o))
