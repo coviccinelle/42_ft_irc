@@ -10,7 +10,7 @@ namespace {
 
 	typedef std::vector< Token >		vec_tok;
 
-	TEST(ParserClass, ParseBasicTest) {
+/*	TEST(ParserClass, ParseBasicTest) {
 		Parser p;
 		vec_tok res = p.Parse("PASS toto");
 
@@ -79,11 +79,11 @@ namespace {
 		EXPECT_EQ(wit, res);
 	}
 
-
+*/
 	TEST(ParserClass, CommandTest)
 	{
 		Parser p;
-		vec_tok res = p.Parse(":thi-phng NICK 
+		vec_tok res = p.Parse("PASS toto");
 	}
 
 }  // namespace

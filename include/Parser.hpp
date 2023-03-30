@@ -50,6 +50,7 @@ class Parser
 		void					_User();
 		void					_Host();
 		void					_Param();
+		void					_Middle();
 		string::iterator		_it;
 		std::vector< Token >	_tokens;
 };

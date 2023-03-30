@@ -56,8 +56,8 @@ Token	Parser::_GetToken()
 	while (state >= 0 && state <= 10)
 	{
 		++_it;
-		//std::cout << "[" << *_it << "]" << std::endl;
-		//sleep(1);
+		std::cout << "[" << *_it << "]" << std::endl;
+//		sleep(1);
 		switch(state)
 		{
 			case 0:
@@ -116,8 +116,8 @@ Token	Parser::_GetToken()
 
 void	Parser::_Nickname()
 {
-	_Wrapper();
 	std::cout << "I'm Nickname" << std::endl;
+	_Wrapper();
 	if (_current != letter && _current != special)
 		throw ;
 	while (_current == letter || _current == digit || _current == special || _current == dash)
@@ -160,16 +160,32 @@ void Parser::_Prefix()
 void	Parser::_Command()
 {
 	std::cout << "I'm command" << std::endl;
+	if (_current != letter && _current != digit)
+		throw ;
+}
+
+void	Parser::_Middle()
+{
+	_Wrapper();
+	if (_current == colon || _current == space)
+		throw;
+	if (_current == eoi)
+		return ;
+//	_Target();
+	std::cout << "checking for valid targets" << std::endl;
 }
 
 void	Parser::_Param()
 {
 	std::cout << "I'm Param" << std::endl;
-	if (_current != space)
-		throw ;
 	_Wrapper();
-	if (_current != nospcl)
-		throw ;
+	while (_current != eoi)
+	{
+		if (_current != space)
+			throw ;
+		_Middle();
+		_Wrapper();
+	}
 }
 
 void Parser::_Message()
@@ -180,27 +196,21 @@ void Parser::_Message()
 		_Prefix();
 		if (_current != space)
 			throw ;
-	}
-	else if (_current == letter || _current == digit)
-	{
-		_Command();
 		_Wrapper();
-		_Param();
-		_Wrapper();
-		if (_current != eoi)
-			throw;
 	}
+	_Command();
+	_Param();
+	std::cout << "Done parsing Message ! OK" << std::endl;
 }
 
 void Parser::_Wrapper()
 {
 	_current = _GetToken();
+//	std::cout << "[" << _current << "]" << std::endl;
 	_tokens.push_back(_current);
-	/*
+	///*
 	if (_current == space)
 		std::cout << "space" << std::endl;
-	else if (_current == nosp)
-		std::cout << "nosp" << std::endl;
 	else if (_current == letter)
 		std::cout << "letter" << std::endl;
 	else if (_current == digit)
@@ -221,7 +231,7 @@ void Parser::_Wrapper()
 		std::cout << "dot" << std::endl;
 	else
 		std::cout << "error" << std::endl;
-		*/
+	//	*/
 }
 
 const std::vector< Token >	&Parser::Parse(const string &str)
@@ -229,10 +239,6 @@ const std::vector< Token >	&Parser::Parse(const string &str)
 	_input = str;
 	_it = --_input.begin();
 
-	_Wrapper();
-	while (_current != eoi)
-	{
-		_Wrapper();
-	}
+	_Message();
 	return (_tokens);
 }
