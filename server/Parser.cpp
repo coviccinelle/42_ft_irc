@@ -95,9 +95,19 @@ Token	Parser::_GetToken()
 	return (eoi);
 }
 
+void	Parser::_Nickname()
+{
+	std::cout << "I'm command" << std::endl;
+}
+
 void Parser::_Prefix()
 {
 	std::cout << "I'm prefix now" << std::endl;
+	_wrapper();
+	if (_current != letter || _current != special)
+		throw ;
+	_Nickname();
+
 }
 
 void	Parser::_Command()

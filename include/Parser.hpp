@@ -46,6 +46,7 @@ class Parser
 		string					_input;
 		void					_Message();
 		void					_Command();
+		void					_Nickname();
 		void					_Prefix();
 		void					_Param();
 		string::iterator		_it;
