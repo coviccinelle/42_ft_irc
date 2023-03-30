@@ -27,11 +27,25 @@ Parser &Parser::operator=(Parser const &rhs)
 	return (*this);
 }
 
-int	isspecial(int ch)
+bool	isspecial(string::const_iterator it)
 {
-	if ((0x5B >= ch && ch <= 0x60) || (0x7B >= ch && ch <= 0x7D))
-		return (ch);
-	return (0);
+	if ((*it >= '[' && *it <= '`') || (*it >= '{' && *it <= '~'))
+		return (true);
+	return (false);
+}
+
+bool is_fstate(string::const_iterator it, int skip)
+{
+	if (*it == ':' && skip != colon) return (true);
+	else if (*it == '@' && skip != at) return (true);
+	else if (*it == '!' && skip != excl_mark) return (true); 
+	else if (*it == '-' && skip != dash) return (true);
+	else if (*it == '.' && skip != dot) return (true);
+	else if (*it == SPACE && skip != space) return (true);
+	else if (isalpha(*it) && skip != letter) { return (true); }
+	else if (isdigit(*it) && skip != digit)	return (true);
+	else if (isspecial(it) && skip != special) return (true);
+	return (false);
 }
 
 Token	Parser::_GetToken()
@@ -41,36 +55,42 @@ Token	Parser::_GetToken()
 	string::iterator end = _input.end();
 	while (state >= 0 && state <= 10)
 	{
+		++_it;
+		//std::cout << "[" << *_it << "]" << std::endl;
+		//sleep(1);
 		switch(state)
 		{
 			case 0:
 				// first char of the new token
 				if (_it == end) return (eoi);
-				else if (*_it == ':') { ++_it; return (colon); }
-				else if (*_it == '@') { ++_it; return (at); }
-				else if (*_it == '!') { ++_it; return (excl_mark); }
+				else if (*_it == ':') { return (colon); }
+				else if (*_it == '@') { return (at); }
+				else if (*_it == '!') { return (excl_mark); }
+				else if (*_it == '-') { return (dash); }
+				else if (*_it == '.') { return (dot); }
+				else if (*_it == SPACE) { return (space); }
 				else if (isalpha(*_it)) state = 1;
 				else if (isdigit(*_it)) state = 2;
-				else if (*_it == SPACE) { ++_it; return (space); }
+				else if (isspecial(_it)) state = 3;
 				else state = 6;
-				++_it;
 				break ;
 			case 1:
 				// letter
-				if (isalpha(*_it)) state = 1;
-				else if (_it == end || *_it == SPACE) return (letter);
+				if (isalpha(*_it)) { state = 1;}
+				else if (_it == end || is_fstate(_it, letter)) { --_it; return (letter); }
 				else state = 6;
-				++_it;
 				break ;
 			case 2:
 				// digit
-				if (isdigit(*_it)) state = 2;
-				else if (*_it == SPACE) return (digit);
-				else if (*_it == '!') return (letter);
+				if (isdigit(*_it)) { state = 2; }
+				else if (_it == end || is_fstate(_it, digit)) { --_it; return (digit); }
 				else state =  6;
-				++_it;
 				break ;
 			case 3:
+				// special
+				if (isspecial(_it)) { state = 3; }
+				else if (_it == end || is_fstate(_it, special)) { --_it; return (special); }
+				else state = 6;
 				break ;
 			case 4:
 				break ;
@@ -78,10 +98,9 @@ Token	Parser::_GetToken()
 				break ;
 			case 6:
 				// nosp
-				if (_it == end || *_it == SPACE) return (nosp);
+				if (_it == end || is_fstate(_it, nosp)) { --_it; return (nosp); }
 				else if (*_it == '!') return (nosp);
 				else state = 6;
-				++_it;
 				break ;
 			case 7:
 				break ;
@@ -148,11 +167,17 @@ void Parser::_Wrapper()
 	else if (_current == eoi)
 		std::cout << "eoi" << std::endl;
 	else if (_current == excl_mark)
-		std::cout << "!" << std::endl;
+		std::cout << "excl_mark" << std::endl;
 	else if (_current == colon)
-		std::cout << ":" << std::endl;
+		std::cout << "colon" << std::endl;
 	else if (_current == at)
-		std::cout << "@" << std::endl;
+		std::cout << "at" << std::endl;
+	else if (_current == dash)
+		std::cout << "dash" << std::endl;
+	else if (_current == special)
+		std::cout << "special" << std::endl;
+	else if (_current == dot)
+		std::cout << "dot" << std::endl;
 	else
 		std::cout << "error" << std::endl;
 		*/
@@ -161,7 +186,7 @@ void Parser::_Wrapper()
 const std::vector< Token >	&Parser::Parse(const string &str)
 {
 	_input = str;
-	_it = _input.begin();
+	_it = --_input.begin();
 
 	_Wrapper();
 	while (_current != eoi)

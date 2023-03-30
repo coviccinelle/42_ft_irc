@@ -16,11 +16,11 @@ enum Token {
 	colon,
 	at,
 	excl_mark,
-
-	special,
-	dash,
 	dot,
+	dash,
 	eoi,
+	special,
+
 	comma,
 	percent,
 	plus,
@@ -52,6 +52,6 @@ class Parser
 		std::vector< Token >	_tokens;
 };
 
-int	isspecial(int ch);
+bool	isspecial(string::const_iterator it);
 
 #endif
