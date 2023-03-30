@@ -41,6 +41,11 @@ bool is_fstate(string::const_iterator it, int skip)
 	else if (*it == '!' && skip != excl_mark) return (true); 
 	else if (*it == '-' && skip != dash) return (true);
 	else if (*it == '.' && skip != dot) return (true);
+	else if (*it == ',' && skip != comma) return (true);
+	else if (*it == '#' && skip != sha) return (true);
+	else if (*it == '%' && skip != percent) return (true);
+	else if (*it == '&' && skip != amp) return (true);
+	else if (*it == '+' && skip != plus) return (true);
 	else if (*it == SPACE && skip != space) return (true);
 	else if (isalpha(*it) && skip != letter) { return (true); }
 	else if (isdigit(*it) && skip != digit)	return (true);
@@ -53,7 +58,7 @@ Token	Parser::_GetToken()
 	int		state = 0;
 	string	s;
 	string::iterator end = _input.end();
-	while (state >= 0 && state <= 10)
+	while (state >= 0 && state <= 4)
 	{
 		++_it;
 		std::cout << "[" << *_it << "]" << std::endl;
@@ -68,46 +73,39 @@ Token	Parser::_GetToken()
 				else if (*_it == '!') { return (excl_mark); }
 				else if (*_it == '-') { return (dash); }
 				else if (*_it == '.') { return (dot); }
+				else if (*_it == ',') { return (comma); }
+				else if (*_it == '#') { return (sha); }
+				else if (*_it == '%') { return (percent); }
+				else if (*_it == '&') { return (amp); }
+				else if (*_it == '+') { return (plus); }
 				else if (*_it == SPACE) { return (space); }
 				else if (isalpha(*_it)) state = 1;
 				else if (isdigit(*_it)) state = 2;
 				else if (isspecial(_it)) state = 3;
-				else state = 6;
+				else state = 4;
 				break ;
 			case 1:
 				// letter
 				if (isalpha(*_it)) { state = 1;}
 				else if (_it == end || is_fstate(_it, letter)) { --_it; return (letter); }
-				else state = 6;
+				else state = 4;
 				break ;
 			case 2:
 				// digit
 				if (isdigit(*_it)) { state = 2; }
 				else if (_it == end || is_fstate(_it, digit)) { --_it; return (digit); }
-				else state =  6;
+				else state =  4;
 				break ;
 			case 3:
 				// special
 				if (isspecial(_it)) { state = 3; }
 				else if (_it == end || is_fstate(_it, special)) { --_it; return (special); }
-				else state = 6;
+				else state = 4;
 				break ;
 			case 4:
-				break ;
-			case 5:
-				break ;
-			case 6:
 				// nospcl
 				if (_it == end || is_fstate(_it, nospcl)) { --_it; return (nospcl); }
-				else state = 6;
-				break ;
-			case 7:
-				break ;
-			case 8:
-				break ;
-			case 9:
-				break ;
-			case 10:
+				else state = 4;
 				break ;
 		}
 	}
@@ -127,13 +125,12 @@ void	Parser::_Nickname()
 //host = hostname /hostaddr
 void	Parser::_Host()
 {
-//	if (_current == 
-	std::cout << "WIP host";
+		_Wrapper();
 }
 
 void	Parser::_User()
 {
-
+		_Wrapper();
 }
 
 //prefix     =  servername / ( nickname [ [ "!" user ] "@" host ] )
@@ -142,19 +139,9 @@ void Parser::_Prefix()
 	std::cout << "I'm prefix" << std::endl;
 	_Nickname();
 	if (_current == excl_mark)
-	{
-		_Wrapper();
 		_User();
-		std::cout << "_User() required here" << std::endl;
-		//_User();  // user       =  1*( %x01-09 / %x0B-0C / %x0E-1F / %x21-3F / %x41-FF )
-				  // ; any octet except NUL, CR, LF, " " and "@"
-	}
 	if (_current == at)
-	{
-		_Wrapper();
 		_Host();
-		std::cout << "host required here!" << std::endl;
-	}
 }
 
 void	Parser::_Command()
@@ -206,7 +193,6 @@ void Parser::_Message()
 void Parser::_Wrapper()
 {
 	_current = _GetToken();
-//	std::cout << "[" << _current << "]" << std::endl;
 	_tokens.push_back(_current);
 	///*
 	if (_current == space)
@@ -229,6 +215,16 @@ void Parser::_Wrapper()
 		std::cout << "special" << std::endl;
 	else if (_current == dot)
 		std::cout << "dot" << std::endl;
+	else if (_current == comma)
+		std::cout << "comma" << std::endl;
+	else if (_current == sha)
+		std::cout << "sha" << std::endl;
+	else if (_current == percent)
+		std::cout << "percent" << std::endl;
+	else if (_current == amp)
+		std::cout << "amp" << std::endl;
+	else if (_current == plus)
+		std::cout << "plus" << std::endl;
 	else
 		std::cout << "error" << std::endl;
 	//	*/

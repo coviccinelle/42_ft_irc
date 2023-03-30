@@ -17,14 +17,14 @@ enum Token {
 	excl_mark,
 	dot,
 	dash,
-	eoi,
 	special,
-
 	comma,
-	percent,
-	plus,
 	sha,
+	percent,
 	amp,
+	plus,
+	eoi,
+
 	dollar,
 	error
 };

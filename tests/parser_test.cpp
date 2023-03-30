@@ -10,7 +10,7 @@ namespace {
 
 	typedef std::vector< Token >		vec_tok;
 
-/*	TEST(ParserClass, ParseBasicTest) {
+	TEST(ParserClass, ParseBasicTest) {
 		Parser p;
 		vec_tok res = p.Parse("PASS toto");
 
@@ -79,7 +79,48 @@ namespace {
 		EXPECT_EQ(wit, res);
 	}
 
-*/
+	TEST(ParserClass, ChanelBasicTest)
+	{
+		Parser p;
+		vec_tok res = p.Parse("CMD #chanel42");
+
+		vec_tok wit;
+		wit.push_back(letter);
+		wit.push_back(space);
+		wit.push_back(sha);
+		wit.push_back(letter);
+		wit.push_back(digit);
+		wit.push_back(eoi);
+
+
+		EXPECT_EQ(wit, res);
+	}
+
+	TEST(ParserClass, MsgToBasic)
+	{
+		Parser p;
+		vec_tok res = p.Parse("CMD user42\%host42@student-42.fr");
+
+		vec_tok wit;
+		wit.push_back(letter);
+		wit.push_back(space);
+		wit.push_back(letter);
+		wit.push_back(digit);
+		wit.push_back(percent);
+		wit.push_back(letter);
+		wit.push_back(digit);
+		wit.push_back(at);
+		wit.push_back(letter);
+		wit.push_back(dash);
+		wit.push_back(digit);
+		wit.push_back(dot);
+		wit.push_back(letter);
+		wit.push_back(eoi);
+
+
+		EXPECT_EQ(wit, res);
+	}
+
 	TEST(ParserClass, CommandTest)
 	{
 		Parser p;
