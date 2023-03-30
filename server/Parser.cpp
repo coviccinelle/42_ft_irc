@@ -97,9 +97,8 @@ Token	Parser::_GetToken()
 			case 5:
 				break ;
 			case 6:
-				// nosp
-				if (_it == end || is_fstate(_it, nosp)) { --_it; return (nosp); }
-				else if (*_it == '!') return (nosp);
+				// nospcl
+				if (_it == end || is_fstate(_it, nospcl)) { --_it; return (nospcl); }
 				else state = 6;
 				break ;
 			case 7:

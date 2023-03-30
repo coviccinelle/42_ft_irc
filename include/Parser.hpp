@@ -9,7 +9,6 @@
 
 enum Token {
 	space,
-	nosp,
 	nospcl,
 	letter,
 	digit,
