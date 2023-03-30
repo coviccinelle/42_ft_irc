@@ -97,17 +97,37 @@ Token	Parser::_GetToken()
 
 void	Parser::_Nickname()
 {
-	std::cout << "I'm command" << std::endl;
+	std::cout << "I'm Nickname" << std::endl;
 }
 
+//prefix     =  servername / ( nickname [ [ "!" user ] "@" host ] )
 void Parser::_Prefix()
 {
-	std::cout << "I'm prefix now" << std::endl;
-	_wrapper();
-	if (_current != letter || _current != special)
+	std::cout << "I'm prefix" << std::endl;
+	_Wrapper();
+	if (_current != letter && _current != special)
 		throw ;
 	_Nickname();
-
+	//Nickname   =  ( letter / special ) *8( letter / digit / special / "-" )
+	_Wrapper();
+	if (_current == excl_mark || _current == at)
+	{
+		if (_current == excl_mark)
+		{
+			_Wrapper();
+			std::cout << "_User() required here" << std::endl;
+			//_User();  // user       =  1*( %x01-09 / %x0B-0C / %x0E-1F / %x21-3F / %x41-FF )
+					  // ; any octet except NUL, CR, LF, " " and "@"
+			_Wrapper();
+		}
+		if (_current == at)
+		{
+			std::cout << "host required here!" << std::endl;
+			//host = hostname /hostaddr
+		}
+	}
+	else if (_current != eoi)
+		throw ;
 }
 
 void	Parser::_Command()
