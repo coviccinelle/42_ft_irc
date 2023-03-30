@@ -117,7 +117,7 @@ void	Parser::_Nickname()
 	std::cout << "I'm Nickname" << std::endl;
 	_Wrapper();
 	if (_current != letter && _current != special)
-		throw ;
+		throw irc_error("parsing failed", ERR_NICK);
 	while (_current == letter || _current == digit || _current == special || _current == dash)
 		_Wrapper();
 }
@@ -125,12 +125,40 @@ void	Parser::_Nickname()
 //host = hostname /hostaddr
 void	Parser::_Host()
 {
+	std::cout << "I'm host" << std::endl;
+	_Wrapper();
+	if (_current != digit && _current != letter)
+		throw irc_error("parsing failed", ERR_HOST);
+	while (_current != eoi)
+	{
 		_Wrapper();
+		if (_current == space)
+			return ;
+		if (_current != digit &&
+			_current != letter &&
+			_current != dot &&
+			_current != dash &&
+			_current != colon)
+			throw irc_error("parsing failed", ERR_HOST);
+	}
+	if (_current == eoi)
+		throw irc_error("parsing failed", ERR_HOST);
 }
 
 void	Parser::_User()
 {
+	std::cout << "I'm user" << std::endl;
+	_Wrapper();
+	if (_current == eoi || _current == space || _current == at)
+		throw irc_error("parsing failed", ERR_USER);
+	while (_current != eoi)
+	{
 		_Wrapper();
+		if (_current == space || _current == at)
+			return ;
+	}
+	if (_current == eoi)
+		throw irc_error("parsing failed", ERR_USER);
 }
 
 //prefix     =  servername / ( nickname [ [ "!" user ] "@" host ] )
@@ -148,14 +176,14 @@ void	Parser::_Command()
 {
 	std::cout << "I'm command" << std::endl;
 	if (_current != letter && _current != digit)
-		throw ;
+		throw irc_error("parsing failed", ERR_COMMAND);
 }
 
 void	Parser::_Middle()
 {
 	_Wrapper();
 	if (_current == colon || _current == space)
-		throw;
+		throw irc_error("parsing failed", ERR_MIDDLE);
 	if (_current == eoi)
 		return ;
 //	_Target();
@@ -169,7 +197,7 @@ void	Parser::_Param()
 	while (_current != eoi)
 	{
 		if (_current != space)
-			throw ;
+			throw irc_error("parsing failed", ERR_PARAM);
 		_Middle();
 		_Wrapper();
 	}
@@ -182,7 +210,7 @@ void Parser::_Message()
 	{
 		_Prefix();
 		if (_current != space)
-			throw ;
+			throw irc_error("parsing failed", ERR_MESSAGE);
 		_Wrapper();
 	}
 	_Command();

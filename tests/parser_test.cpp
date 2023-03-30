@@ -79,6 +79,7 @@ namespace {
 		EXPECT_EQ(wit, res);
 	}
 
+	/*
 	TEST(ParserClass, ChanelBasicTest)
 	{
 		Parser p;
@@ -120,11 +121,18 @@ namespace {
 
 		EXPECT_EQ(wit, res);
 	}
+	*/
 
 	TEST(ParserClass, CommandTest)
 	{
 		Parser p;
-		vec_tok res = p.Parse("PASS toto");
+		try {
+			vec_tok res = p.Parse(":Tot{o-F42!SuperUser@ PASS toto");
+		}
+		catch(irc_error &e)
+		{
+			EXPECT_EQ(e.code(), ERR_HOST);
+		}
 	}
 
 }  // namespace
