@@ -48,6 +48,8 @@ class Parser
 		void					_Command();
 		void					_Nickname();
 		void					_Prefix();
+		void					_User();
+		void					_Host();
 		void					_Param();
 		string::iterator		_it;
 		std::vector< Token >	_tokens;

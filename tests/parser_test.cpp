@@ -79,4 +79,11 @@ namespace {
 		EXPECT_EQ(wit, res);
 	}
 
+
+	TEST(ParserClass, CommandTest)
+	{
+		Parser p;
+		vec_tok res = p.Parse(":thi-phng NICK 
+	}
+
 }  // namespace
