@@ -114,9 +114,47 @@ Token	Parser::_GetToken()
 	return (eoi);
 }
 
+void	Parser::_Nickname()
+{
+	_Wrapper();
+	std::cout << "I'm Nickname" << std::endl;
+	if (_current != letter && _current != special)
+		throw ;
+	while (_current == letter || _current == digit || _current == special || _current == dash)
+		_Wrapper();
+}
+
+//host = hostname /hostaddr
+void	Parser::_Host()
+{
+//	if (_current == 
+	std::cout << "WIP host";
+}
+
+void	Parser::_User()
+{
+
+}
+
+//prefix     =  servername / ( nickname [ [ "!" user ] "@" host ] )
 void Parser::_Prefix()
 {
-	std::cout << "I'm prefix now" << std::endl;
+	std::cout << "I'm prefix" << std::endl;
+	_Nickname();
+	if (_current == excl_mark)
+	{
+		_Wrapper();
+		_User();
+		std::cout << "_User() required here" << std::endl;
+		//_User();  // user       =  1*( %x01-09 / %x0B-0C / %x0E-1F / %x21-3F / %x41-FF )
+				  // ; any octet except NUL, CR, LF, " " and "@"
+	}
+	if (_current == at)
+	{
+		_Wrapper();
+		_Host();
+		std::cout << "host required here!" << std::endl;
+	}
 }
 
 void	Parser::_Command()
@@ -127,6 +165,11 @@ void	Parser::_Command()
 void	Parser::_Param()
 {
 	std::cout << "I'm Param" << std::endl;
+	if (_current != space)
+		throw ;
+	_Wrapper();
+	if (_current != nospcl)
+		throw ;
 }
 
 void Parser::_Message()
@@ -135,7 +178,6 @@ void Parser::_Message()
 	if (_current == colon)
 	{
 		_Prefix();
-		_Wrapper();
 		if (_current != space)
 			throw ;
 	}
