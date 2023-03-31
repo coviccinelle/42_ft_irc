@@ -210,12 +210,36 @@ void	Parser::_Middle()
 	std::cout << "checking for valid targets" << std::endl;
 }
 
+
+void	Parser::_Target()
+{
+	std::string::iterator start = _it + 1;
+	while (1)
+	{
+		_Wrapper();
+		if (_current == comma)
+		{
+			_cmd.target.push_back(string(start, _it));
+			start = _it + 1;
+		}
+		else if (_current == space || _current == eoi)
+		{
+			_cmd.target.push_back(string(start, _it));
+			return ;
+		}
+	}
+}
+
 void	Parser::_Param()
 {
 	std::cout << "I'm Param" << std::endl;
+	_Wrapper();
+	if (_current != space)
+		throw irc_error("parsing failed: _Param: space expected", ERR_PARAM);
+	if (_current != eoi)
+		_Target();
 	while (_current != eoi)
 	{
-		_Wrapper();
 		if (_current != space)
 			throw irc_error("parsing failed: _Param: space expected", ERR_PARAM);
 		_Middle();
@@ -238,7 +262,6 @@ void Parser::_Message()
 	_cmd.command = string(start, _it + 1);
 	_Param();
 	std::cout << "Done parsing Message ! OK" << std::endl;
-	(void)start;
 	_cmd.message = string(start, _it);
 }
 
@@ -291,6 +314,7 @@ void	Parser::_ParseInit()
 	_cmd.nickname = "";
 	_cmd.command = "";
 	_cmd.middle.clear();
+	_cmd.target.clear();
 }
 
 const std::vector< Token >	&Parser::Parse(const string &str)
@@ -308,6 +332,10 @@ const std::vector< Token >	&Parser::Parse(const string &str)
 	std::cout << "Command :[" << _cmd.command << "]" << std::endl;
 	std::cout << "Middle : " << std::endl;
 	for (std::vector<string>::iterator it = _cmd.middle.begin(); it != _cmd.middle.end(); ++it)
+		std::cout << " :[" << *it << "]" << std::endl;
+
+	std::cout << "Target : " << std::endl;
+	for (std::vector<string>::iterator it = _cmd.target.begin(); it != _cmd.target.end(); ++it)
 		std::cout << " :[" << *it << "]" << std::endl;
 	return (_tokens);
 }
