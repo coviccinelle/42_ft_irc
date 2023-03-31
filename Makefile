@@ -7,6 +7,7 @@ RM		=	rm -rf
 SRC		=	server/Server.cpp \
 			server/Client.cpp \
 			server/Parser.cpp \
+			server/Command.cpp \
 			utils/utils.cpp \
 			utils/irc_error.cpp \
 			tests/parser_test.cpp

@@ -12,7 +12,8 @@ namespace {
 
 	TEST(ParserClass, ParseBasicTest) {
 		Parser p;
-		vec_tok res = p.Parse("PASS toto");
+		p.Parse("PASS toto");
+		vec_tok res = p.Tokens();
 
 		vec_tok wit;
 		wit.push_back(letter);
@@ -25,7 +26,8 @@ namespace {
 
 	TEST(ParserClass, PrefixBasicTest) {
 		Parser p;
-		vec_tok res = p.Parse(":Tot{o-F42 PASS toto");
+		p.Parse(":Tot{o-F42 PASS toto");
+		vec_tok res = p.Tokens();
 
 		vec_tok wit;
 		wit.push_back(colon);
@@ -46,7 +48,8 @@ namespace {
 
 	TEST(ParserClass, PrefixAdvancedTest) {
 		Parser p;
-		vec_tok res = p.Parse(":Tot{o-F42!SuperUser@host-42school.web-school.com PASS toto");
+		p.Parse(":Tot{o-F42!SuperUser@host-42school.web-school.com PASS toto");
+		vec_tok res = p.Tokens();
 
 		vec_tok wit;
 		wit.push_back(colon);
@@ -78,11 +81,11 @@ namespace {
 
 		EXPECT_EQ(wit, res);
 	}
-/*
 	TEST(ParserClass, ChanelBasicTest)
 	{
 		Parser p;
-		vec_tok res = p.Parse("CMD #chanel42");
+		p.Parse("CMD #chanel42");
+		vec_tok res = p.Tokens();
 
 		vec_tok wit;
 		wit.push_back(letter);
@@ -98,7 +101,8 @@ namespace {
 	TEST(ParserClass, MsgToBasic)
 	{
 		Parser p;
-		vec_tok res = p.Parse("CMD user42\%host42@student-42.fr");
+		p.Parse("CMD user42\%host42@student-42.fr");
+		vec_tok res = p.Tokens();
 
 		vec_tok wit;
 		wit.push_back(letter);
@@ -119,7 +123,6 @@ namespace {
 
 		EXPECT_EQ(wit, res);
 	}
-*/
 
 	TEST(ParserClass, ShouldNOTThrowErrTest)
 	{
@@ -135,14 +138,14 @@ namespace {
 	{
 		Parser p;
 		try {
-			vec_tok res = p.Parse(":Tot{o-F42!SuperUser@ PASS toto");
+			p.Parse(":Tot{o-F42!SuperUser@ PASS toto");
+			vec_tok res = p.Tokens();
 			EXPECT_FALSE(true);
 		}
 		catch(irc_error &e)
 		{
-			std::cout << e.what() << std::endl;
 			EXPECT_EQ(e.code(), ERR_HOST);
-			std::cout << e.what() << std::endl;
+//			std::cout << e.what() << std::endl;
 		}
 
 		try {
@@ -151,7 +154,7 @@ namespace {
 		catch(irc_error &e)
 		{
 			EXPECT_EQ(e.code(), ERR_USER);
-			std::cout << e.what() << std::endl;
+//			std::cout << e.what() << std::endl;
 		}
 
 		try {
@@ -160,7 +163,7 @@ namespace {
 		catch(irc_error &e)
 		{
 			EXPECT_EQ(e.code(), ERR_USER);
-			std::cout << e.what() << std::endl;
+//			std::cout << e.what() << std::endl;
 		}
 
 		try {
@@ -169,7 +172,7 @@ namespace {
 		catch(irc_error &e)
 		{
 			EXPECT_EQ(e.code(), ERR_PREFIX);
-			std::cout << e.what() << std::endl;
+//			std::cout << e.what() << std::endl;
 		}
 		try {
 			p.Parse(":To:t{o-F42! PASS toto");
@@ -177,7 +180,7 @@ namespace {
 		catch(irc_error &e)
 		{
 			EXPECT_EQ(e.code(), ERR_MESSAGE);
-			std::cout << e.what() << std::endl;
+//			std::cout << e.what() << std::endl;
 		}
 		try {
 			p.Parse(":Tot{o-F42!@hostname PASS toto");
@@ -185,7 +188,7 @@ namespace {
 		}
 		catch(irc_error &e)
 		{
-			std::cout << e.what() << std::endl;
+//			std::cout << e.what() << std::endl;
 			EXPECT_EQ(e.code(), ERR_USER);
 		}
 
@@ -195,7 +198,7 @@ namespace {
 		}
 		catch(irc_error &e)
 		{
-			std::cout << e.what() << std::endl;
+//			std::cout << e.what() << std::endl;
 			EXPECT_EQ(e.code(), ERR_USER);
 		}
 		try {
@@ -204,7 +207,7 @@ namespace {
 		}
 		catch(irc_error &e)
 		{
-			std::cout << e.what() << std::endl;
+//			std::cout << e.what() << std::endl;
 			EXPECT_EQ(e.code(), ERR_MESSAGE);
 		}
 		try {
@@ -213,7 +216,7 @@ namespace {
 		}
 		catch(irc_error &e)
 		{
-			std::cout << e.what() << std::endl;
+//			std::cout << e.what() << std::endl;
 			EXPECT_EQ(e.code(), ERR_NICK);
 		}
 
@@ -223,7 +226,7 @@ namespace {
 		}
 		catch(irc_error &e)
 		{
-			std::cout << e.what() << std::endl;
+//			std::cout << e.what() << std::endl;
 			EXPECT_EQ(e.code(), ERR_PREFIX);
 		}
 	}

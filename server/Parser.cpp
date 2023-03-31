@@ -2,19 +2,21 @@
 
 Parser::Parser(void)
 {
-
 	return ;
 }
 
 Parser::~Parser(void)
 {
-
 	return ;
 }
 
 Parser::Parser(Parser const &src)
 {
-	*this = src;
+	_it = src._it;
+	_current = src._current;
+	_tokens = src._tokens;
+	_input = src._input;
+	_cmd = src._cmd;
 
 	return ;
 }
@@ -23,6 +25,11 @@ Parser &Parser::operator=(Parser const &rhs)
 {
 	if (&rhs == this)
 		return (*this);
+	_it = rhs._it;
+	_current = rhs._current;
+	_tokens = rhs._tokens;
+	_input = rhs._input;
+	_cmd = rhs._cmd;
 
 	return (*this);
 }
@@ -61,8 +68,6 @@ Token	Parser::_GetToken()
 	while (state >= 0 && state <= 4)
 	{
 		++_it;
-//		std::cout << "[" << *_it << "]" << std::endl;
-//		sleep(1);
 		switch(state)
 		{
 			case 0:
@@ -114,7 +119,6 @@ Token	Parser::_GetToken()
 
 void	Parser::_Nickname()
 {
-	std::cout << "I'm Nickname" << std::endl;
 	std::string::iterator	start = _it + 1;
 	_Wrapper();
 	if (_current != letter && _current != special)
@@ -124,10 +128,8 @@ void	Parser::_Nickname()
 	_cmd.nickname = string(start, _it);
 }
 
-//host = hostname /hostaddr
 void	Parser::_Host()
 {
-	std::cout << "I'm host" << std::endl;
 	std::string::iterator	start = _it + 1;
 	_Wrapper();
 	if (_current != digit && _current != letter)
@@ -154,7 +156,6 @@ void	Parser::_Host()
 
 void	Parser::_User()
 {
-	std::cout << "I'm user" << std::endl;
 	std::string::iterator	start = _it + 1;
 	_Wrapper();
 	if (_current == eoi || _current == space || _current == at)
@@ -173,10 +174,8 @@ void	Parser::_User()
 	_cmd.user = string(start, _it);
 }
 
-//prefix     =  servername / ( nickname [ [ "!" user ] "@" host ] )
 void Parser::_Prefix()
 {
-	std::cout << "I'm prefix" << std::endl;
 	string::iterator	start = _it + 1;
 	_Nickname();
 	if (_current == excl_mark)
@@ -193,7 +192,6 @@ void Parser::_Prefix()
 
 void	Parser::_Command()
 {
-	std::cout << "I'm command" << std::endl;
 	if (_current != letter && _current != digit)
 		throw irc_error("parsing failed: _Command: letter or digit expected", ERR_COMMAND);
 }
@@ -207,7 +205,6 @@ void	Parser::_Middle()
 	while (_current != space && _current != eoi)
 		_Wrapper();
 	_cmd.middle.push_back(string(start, _it));
-	std::cout << "checking for valid targets" << std::endl;
 }
 
 
@@ -232,7 +229,6 @@ void	Parser::_Target()
 
 void	Parser::_Param()
 {
-	std::cout << "I'm Param" << std::endl;
 	_Wrapper();
 	if (_current != space)
 		throw irc_error("parsing failed: _Param: space expected", ERR_PARAM);
@@ -261,7 +257,6 @@ void Parser::_Message()
 	_Command();
 	_cmd.command = string(start, _it + 1);
 	_Param();
-	std::cout << "Done parsing Message ! OK" << std::endl;
 	_cmd.message = string(start, _it);
 }
 
@@ -269,40 +264,6 @@ void Parser::_Wrapper()
 {
 	_current = _GetToken();
 	_tokens.push_back(_current);
-	/*
-	if (_current == space)
-		std::cout << "space" << std::endl;
-	else if (_current == letter)
-		std::cout << "letter" << std::endl;
-	else if (_current == digit)
-		std::cout << "digit" << std::endl;
-	else if (_current == eoi)
-		std::cout << "eoi" << std::endl;
-	else if (_current == excl_mark)
-		std::cout << "excl_mark" << std::endl;
-	else if (_current == colon)
-		std::cout << "colon" << std::endl;
-	else if (_current == at)
-		std::cout << "at" << std::endl;
-	else if (_current == dash)
-		std::cout << "dash" << std::endl;
-	else if (_current == special)
-		std::cout << "special" << std::endl;
-	else if (_current == dot)
-		std::cout << "dot" << std::endl;
-	else if (_current == comma)
-		std::cout << "comma" << std::endl;
-	else if (_current == sha)
-		std::cout << "sha" << std::endl;
-	else if (_current == percent)
-		std::cout << "percent" << std::endl;
-	else if (_current == amp)
-		std::cout << "amp" << std::endl;
-	else if (_current == plus)
-		std::cout << "plus" << std::endl;
-	else
-		std::cout << "error" << std::endl;
-	*/
 }
 
 void	Parser::_ParseInit()
@@ -317,25 +278,18 @@ void	Parser::_ParseInit()
 	_cmd.target.clear();
 }
 
-const std::vector< Token >	&Parser::Parse(const string &str)
+const std::vector< Token >	&Parser::Tokens() const
+{
+	return (_tokens);
+}
+
+Command	Parser::Parse(const string &str)
 {
 	_ParseInit();
 	_input = str;
 	_it = --_input.begin();
 
 	_Message();
-	std::cout << "Message :[" << _cmd.message << "]" << std::endl;
-	std::cout << "Prefix :[" << _cmd.prefix << "]" << std::endl;
-	std::cout << "User :[" << _cmd.user << "]" << std::endl;
-	std::cout << "Host :[" << _cmd.host << "]" << std::endl;
-	std::cout << "Nickname :[" << _cmd.nickname << "]" << std::endl;
-	std::cout << "Command :[" << _cmd.command << "]" << std::endl;
-	std::cout << "Middle : " << std::endl;
-	for (std::vector<string>::iterator it = _cmd.middle.begin(); it != _cmd.middle.end(); ++it)
-		std::cout << " :[" << *it << "]" << std::endl;
-
-	std::cout << "Target : " << std::endl;
-	for (std::vector<string>::iterator it = _cmd.target.begin(); it != _cmd.target.end(); ++it)
-		std::cout << " :[" << *it << "]" << std::endl;
-	return (_tokens);
+	//_cmd.Debug();
+	return (_cmd);
 }

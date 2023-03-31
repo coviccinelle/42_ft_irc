@@ -3,6 +3,7 @@
 
 #include "../utils/utils.hpp"
 #include "../include/irc_error.hpp"
+#include "../include/Command.hpp"
 
 #define NUL 0x00
 #define SPACE 0x20
@@ -24,20 +25,8 @@ enum Token {
 	amp,
 	plus,
 	eoi,
-
 	dollar,
 	error
-};
-
-struct Command {
-	string					message;
-	string					prefix;
-	string					user;
-	string					host;
-	string					nickname;
-	string					command;
-	std::vector< string >	middle;
-	std::vector< string >	target;
 };
 
 class Parser
@@ -48,7 +37,9 @@ class Parser
 		Parser(Parser const &src);
 		Parser	&operator=(Parser const &rhs);
 
-		const std::vector< Token >	&Parse(const string &str);
+		Command						Parse(const string &str);
+
+		const std::vector< Token >	&Tokens() const;
 	private:
 		Token					_GetToken();
 		void					_Wrapper();
