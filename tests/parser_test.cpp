@@ -123,15 +123,64 @@ namespace {
 	}
 	*/
 
-	TEST(ParserClass, CommandTest)
+	TEST(ParserClass, ShouldNOTThrowErrTest)
+	{
+		Parser p;
+
+		p.Parse(":Tot{o-F42!SuperUser@hostname PASS toto");
+		p.Parse(":Tot{o-F42!SuperUser@hostname.web-school.42.fr PASS toto");
+		p.Parse(":Tot{o-F42!SuperUser PASS toto");
+		p.Parse(":Tot{o-F42 PASS toto");
+	}
+
+	TEST(ParserClass, ShouldThrowErrTest)
 	{
 		Parser p;
 		try {
 			vec_tok res = p.Parse(":Tot{o-F42!SuperUser@ PASS toto");
+			EXPECT_FALSE(true);
 		}
 		catch(irc_error &e)
 		{
+			std::cout << e.what() << std::endl;
 			EXPECT_EQ(e.code(), ERR_HOST);
+		}
+		try {
+			p.Parse(":Tot{o-F42!@hostname PASS toto");
+			EXPECT_FALSE(true);
+		}
+		catch(irc_error &e)
+		{
+			std::cout << e.what() << std::endl;
+			EXPECT_EQ(e.code(), ERR_USER);
+		}
+
+		try {
+			p.Parse(":Tot{o-F42! PASS toto");
+			EXPECT_FALSE(true);
+		}
+		catch(irc_error &e)
+		{
+			std::cout << e.what() << std::endl;
+			EXPECT_EQ(e.code(), ERR_USER);
+		}
+		try {
+			p.Parse(":To:t{o-F42! PASS toto");
+			EXPECT_FALSE(true);
+		}
+		catch(irc_error &e)
+		{
+			std::cout << e.what() << std::endl;
+			EXPECT_EQ(e.code(), ERR_MESSAGE);
+		}
+		try {
+			p.Parse(": PASS toto");
+			EXPECT_FALSE(true);
+		}
+		catch(irc_error &e)
+		{
+			std::cout << e.what() << std::endl;
+			EXPECT_EQ(e.code(), ERR_NICK);
 		}
 	}
 
