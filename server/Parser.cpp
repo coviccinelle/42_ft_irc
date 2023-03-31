@@ -61,7 +61,7 @@ Token	Parser::_GetToken()
 	while (state >= 0 && state <= 4)
 	{
 		++_it;
-		std::cout << "[" << *_it << "]" << std::endl;
+//		std::cout << "[" << *_it << "]" << std::endl;
 //		sleep(1);
 		switch(state)
 		{
@@ -117,7 +117,7 @@ void	Parser::_Nickname()
 	std::cout << "I'm Nickname" << std::endl;
 	_Wrapper();
 	if (_current != letter && _current != special)
-		throw irc_error("parsing failed", ERR_NICK);
+		throw irc_error("parsing failed: _Nickname: letter or special expected", ERR_NICK);
 	while (_current == letter || _current == digit || _current == special || _current == dash)
 		_Wrapper();
 }
@@ -128,7 +128,7 @@ void	Parser::_Host()
 	std::cout << "I'm host" << std::endl;
 	_Wrapper();
 	if (_current != digit && _current != letter)
-		throw irc_error("parsing failed", ERR_HOST);
+		throw irc_error("parsing failed: _Host: letter or digit expected", ERR_HOST);
 	while (_current != eoi)
 	{
 		_Wrapper();
@@ -139,10 +139,10 @@ void	Parser::_Host()
 			_current != dot &&
 			_current != dash &&
 			_current != colon)
-			throw irc_error("parsing failed", ERR_HOST);
+			throw irc_error("parsing failed: _Host: digit or letter or dot or dash or colon expected", ERR_HOST);
 	}
 	if (_current == eoi)
-		throw irc_error("parsing failed", ERR_HOST);
+		throw irc_error("parsing failed: _Host: eoi found", ERR_HOST);
 }
 
 void	Parser::_User()
@@ -150,7 +150,7 @@ void	Parser::_User()
 	std::cout << "I'm user" << std::endl;
 	_Wrapper();
 	if (_current == eoi || _current == space || _current == at)
-		throw irc_error("parsing failed", ERR_USER);
+		throw irc_error("parsing failed: _User: eoi or space or at found", ERR_USER);
 	while (_current != eoi)
 	{
 		_Wrapper();
@@ -158,7 +158,7 @@ void	Parser::_User()
 			return ;
 	}
 	if (_current == eoi)
-		throw irc_error("parsing failed", ERR_USER);
+		throw irc_error("parsing failed: _User: eoi found", ERR_USER);
 }
 
 //prefix     =  servername / ( nickname [ [ "!" user ] "@" host ] )
@@ -176,14 +176,14 @@ void	Parser::_Command()
 {
 	std::cout << "I'm command" << std::endl;
 	if (_current != letter && _current != digit)
-		throw irc_error("parsing failed", ERR_COMMAND);
+		throw irc_error("parsing failed: _Command: letter or digit expected", ERR_COMMAND);
 }
 
 void	Parser::_Middle()
 {
 	_Wrapper();
 	if (_current == colon || _current == space)
-		throw irc_error("parsing failed", ERR_MIDDLE);
+		throw irc_error("parsing failed: _Middle: colon or space found", ERR_MIDDLE);
 	if (_current == eoi)
 		return ;
 //	_Target();
@@ -197,7 +197,7 @@ void	Parser::_Param()
 	while (_current != eoi)
 	{
 		if (_current != space)
-			throw irc_error("parsing failed", ERR_PARAM);
+			throw irc_error("parsing failed: _Param: space expected", ERR_PARAM);
 		_Middle();
 		_Wrapper();
 	}
@@ -210,7 +210,7 @@ void Parser::_Message()
 	{
 		_Prefix();
 		if (_current != space)
-			throw irc_error("parsing failed", ERR_MESSAGE);
+			throw irc_error("parsing failed: _Message: space expected", ERR_MESSAGE);
 		_Wrapper();
 	}
 	_Command();
@@ -222,7 +222,7 @@ void Parser::_Wrapper()
 {
 	_current = _GetToken();
 	_tokens.push_back(_current);
-	///*
+	/*
 	if (_current == space)
 		std::cout << "space" << std::endl;
 	else if (_current == letter)
@@ -255,7 +255,7 @@ void Parser::_Wrapper()
 		std::cout << "plus" << std::endl;
 	else
 		std::cout << "error" << std::endl;
-	//	*/
+	*/
 }
 
 const std::vector< Token >	&Parser::Parse(const string &str)
