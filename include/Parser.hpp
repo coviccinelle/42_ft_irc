@@ -30,9 +30,13 @@ enum Token {
 };
 
 struct Command {
-	string	message;
-	string	prefix;
-	string	user;
+	string					message;
+	string					prefix;
+	string					user;
+	string					host;
+	string					nickname;
+	string					command;
+	std::vector< string >	middle;
 };
 
 class Parser
@@ -56,6 +60,7 @@ class Parser
 		void					_Param();
 		void					_Middle();
 		void					_Target();
+		void					_ParseInit();
 
 		string::iterator		_it;
 		Token					_current;
