@@ -78,7 +78,6 @@ namespace {
 
 		EXPECT_EQ(wit, res);
 	}
-/*
 	TEST(ParserClass, ChanelBasicTest)
 	{
 		Parser p;
@@ -119,7 +118,6 @@ namespace {
 
 		EXPECT_EQ(wit, res);
 	}
-*/
 
 	TEST(ParserClass, ShouldNOTThrowErrTest)
 	{
@@ -128,6 +126,7 @@ namespace {
 		p.Parse(":Tot{o-F42!SuperUser@hostname PASS toto");
 		p.Parse(":Tot{o-F42!SuperUser@hostname.web-school.42.fr PASS toto");
 		p.Parse(":Tot{o-F42 PASS toto");
+		p.Parse(":Tot{o-F42 PASS toto!localhost@student-42.fr,tata42,titihoula,huhu bidouille foo bar");
 	}
 
 	TEST(ParserClass, ShouldThrowErrTest)

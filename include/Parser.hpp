@@ -37,6 +37,7 @@ struct Command {
 	string					nickname;
 	string					command;
 	std::vector< string >	middle;
+	std::vector< string >	target;
 };
 
 class Parser
@@ -61,6 +62,7 @@ class Parser
 		void					_Middle();
 		void					_Target();
 		void					_ParseInit();
+		void					_MsgTo();
 
 		string::iterator		_it;
 		Token					_current;
