@@ -29,6 +29,12 @@ enum Token {
 	error
 };
 
+struct Command {
+	string	message;
+	string	prefix;
+	string	user;
+};
+
 class Parser
 {
 	public:
@@ -41,8 +47,6 @@ class Parser
 	private:
 		Token					_GetToken();
 		void					_Wrapper();
-		Token					_current;
-		string					_input;
 		void					_Message();
 		void					_Command();
 		void					_Nickname();
@@ -51,8 +55,13 @@ class Parser
 		void					_Host();
 		void					_Param();
 		void					_Middle();
+		void					_Target();
+
 		string::iterator		_it;
+		Token					_current;
 		std::vector< Token >	_tokens;
+		string					_input;
+		Command					_cmd;
 };
 
 bool	isspecial(string::const_iterator it);

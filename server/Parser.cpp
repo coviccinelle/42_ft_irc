@@ -148,6 +148,7 @@ void	Parser::_Host()
 void	Parser::_User()
 {
 	std::cout << "I'm user" << std::endl;
+	std::string::iterator	start = _it + 1;
 	_Wrapper();
 	if (_current == eoi || _current == space || _current == at)
 		throw irc_error("parsing failed: _User: eoi or space or at found", ERR_USER);
@@ -155,21 +156,32 @@ void	Parser::_User()
 	{
 		_Wrapper();
 		if (_current == space || _current == at)
+		{
+			_cmd.user = string(start, _it);
 			return ;
+		}
 	}
 	if (_current == eoi)
 		throw irc_error("parsing failed: _User: eoi found", ERR_USER);
+	_cmd.user = string(start, _it);
 }
 
 //prefix     =  servername / ( nickname [ [ "!" user ] "@" host ] )
 void Parser::_Prefix()
 {
+	string::iterator	start = _it + 1;
 	std::cout << "I'm prefix" << std::endl;
 	_Nickname();
 	if (_current == excl_mark)
+	{
 		_User();
-	if (_current == at)
+		if (_current != at)
+			throw irc_error("parsing failed: _Prefix: at expected", ERR_PREFIX);
 		_Host();
+	}
+	else if (_current == at)
+		_Host();
+	_cmd.prefix = string(start, _it);
 }
 
 void	Parser::_Command()
@@ -186,7 +198,6 @@ void	Parser::_Middle()
 		throw irc_error("parsing failed: _Middle: colon or space found", ERR_MIDDLE);
 	if (_current == eoi)
 		return ;
-//	_Target();
 	std::cout << "checking for valid targets" << std::endl;
 }
 
@@ -205,6 +216,7 @@ void	Parser::_Param()
 
 void Parser::_Message()
 {
+	string::iterator	start = _it;
 	_Wrapper();
 	if (_current == colon)
 	{
@@ -216,6 +228,8 @@ void Parser::_Message()
 	_Command();
 	_Param();
 	std::cout << "Done parsing Message ! OK" << std::endl;
+	(void)start;
+	_cmd.message = string(start, _it);
 }
 
 void Parser::_Wrapper()
@@ -264,5 +278,8 @@ const std::vector< Token >	&Parser::Parse(const string &str)
 	_it = --_input.begin();
 
 	_Message();
+	std::cout << "Message :[" << _cmd.message << "]" << std::endl;
+	std::cout << "Prefix :[" << _cmd.prefix << "]" << std::endl;
+	std::cout << "User :[" << _cmd.user << "]" << std::endl;
 	return (_tokens);
 }

@@ -78,8 +78,7 @@ namespace {
 
 		EXPECT_EQ(wit, res);
 	}
-
-	/*
+/*
 	TEST(ParserClass, ChanelBasicTest)
 	{
 		Parser p;
@@ -96,7 +95,6 @@ namespace {
 
 		EXPECT_EQ(wit, res);
 	}
-
 	TEST(ParserClass, MsgToBasic)
 	{
 		Parser p;
@@ -121,7 +119,7 @@ namespace {
 
 		EXPECT_EQ(wit, res);
 	}
-	*/
+*/
 
 	TEST(ParserClass, ShouldNOTThrowErrTest)
 	{
@@ -129,7 +127,6 @@ namespace {
 
 		p.Parse(":Tot{o-F42!SuperUser@hostname PASS toto");
 		p.Parse(":Tot{o-F42!SuperUser@hostname.web-school.42.fr PASS toto");
-		p.Parse(":Tot{o-F42!SuperUser PASS toto");
 		p.Parse(":Tot{o-F42 PASS toto");
 	}
 
@@ -170,7 +167,7 @@ namespace {
 		}
 		catch(irc_error &e)
 		{
-			EXPECT_EQ(e.code(), ERR_USER);
+			EXPECT_EQ(e.code(), ERR_PREFIX);
 			std::cout << e.what() << std::endl;
 		}
 		try {
@@ -217,6 +214,16 @@ namespace {
 		{
 			std::cout << e.what() << std::endl;
 			EXPECT_EQ(e.code(), ERR_NICK);
+		}
+
+		try {
+			p.Parse(":Tot{o-F42!SuperUser PASS toto");
+			EXPECT_FALSE(true);
+		}
+		catch(irc_error &e)
+		{
+			std::cout << e.what() << std::endl;
+			EXPECT_EQ(e.code(), ERR_PREFIX);
 		}
 	}
 
