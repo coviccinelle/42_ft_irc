@@ -56,7 +56,6 @@ class Client
 
 		/* Public Methods */
 		int								AcceptClient(int listener); // Return socket fd for socker communication
-		void							SplitCmds(const string &str, const string delimiter = "\r\n"); // Split string to : [string("CMD"), string("args")]; Also trim "\r\n"
 		void 							SendData(const string &msg) const; // Use send(2) method to send data back to client
 
 		void							ExecCommand(Command &cmd); // Switch case
@@ -67,15 +66,15 @@ class Client
 		int								GetFd(void) const;
 		const string					&GetIp() const;
 		cst_vec_str						&GetUinfo() const;
-		cst_vec_vec_str					&GetCmds() const;
+		const std::vector< Command >			&GetCmds() const;
 
 	private:
 		/* Private Methods */
-		void							_CapLs(cst_vec_str &cmd);// Parse CAP LS cmd
-		void							_Pass(cst_vec_str &cmd); // Parse PASS cmd
-		void							_Nick(cst_vec_str &cmd); // Parse NICK cmd
-		void							_User(cst_vec_str &cmd); // Parse USER cmd
-		void							_Ping(cst_vec_str &cmd); // Parse PING cmd
+		void							_CapLs(Command &cmd);// Parse CAP LS cmd
+		void							_Pass(Command &cmd); // Parse PASS cmd
+		void							_Nick(Command &cmd); // Parse NICK cmd
+		void							_User(Command &cmd); // Parse USER cmd
+		void							_Ping(Command &cmd); // Parse PING cmd
 		void							_ParseBuf(const string &buf);
 		void							ValidNickname(const string &nick);
 
@@ -88,7 +87,7 @@ class Client
 
 		/* Commands */
 		string							_buf;
-		vector< Command >				_cmds; // Commands that need to be process
+		std::vector< Command >			_cmds; // Commands that need to be process
 		std::map< string, CmdVal >		_mapCmd; // mapping between cmd names and integer; used for switch case.
 
 		/* Client info */

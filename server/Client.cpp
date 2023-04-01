@@ -115,20 +115,15 @@ cst_vec_str	&Client::GetUinfo() const
 	return (_uinfo);
 }
 
-cst_vec_vec_str	&Client::GetCmds() const
+const std::vector< Command >	&Client::GetCmds() const
 {
 	return (_cmds);
 }
 
-void Client::SplitCmds(const string &str, const string delimiter)
+void	Client::_User(Command &cmd)
 {
-
-}
-
-
-
-void	Client::_User(cst_vec_str &cmd)
-{
+	(void)cmd;
+	/*
 	if (cmd.size() == 1)
 	{
 		SendData(ERR_NEEDMOREPARAMS(cmd[0]));
@@ -155,10 +150,13 @@ void	Client::_User(cst_vec_str &cmd)
 		_uinfo[realname] = rn;
 		SendData(RPL_WELCOME(_uinfo[nickname], _uinfo[username], _uinfo[hostname]));
 	}
+	*/
 }
 
-void	Client::_Nick(cst_vec_str &cmd)
+void	Client::_Nick(Command &cmd)
 {
+	(void)cmd;
+	/*
 	if (_validPass == false)
 		throw irc_error("must send PASS command first", CLOSE_CONNECTION);
 	if (cmd.size() == 1)
@@ -169,10 +167,13 @@ void	Client::_Nick(cst_vec_str &cmd)
 	SendData(msg);
 	_uinfo[nickname] = p[0];
 	std::cout << "NICK has been set to " << _uinfo[nickname] << std::endl;
+	*/
 }
 
-void	Client::_Pass(cst_vec_str &cmd)
+void	Client::_Pass(Command &cmd)
 {
+	(void)cmd;
+	/*
 	if (cmd.size() == 1)
 		throw irc_error(ERR_NEEDMOREPARAMS(cmd[0]), CLOSE_CONNECTION);
 	if (_validPass)
@@ -181,16 +182,22 @@ void	Client::_Pass(cst_vec_str &cmd)
 		throw irc_error("invalid pass", CLOSE_CONNECTION);
 	std::cout << "ℹ️  irc server:\033[0;32m valid pass \033[0;37mfrom " << _ip << " on socket " << _fd << std::endl;
 	_validPass = true;
+	*/
 }
 
-void	Client::_Ping(cst_vec_str &cmd)
+void	Client::_Ping(Command &cmd)
 {
 	(void)cmd;
+	/*
+	(void)cmd;
 	std::cout << "ping command received" << std::endl;
+	*/
 }
 
-void	Client::_CapLs(cst_vec_str &cmd)
+void	Client::_CapLs(Command &cmd)
 {
+	(void)cmd;
+	/*
 	if (cmd.size() != 2 || cmd[1] != "LS")
 	{
 		std::cout << "CAP LS invalid" << std::endl;
@@ -201,6 +208,7 @@ void	Client::_CapLs(cst_vec_str &cmd)
 		std::cout << "CAP LS ok" << std::endl;
 		return ;
 	}
+	*/
 }
 
 // Mapping between string comands name and enum type ex: "PASS" (string) -> PASS (int)
@@ -217,6 +225,7 @@ CmdVal	Client::ResolveOption(const string &input)
 
 void	Client::ExecCommand(Command &cmd)
 {
+	cmd.Debug();
 	switch (ResolveOption(cmd.command))
 	{
 		case CAP:
@@ -256,7 +265,7 @@ void	Client::_ParseBuf(const string &buf)
 	raw_cmds = Split(string(_buf.begin(), _buf.begin() + pos), "\r\n");
 	_buf = string(_buf.begin() + pos, _buf.end());
 	for (vec_str::iterator it = raw_cmds.begin(); it != raw_cmds.end(); ++it)
-		_cmds.push_back(_parser.parse(*it));
+		_cmds.push_back(_parser.Parse(*it));
 }
 
 void	Client::ParseRecv(const string &buf)
@@ -279,8 +288,8 @@ void	Client::ParseRecv(const string &buf)
 			throw;
 		}
 			// printer
-		for (vec_str::const_iterator j = _cmds[0].begin(); j != _cmds[0].end(); ++j)
-			std::cout <<  "[" << *j << "]";
+		for (std::vector< Command >::const_iterator j = _cmds.begin(); j != _cmds.end(); ++j)
+			std::cout <<  "[" << j->command << "]";
 		std::cout << std::endl;
 			//
 		_cmds.erase(_cmds.begin());

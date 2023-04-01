@@ -211,6 +211,7 @@ void	Parser::_Middle()
 void	Parser::_Target()
 {
 	std::string::iterator start = _it + 1;
+	std::string::iterator start2 = _it + 1;
 	while (1)
 	{
 		_Wrapper();
@@ -222,6 +223,7 @@ void	Parser::_Target()
 		else if (_current == space || _current == eoi)
 		{
 			_cmd.target.push_back(string(start, _it));
+			_cmd.middle.push_back(string(start2, _it));
 			return ;
 		}
 	}
@@ -244,7 +246,7 @@ void	Parser::_Param()
 
 void Parser::_Message()
 {
-	string::iterator	start = _it;
+	string::iterator	start = _input.begin();
 	_Wrapper();
 	if (_current == colon)
 	{
