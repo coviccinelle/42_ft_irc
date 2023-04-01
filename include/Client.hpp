@@ -3,6 +3,7 @@
 
 #include "../utils/utils.hpp"
 #include "../include/irc_error.hpp"
+#include "../include/Parser.hpp"
 
 # define RPL_WELCOME(nick, user, host) ("001 " + nick + " :Welcome to the Internet Relay Network " + nick + "!" + user + "@" + host + "\r\n")
 # define ERR_NEEDMOREPARAMS(command) ("461 " + command + " :Not enough parameters\r\n")
@@ -58,7 +59,7 @@ class Client
 		void							SplitCmds(const string &str, const string delimiter = "\r\n"); // Split string to : [string("CMD"), string("args")]; Also trim "\r\n"
 		void 							SendData(const string &msg) const; // Use send(2) method to send data back to client
 
-		void							ExecCommand(cst_vec_str &cmd); // Switch case
+		void							ExecCommand(Command &cmd); // Switch case
 		void							ParseRecv(const string &buf); // Parse the cmd received by the server
 		CmdVal							ResolveOption(const string &input); // Return a enum code for switch case eval
 
@@ -75,6 +76,7 @@ class Client
 		void							_Nick(cst_vec_str &cmd); // Parse NICK cmd
 		void							_User(cst_vec_str &cmd); // Parse USER cmd
 		void							_Ping(cst_vec_str &cmd); // Parse PING cmd
+		void							_ParseBuf(const string &buf);
 		void							ValidNickname(const string &nick);
 
 		/* Connection Info */
@@ -86,7 +88,7 @@ class Client
 
 		/* Commands */
 		string							_buf;
-		vec_vec_str						_cmds; // Commands that need to be process
+		vector< Command >				_cmds; // Commands that need to be process
 		std::map< string, CmdVal >		_mapCmd; // mapping between cmd names and integer; used for switch case.
 
 		/* Client info */
@@ -95,6 +97,7 @@ class Client
 
 		/* Utils */
 		const std::map< int, Client >	*_clients;
+		Parser							_parser;
 };
 
 // Non-Member function

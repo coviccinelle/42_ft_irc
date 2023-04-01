@@ -122,22 +122,7 @@ cst_vec_vec_str	&Client::GetCmds() const
 
 void Client::SplitCmds(const string &str, const string delimiter)
 {
-	vec_str	tmp(Split(trim(str), delimiter));
 
-	for (vec_str::iterator it = tmp.begin(); it != tmp.end(); ++it)
-	{
-		int		start(0);
-		int 	end(it->find(" "));
-		vec_str	v;
-		if (end != -1)
-		{
-			v.push_back(trim(it->substr(start, end - start)));
-			v.push_back(trim(it->substr(end, it->size())));
-		}
-		else
-			v.push_back(it->substr(start, str.size()));
-		_cmds.push_back(v);
-	}
 }
 
 
@@ -230,9 +215,9 @@ CmdVal	Client::ResolveOption(const string &input)
 	return (UNKNOWN); 
 }
 
-void	Client::ExecCommand(cst_vec_str &cmd)
+void	Client::ExecCommand(Command &cmd)
 {
-	switch (ResolveOption(cmd[0]))
+	switch (ResolveOption(cmd.command))
 	{
 		case CAP:
 		{
@@ -259,18 +244,24 @@ void	Client::ExecCommand(cst_vec_str &cmd)
 	}
 }
 
-void	Client::ParseRecv(const string &buf)
+void	Client::_ParseBuf(const string &buf)
 {
+	vec_str	raw_cmds;
+
 	std::cout << "buf: "  << buf << std::endl;
 	size_t pos;
 	_buf += buf;
 	if ((pos = _buf.find_last_of("\n")) == string::npos)
 		return ;
-	string tmp = _buf.substr(0, (_buf.begin() + pos) - _buf.begin());
-	SplitCmds(trim(tmp));
-	tmp = _buf.substr(pos, _buf.end() - (_buf.begin() + pos));
-	_buf = tmp;
+	raw_cmds = Split(string(_buf.begin(), _buf.begin() + pos), "\r\n");
+	_buf = string(_buf.begin() + pos, _buf.end());
+	for (vec_str::iterator it = raw_cmds.begin(); it != raw_cmds.end(); ++it)
+		_cmds.push_back(_parser.parse(*it));
+}
 
+void	Client::ParseRecv(const string &buf)
+{
+	_ParseBuf(buf);
 	if (_cmds.empty())
 	{
 		std::cerr << "⚠️  warning : empty commands" << std::endl;
