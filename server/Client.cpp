@@ -247,10 +247,7 @@ void	Client::_ParseBuf(const string &buf)
 	size_t pos;
 	_buf += buf;
 	if ((pos = _buf.find_last_of("\n")) == string::npos)
-	{
-		std::cout << "RETURN" << std::endl;
 		return ;
-	}
 	raw_cmds = Split(string(_buf.begin(), _buf.begin() + pos), "\r\n");
 	_buf = trim(string(_buf.begin() + pos, _buf.end()));
 	for (vec_str::iterator it = raw_cmds.begin(); it != raw_cmds.end(); ++it)
@@ -269,11 +266,7 @@ void	Client::_ParseBuf(const string &buf)
 
 void	Client::ParseRecv(const string &buf)
 {
-	std::cout << "_buf: "  << _buf << std::endl;
 	_ParseBuf(buf);
-	std::cout << "end" << std::endl; 
-	std::cout << "_buf: "  << _buf << std::endl;
-	std::cout << "end" << std::endl; 
 	if (_cmds.empty())
 	{
 		std::cerr << "⚠️  warning : empty commands" << std::endl;
@@ -282,10 +275,6 @@ void	Client::ParseRecv(const string &buf)
 
 	while (_cmds.empty() == 0)
 	{
-		// printer
-		for (std::vector< Command >::const_iterator j = _cmds.begin(); j != _cmds.end(); ++j)
-			std::cout <<  "[" << j->command << "]";
-		std::cout << std::endl;
 		try {
 			ExecCommand(_cmds[0]);
 		}
@@ -301,7 +290,7 @@ void	Client::ParseRecv(const string &buf)
 
 void Client::SendData(const string &msg) const
 {
-	std::cout << "[" << msg << "]" << std::endl;
+	std::cout << "Sending data :[" << msg << "]" << std::endl;
 	ssize_t ret = send(_fd, msg.data(), msg.size(), 0);
 	if (ret == -1)
 		std::cerr << "⚠️ warning : send err" << std::endl;

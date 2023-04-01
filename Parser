@@ -243,7 +243,6 @@ void	Parser::_Trailing()
 	while (_current != eoi)
 		_Wrapper();
 	_cmd.trailing = string(start, _it);
-	std::cout << "HERERERERE" << _cmd.trailing << std::endl;
 }
 
 void	Parser::_Param()
