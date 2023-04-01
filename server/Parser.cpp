@@ -196,23 +196,6 @@ void	Parser::_Command()
 		throw irc_error("parsing failed: _Command: letter or digit expected", ERR_COMMAND);
 }
 
-void	Parser::_Middle()
-{
-	string::iterator	start = _it + 1;
-	if (_current == colon)
-	{
-		_Trailing();
-		return ;
-	}
-	_Wrapper();
-	if (_current == space)
-		throw irc_error("parsing failed: _Middle: space found", ERR_MIDDLE);
-	while (_current != space && _current != eoi)
-		_Wrapper();
-	_cmd.middle.push_back(string(start, _it));
-}
-
-
 void	Parser::_Target()
 {
 	std::string::iterator start = _it + 1;
@@ -236,6 +219,29 @@ void	Parser::_Target()
 	}
 }
 
+void	Parser::_Middle()
+{
+	string::iterator	start = _it + 1;
+	if (_current == colon)
+	{
+		_Trailing();
+		return ;
+	}
+	_Wrapper();
+	if (_current == space)
+		throw irc_error("parsing failed: _Middle: space found", ERR_MIDDLE);
+	while (_current != space && _current != eoi)
+	{
+		if (_current == colon)
+		{
+			_Trailing();
+		}
+		else
+			_Wrapper();
+	}
+	_cmd.middle.push_back(string(start, _it));
+}
+
 void	Parser::_Trailing()
 {
 	string::iterator	start = _it + 1;
@@ -250,8 +256,12 @@ void	Parser::_Param()
 	_Wrapper();
 	if (_current != space)
 		throw irc_error("parsing failed: _Param: space expected", ERR_PARAM);
-	if (_current != eoi)
+
+	if (_current == space)
+	{
 		_Target();
+	}
+	//target and also the first middle
 	while (_current != eoi)
 	{
 		if (_current != space)

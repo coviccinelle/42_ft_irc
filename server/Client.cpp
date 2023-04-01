@@ -128,7 +128,7 @@ void	Client::_User(Command &cmd)
 		return ;
 	}
 	//TODO: SendData(ERR_ALREADYREGISTERED);
-	if (cmd.middle.size() < 4 || _uinfo[nickname].empty() || cmd.trailing.empty() == true)
+	if (cmd.middle.size() < 4 || _uinfo[nickname].empty()/* || cmd.trailing.empty() == true*/)
 	{
 		std::cout << "Invalid param" << std::endl;
 		return ;
@@ -138,6 +138,7 @@ void	Client::_User(Command &cmd)
 		_uinfo[username] = cmd.middle[0];
 		_uinfo[hostname] = cmd.middle[1];
 		_uinfo[servername] = cmd.middle[2];
+		cmd.trailing = cmd.middle[3];
 		_uinfo[realname] = cmd.trailing;
 		SendData(RPL_WELCOME(_uinfo[nickname], _uinfo[username], _uinfo[hostname]));
 	}
