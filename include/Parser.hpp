@@ -51,6 +51,7 @@ class Parser
 		void					_Host();
 		void					_Param();
 		void					_Middle();
+		void					_Trailing();
 		void					_Target();
 		void					_ParseInit();
 		void					_MsgTo();

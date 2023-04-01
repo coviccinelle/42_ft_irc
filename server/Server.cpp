@@ -6,7 +6,7 @@
 /*   By: jfrancai <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/28 11:42:52 by jfrancai          #+#    #+#             */
-/*   Updated: 2023/03/28 11:49:58 by jfrancai         ###   ########.fr       */
+/*   Updated: 2023/04/01 15:26:00 by jfrancai         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -131,20 +131,11 @@ void	Server::_ReceiveData(struct pollfd &pfd)
 			catch (irc_error &e)
 			{
 				if (e.code() == CLOSE_CONNECTION)
-				{
+					{ std::cout << e.what() << std::endl; _CloseConnection(pfd); }
+				else if (e.code() == NO_SEND)
 					std::cout << e.what() << std::endl;
-					return (_CloseConnection(pfd));
-				}
-				if (e.code() == NO_SEND)
-				{
-					std::cout << e.what() << std::endl;
-					return ;
-				}
-				if (e.code() == SEND_ERROR)
-				{
+				else if (e.code() == SEND_ERROR)
 					client.SendData(e.what());
-					return ;
-				}
 			}
 		}
 	}

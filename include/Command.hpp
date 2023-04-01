@@ -18,6 +18,7 @@ class Command
 		string					host;
 		string					nickname;
 		string					command;
+		string					trailing;
 		// First param after command is evaluated as the target;
 		// It is a vec of string splitted on commas ','
 		// Ex : "target1,target2" -> ["target1", "target2"]
