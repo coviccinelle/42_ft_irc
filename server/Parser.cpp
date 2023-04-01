@@ -235,6 +235,7 @@ void	Parser::_Middle()
 		if (_current == colon)
 		{
 			_Trailing();
+//			return ;
 		}
 		else
 			_Wrapper();
@@ -302,6 +303,7 @@ void	Parser::_ParseInit()
 	_cmd.host = "";
 	_cmd.nickname = "";
 	_cmd.command = "";
+	_cmd.trailing = "";
 	_cmd.middle.clear();
 	_cmd.target.clear();
 }

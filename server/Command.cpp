@@ -26,6 +26,7 @@ Command::Command(Command const &src)
 	command = src.command;
 	middle = src.middle;
 	target = src.target;
+	trailing = src.trailing;
 
 	return ;
 }
@@ -44,6 +45,7 @@ Command &Command::operator=(Command const &rhs)
 	command = rhs.command;
 	middle = rhs.middle;
 	target = rhs.target;
+	trailing = rhs.trailing;
 
 	return (*this);
 }
