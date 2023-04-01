@@ -174,10 +174,14 @@ void	Client::_User(cst_vec_str &cmd)
 
 void	Client::_Nick(cst_vec_str &cmd)
 {
+	if (_validPass == false)
+		throw irc_error("must send PASS command first", CLOSE_CONNECTION);
 	if (cmd.size() == 1)
 		throw irc_error(ERR_NONICKNAMEGIVEN, SEND_ERROR);
 	vec_str p(Split(cmd[1]));
 	ValidNickname(cmd[1]);
+	string msg = ":" + _uinfo[nickname] + "!" + _uinfo[username] + "@" + _uinfo[hostname] + " NICK " + p[0] + "\r\n";
+	SendData(msg);
 	_uinfo[nickname] = p[0];
 	std::cout << "NICK has been set to " << _uinfo[nickname] << std::endl;
 }
@@ -257,6 +261,7 @@ void	Client::ExecCommand(cst_vec_str &cmd)
 
 void	Client::ParseRecv(const string &buf)
 {
+	std::cout << "buf: "  << buf << std::endl;
 	size_t pos;
 	_buf += buf;
 	if ((pos = _buf.find_last_of("\n")) == string::npos)
@@ -274,7 +279,14 @@ void	Client::ParseRecv(const string &buf)
 
 	while (_cmds.empty() == 0)
 	{
-		ExecCommand(_cmds[0]);
+		try {
+			ExecCommand(_cmds[0]);
+		}
+		catch (irc_error &e)
+		{
+			_cmds.erase(_cmds.begin());
+			throw;
+		}
 			// printer
 		for (vec_str::const_iterator j = _cmds[0].begin(); j != _cmds[0].end(); ++j)
 			std::cout <<  "[" << *j << "]";
@@ -287,8 +299,8 @@ void	Client::ParseRecv(const string &buf)
 
 void Client::SendData(const string &msg) const
 {
-	std::cout << msg << std::endl;
-	ssize_t ret = send(_fd, msg.data(), msg.size() + 1, 0);
+	std::cout << "[" << msg << "]" << std::endl;
+	ssize_t ret = send(_fd, msg.data(), msg.size(), 0);
 	if (ret == -1)
 		std::cerr << "⚠️ warning : send err" << std::endl;
 }
@@ -305,9 +317,10 @@ void	Client::ValidNickname(const string &nick)
 	}
 	for (std::map< int, Client >::const_iterator it = _clients->begin(); it != _clients->end(); ++it)
 	{
-		if (it->second.GetUinfo()[nickname] == nick)
+		if (&it->second != this && it->second.GetUinfo()[nickname] == nick)
 		{
-			throw irc_error(ERR_NICKNAMEINUSE(nick), CLOSE_CONNECTION);
+			_uinfo[nickname] = "";
+			throw irc_error(ERR_NICKNAMEINUSE(nick), SEND_ERROR);
 		}
 	}
 }

@@ -13,6 +13,14 @@ enum Errors {
 	CLOSE_CONNECTION,
 	NO_SEND,
 	SEND_ERROR,
+	ERR_HOST,
+	ERR_NICK,
+	ERR_USER,
+	ERR_PREFIX,
+	ERR_COMMAND,
+	ERR_MIDDLE,
+	ERR_PARAM,
+	ERR_MESSAGE,
 };
 
 class irc_error: public std::exception
@@ -26,7 +34,7 @@ class irc_error: public std::exception
 		irc_error(const string &error, int code = SUCCESS);
 
 		virtual const char* what() const throw();
-		virtual int			code() const throw();
+		int					code() const throw();
 	private:
 		string	_str;
 		int		_code;
