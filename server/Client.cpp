@@ -122,67 +122,54 @@ const std::vector< Command >	&Client::GetCmds() const
 
 void	Client::_User(Command &cmd)
 {
-	(void)cmd;
-	/*
-	if (cmd.size() == 1)
+	if (cmd.middle.size() == 0)
 	{
-		SendData(ERR_NEEDMOREPARAMS(cmd[0]));
+		SendData(ERR_NEEDMOREPARAMS(cmd.command));
 		return ;
 	}
 	//TODO: SendData(ERR_ALREADYREGISTERED);
-	vec_str p(Split(cmd[1]));
-	if (p.size() < 4 || _uinfo[nickname].empty() || cmd[1].rfind(":") == string::npos)
+	if (cmd.middle.size() < 4 || _uinfo[nickname].empty() || cmd.trailing.empty() == true)
 	{
 		std::cout << "Invalid param" << std::endl;
 		return ;
 	}
 	else
 	{
-		string rn(cmd[1].substr(cmd[1].rfind(":") + 1));
-		if (rn.empty())
-		{
-			std::cout << "empty realname" << std::endl;
-			return ;
-		}
-		_uinfo[username] = p[0];
-		_uinfo[hostname] = p[1];
-		_uinfo[servername] = p[2];
-		_uinfo[realname] = rn;
+		_uinfo[username] = cmd.middle[0];
+		_uinfo[hostname] = cmd.middle[1];
+		_uinfo[servername] = cmd.middle[2];
+		_uinfo[realname] = cmd.trailing;
 		SendData(RPL_WELCOME(_uinfo[nickname], _uinfo[username], _uinfo[hostname]));
 	}
-	*/
 }
 
 void	Client::_Nick(Command &cmd)
 {
-	(void)cmd;
-	/*
 	if (_validPass == false)
-		throw irc_error("must send PASS command first", CLOSE_CONNECTION);
-	if (cmd.size() == 1)
+		throw irc_error(string(":server@127.0.0.1") + string(" please register PASS before retry.\r\n"), SEND_ERROR);
+	if (cmd.target.size() != 1)
 		throw irc_error(ERR_NONICKNAMEGIVEN, SEND_ERROR);
-	vec_str p(Split(cmd[1]));
-	ValidNickname(cmd[1]);
-	string msg = ":" + _uinfo[nickname] + "!" + _uinfo[username] + "@" + _uinfo[hostname] + " NICK " + p[0] + "\r\n";
+	_uinfo[nickname] = cmd.target[0];
+	string msg = ":" + _uinfo[nickname];
+	if (_uinfo[username].empty() == false)
+		msg += "!" + _uinfo[username];
+	if (_uinfo[hostname].empty() == false)
+		msg += "@" + _uinfo[hostname];
+	msg +=  + " NICK " + _uinfo[nickname] + "\r\n";
 	SendData(msg);
-	_uinfo[nickname] = p[0];
 	std::cout << "NICK has been set to " << _uinfo[nickname] << std::endl;
-	*/
 }
 
 void	Client::_Pass(Command &cmd)
 {
-	(void)cmd;
-	/*
-	if (cmd.size() == 1)
-		throw irc_error(ERR_NEEDMOREPARAMS(cmd[0]), CLOSE_CONNECTION);
+	if (cmd.middle.size() < 1)
+		throw irc_error(ERR_NEEDMOREPARAMS(cmd.middle[0]), SEND_ERROR);
 	if (_validPass)
-		throw irc_error(ERR_ALREADYREGISTERED, CLOSE_CONNECTION);
-	if (cmd[1] != _servPass)
-		throw irc_error("invalid pass", CLOSE_CONNECTION);
+		throw irc_error(ERR_ALREADYREGISTERED, SEND_ERROR);
+	if (cmd.middle[0] != _servPass)
+		throw irc_error(string(":") + _ip + string(" invalid password please retry.\r\n"), SEND_ERROR);
 	std::cout << "ℹ️  irc server:\033[0;32m valid pass \033[0;37mfrom " << _ip << " on socket " << _fd << std::endl;
 	_validPass = true;
-	*/
 }
 
 void	Client::_Ping(Command &cmd)
@@ -257,20 +244,36 @@ void	Client::_ParseBuf(const string &buf)
 {
 	vec_str	raw_cmds;
 
-	std::cout << "buf: "  << buf << std::endl;
 	size_t pos;
 	_buf += buf;
 	if ((pos = _buf.find_last_of("\n")) == string::npos)
+	{
+		std::cout << "RETURN" << std::endl;
 		return ;
+	}
 	raw_cmds = Split(string(_buf.begin(), _buf.begin() + pos), "\r\n");
-	_buf = string(_buf.begin() + pos, _buf.end());
+	_buf = trim(string(_buf.begin() + pos, _buf.end()));
 	for (vec_str::iterator it = raw_cmds.begin(); it != raw_cmds.end(); ++it)
-		_cmds.push_back(_parser.Parse(*it));
+	{
+		try
+		{
+			_cmds.push_back(_parser.Parse(*it));
+		}
+		catch (irc_error &e)
+		{
+			std::cout << e.what() << std::endl;
+			throw ;
+		}
+	}
 }
 
 void	Client::ParseRecv(const string &buf)
 {
+	std::cout << "_buf: "  << _buf << std::endl;
 	_ParseBuf(buf);
+	std::cout << "end" << std::endl; 
+	std::cout << "_buf: "  << _buf << std::endl;
+	std::cout << "end" << std::endl; 
 	if (_cmds.empty())
 	{
 		std::cerr << "⚠️  warning : empty commands" << std::endl;
@@ -279,6 +282,10 @@ void	Client::ParseRecv(const string &buf)
 
 	while (_cmds.empty() == 0)
 	{
+		// printer
+		for (std::vector< Command >::const_iterator j = _cmds.begin(); j != _cmds.end(); ++j)
+			std::cout <<  "[" << j->command << "]";
+		std::cout << std::endl;
 		try {
 			ExecCommand(_cmds[0]);
 		}
@@ -287,11 +294,6 @@ void	Client::ParseRecv(const string &buf)
 			_cmds.erase(_cmds.begin());
 			throw;
 		}
-			// printer
-		for (std::vector< Command >::const_iterator j = _cmds.begin(); j != _cmds.end(); ++j)
-			std::cout <<  "[" << j->command << "]";
-		std::cout << std::endl;
-			//
 		_cmds.erase(_cmds.begin());
 	}
 	return ;

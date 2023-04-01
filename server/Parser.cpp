@@ -200,8 +200,13 @@ void	Parser::_Middle()
 {
 	string::iterator	start = _it + 1;
 	_Wrapper();
-	if (_current == colon || _current == space)
-		throw irc_error("parsing failed: _Middle: colon or space found", ERR_MIDDLE);
+	if (_current == colon)
+	{
+		_Trailing();
+		return ;
+	}
+	if (_current == space)
+		throw irc_error("parsing failed: _Middle: space found", ERR_MIDDLE);
 	while (_current != space && _current != eoi)
 		_Wrapper();
 	_cmd.middle.push_back(string(start, _it));
@@ -215,6 +220,8 @@ void	Parser::_Target()
 	while (1)
 	{
 		_Wrapper();
+		if (_current == colon)
+			throw irc_error("parsing failed: _Target: colon found", ERR_MIDDLE);
 		if (_current == comma)
 		{
 			_cmd.target.push_back(string(start, _it));
@@ -227,6 +234,15 @@ void	Parser::_Target()
 			return ;
 		}
 	}
+}
+
+void	Parser::_Trailing()
+{
+	string::iterator	start = _it + 1;
+	_Wrapper();
+	while (_current != eoi)
+		_Wrapper();
+	_cmd.trailing = string(start, _it);
 }
 
 void	Parser::_Param()

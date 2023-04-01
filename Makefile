@@ -1,6 +1,6 @@
 NAME	=	ircserv 
 CC		=	c++
-CFLAGS	=	-Wall -Wextra -Werror -std=c++98 -I include/
+CFLAGS	=	-Wall -Wextra -Werror -g3 -std=c++98 -I include/
 TESTFLAGS =   -I lib/googletest/include -L lib/googletest/lib -lgtest -lgtest_main -lgmock
 RM		=	rm -rf
 
