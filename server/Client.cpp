@@ -161,7 +161,6 @@ void	Client::_Nick(Command &cmd)
 
 	string from;
 	if (_uinfo[nickname].empty() == false) {
-		std::cout << "here " << _uinfo[nickname] << std::endl;
 		from = _uinfo[nickname];
 		if (_uinfo[username].empty() == false)
 			from += "!" + _uinfo[username];
@@ -267,7 +266,7 @@ void	Client::_ParseBuf(const string &buf)
 	{
 		try
 		{
-			_cmds.push_back(_parser.Parse(*it));
+			_cmds.push_back(_parser.Parse(trim(*it)));
 		}
 		catch (irc_error &e)
 		{
