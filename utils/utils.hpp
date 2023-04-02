@@ -19,6 +19,8 @@
 #include <poll.h>
 #include <arpa/inet.h>
 
+#define SERVER_NAME string("irc")
+
 typedef std::string 						string;
 
 typedef std::vector< string >				vec_str;

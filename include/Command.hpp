@@ -14,6 +14,7 @@ class Command
 
 		string					message;
 		string					prefix;
+		string					params;
 		string					user;
 		string					host;
 		string					nickname;

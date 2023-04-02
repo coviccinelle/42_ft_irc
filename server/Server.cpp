@@ -131,11 +131,11 @@ void	Server::_ReceiveData(struct pollfd &pfd)
 			catch (irc_error &e)
 			{
 				if (e.code() == CLOSE_CONNECTION)
-					{ std::cout << e.what() << std::endl; _CloseConnection(pfd); }
+					{ client.SendData(SERVER_NAME, e.what()); _CloseConnection(pfd); }
 				else if (e.code() == NO_SEND)
 					std::cout << e.what() << std::endl;
 				else if (e.code() == SEND_ERROR)
-					client.SendData(e.what());
+					client.SendData(SERVER_NAME, e.what());
 			}
 		}
 	}

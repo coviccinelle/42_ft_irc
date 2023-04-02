@@ -9,7 +9,7 @@ Client::Client() :
 	_buf(""),
 	_cmds(0),
 	_mapCmd(),
-	_validPass(false),
+	_registd(false),
 	_uinfo(INF_CLI_SIZE),
 	_clients(NULL)
 {
@@ -26,7 +26,7 @@ Client::Client(const string &pass, const std::map< int, Client > &clients) :
 	_buf(""),
 	_cmds(0),
 	_mapCmd(),
-	_validPass(false),
+	_registd(false),
 	_uinfo(INF_CLI_SIZE),
 	_clients(&clients)
 {
@@ -56,7 +56,7 @@ Client::Client(Client const &src)
 	_cmds = src._cmds;
 	_mapCmd = src._mapCmd;
 
-	_validPass = src._validPass;
+	_registd = src._registd;
 	_uinfo = src._uinfo;
 
 	_clients = src._clients;
@@ -77,7 +77,7 @@ Client &Client::operator=(Client const &rhs)
 	_cmds = rhs._cmds;
 	_mapCmd = rhs._mapCmd;
 
-	_validPass = rhs._validPass;
+	_registd = rhs._registd;
 	_uinfo = rhs._uinfo;
 
 	_clients = rhs._clients;
@@ -123,9 +123,11 @@ const std::vector< Command >	&Client::GetCmds() const
 
 void	Client::_User(Command &cmd)
 {
+	if (_uinfo[password] != _servPass)
+		throw irc_error(ERR_NEEDMOREPARAMS("PASS"), CLOSE_CONNECTION);
 	if (cmd.middle.size() == 0)
 	{
-		SendData(ERR_NEEDMOREPARAMS(cmd.command));
+		SendData(SERVER_NAME, ERR_NEEDMOREPARAMS(cmd.command));
 		return ;
 	}
 	//TODO: SendData(ERR_ALREADYREGISTERED);
@@ -139,39 +141,49 @@ void	Client::_User(Command &cmd)
 		_uinfo[username] = cmd.middle[0];
 		_uinfo[hostname] = cmd.middle[1];
 		_uinfo[servername] = cmd.middle[2];
-		//cmd.trailing = cmd.middle[3];
 		_uinfo[realname] = cmd.trailing;
-		SendData(RPL_WELCOME(_uinfo[nickname], _uinfo[username], _uinfo[hostname]));
+		if (_uinfo[nickname].empty() == false)
+			_registd = true;
+		SendData(SERVER_NAME, RPL_WELCOME(_uinfo[nickname], _uinfo[username], _uinfo[hostname]));
 	}
 }
 
 void	Client::_Nick(Command &cmd)
 {
-	if (_validPass == false)
-		throw irc_error(string(":server@127.0.0.1") + string(" please register PASS before retry.\r\n"), SEND_ERROR);
+	if (_uinfo[password] != _servPass)
+		throw irc_error(ERR_NEEDMOREPARAMS("PASS"), CLOSE_CONNECTION);
 	if (cmd.target.size() != 1)
 		throw irc_error(ERR_NONICKNAMEGIVEN, SEND_ERROR);
+	if (_registd == false &&
+		_uinfo[username].empty() == false &&
+		_uinfo[hostname].empty() == false && 
+		_uinfo[servername].empty() == false && 
+		_uinfo[realname].empty() == false)
+		_registd = true;
+
+	string from;
+	if (_uinfo[nickname].empty() == false) {
+		from = _uinfo[nickname];
+		if (_uinfo[username].empty() == false)
+			from += "!" + _uinfo[username];
+		if (_uinfo[hostname].empty() == false)
+			from += "@" + _uinfo[hostname];
+	}
+	else {
+		from = SERVER_NAME;
+	}
 	_uinfo[nickname] = cmd.target[0];
-	string msg = ":" + _uinfo[nickname];
-	if (_uinfo[username].empty() == false)
-		msg += "!" + _uinfo[username];
-	if (_uinfo[hostname].empty() == false)
-		msg += "@" + _uinfo[hostname];
-	msg +=  + " NICK " + _uinfo[nickname] + "\r\n";
-	SendData(msg);
-	std::cout << "NICK has been set to " << _uinfo[nickname] << std::endl;
+
+	SendData(from, "NICK " + _uinfo[nickname] + "\r\n");
 }
 
 void	Client::_Pass(Command &cmd)
 {
 	if (cmd.middle.size() < 1)
 		throw irc_error(ERR_NEEDMOREPARAMS(cmd.middle[0]), SEND_ERROR);
-	if (_validPass)
+	if (_registd)
 		throw irc_error(ERR_ALREADYREGISTERED, SEND_ERROR);
-	if (cmd.middle[0] != _servPass)
-		throw irc_error(string(":") + _ip + string(" invalid password please retry.\r\n"), SEND_ERROR);
-	std::cout << "ℹ️  irc server:\033[0;32m valid pass \033[0;37mfrom " << _ip << " on socket " << _fd << std::endl;
-	_validPass = true;
+	_uinfo[password] = cmd.params;
 }
 
 void	Client::_Ping(Command &cmd)
@@ -274,17 +286,14 @@ void	Client::_ParseBuf(const string &buf)
 	size_t pos;
 	_buf += buf;
 	if ((pos = _buf.find_last_of("\n")) == string::npos)
-	{
-		std::cout << "RETURN" << std::endl;
 		return ;
-	}
 	raw_cmds = Split(string(_buf.begin(), _buf.begin() + pos), "\r\n");
 	_buf = trim(string(_buf.begin() + pos, _buf.end()));
 	for (vec_str::iterator it = raw_cmds.begin(); it != raw_cmds.end(); ++it)
 	{
 		try
 		{
-			_cmds.push_back(_parser.Parse(*it));
+			_cmds.push_back(_parser.Parse(trim(*it)));
 		}
 		catch (irc_error &e)
 		{
@@ -296,11 +305,7 @@ void	Client::_ParseBuf(const string &buf)
 
 void	Client::ParseRecv(const string &buf)
 {
-	std::cout << "_buf: "  << _buf << std::endl;
 	_ParseBuf(buf);
-	std::cout << "end" << std::endl; 
-	std::cout << "_buf: "  << _buf << std::endl;
-	std::cout << "end" << std::endl; 
 	if (_cmds.empty())
 	{
 		std::cerr << "⚠️  warning : empty commands" << std::endl;
@@ -309,10 +314,6 @@ void	Client::ParseRecv(const string &buf)
 
 	while (_cmds.empty() == 0)
 	{
-		// printer
-		for (std::vector< Command >::const_iterator j = _cmds.begin(); j != _cmds.end(); ++j)
-			std::cout <<  "[" << j->command << "]";
-		std::cout << std::endl;
 		try {
 			ExecCommand(_cmds[0]);
 		}
@@ -326,11 +327,12 @@ void	Client::ParseRecv(const string &buf)
 	return ;
 }
 
-void Client::SendData(const string &msg) const
+void Client::SendData(const string &from, const string &msg) const
 {
-	std::cout << "[" << msg << "]" << std::endl;
-	ssize_t ret = send(_fd, msg.data(), msg.size(), 0);
-	if (ret == -1)
+	string s = ":" + from + " " + msg;
+
+	std::cout << "Sending data :[" << s << "]" << std::endl;
+	if (send(_fd, s.data(), s.size(), 0) == -1)
 		std::cerr << "⚠️ warning : send err" << std::endl;
 }
 
