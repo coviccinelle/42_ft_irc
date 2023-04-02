@@ -272,11 +272,9 @@ void	Parser::_Param()
 	if (_current != space)
 		throw irc_error("parsing failed: _Param: space expected", ERR_PARAM);
 	std::string::iterator start = _it + 1;
-	if (_current == space)
-	{
-//	if (_current != eoi)
+	//if (_current == space)// OR 	
+	if (_current != eoi)
 		_Target();
-	}
 	//target and also the first middle
 	while (_current != eoi)
 	{
