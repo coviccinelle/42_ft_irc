@@ -61,7 +61,7 @@ class Client
 		int								GetFd(void) const;
 		const string					&GetIp() const;
 		cst_vec_str						&GetUinfo() const;
-		const std::vector< Command >			&GetCmds() const;
+		const std::list< Command >		&GetCmds() const;
 
 	private:
 		/* Private Methods */
@@ -82,7 +82,7 @@ class Client
 
 		/* Commands */
 		string							_buf;
-		std::vector< Command >			_cmds; // Commands that need to be process
+		std::list< Command >			_cmds; // Commands that need to be process
 		std::map< string, CmdVal >		_mapCmd; // mapping between cmd names and integer; used for switch case.
 
 		/* Client info */

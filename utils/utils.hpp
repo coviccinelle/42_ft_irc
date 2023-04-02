@@ -10,6 +10,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <list>
 
 #include <fcntl.h> // pour les flags F_SETFL et O_NONBLOCK
 #include <sys/types.h>

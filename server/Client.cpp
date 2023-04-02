@@ -115,7 +115,7 @@ cst_vec_str	&Client::GetUinfo() const
 	return (_uinfo);
 }
 
-const std::vector< Command >	&Client::GetCmds() const
+const std::list< Command >	&Client::GetCmds() const
 {
 	return (_cmds);
 }
@@ -288,14 +288,14 @@ void	Client::ParseRecv(const string &buf)
 	while (_cmds.empty() == 0)
 	{
 		try {
-			ExecCommand(_cmds[0]);
+			ExecCommand(*_cmds.begin());
 		}
 		catch (irc_error &e)
 		{
-			_cmds.erase(_cmds.begin());
+			_cmds.pop_front();
 			throw;
 		}
-		_cmds.erase(_cmds.begin());
+		_cmds.pop_front();
 	}
 	return ;
 }
