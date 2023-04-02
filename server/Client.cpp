@@ -126,7 +126,7 @@ void	Client::_User(Command &cmd)
 		throw irc_error(ERR_NEEDMOREPARAMS("PASS"), CLOSE_CONNECTION);
 	if (cmd.middle.size() == 0)
 	{
-		SendData(ERR_NEEDMOREPARAMS(cmd.command));
+		SendData(SERVER_NAME, ERR_NEEDMOREPARAMS(cmd.command));
 		return ;
 	}
 	//TODO: SendData(ERR_ALREADYREGISTERED);
@@ -138,12 +138,11 @@ void	Client::_User(Command &cmd)
 	else
 	{
 		_uinfo[username] = cmd.middle[0];
-		_uinfo[hostname] = cmd.middle[1];
-		_uinfo[servername] = cmd.middle[2];
+		_uinfo[hostname] = cmd.middle[2];
 		_uinfo[realname] = cmd.trailing;
 		if (_uinfo[nickname].empty() == false)
 			_registd = true;
-		SendData(RPL_WELCOME(_uinfo[nickname], _uinfo[username], _uinfo[hostname]));
+		SendData(SERVER_NAME, RPL_WELCOME(_uinfo[nickname], _uinfo[username], _uinfo[hostname]));
 	}
 }
 
@@ -153,7 +152,6 @@ void	Client::_Nick(Command &cmd)
 		throw irc_error(ERR_NEEDMOREPARAMS("PASS"), CLOSE_CONNECTION);
 	if (cmd.target.size() != 1)
 		throw irc_error(ERR_NONICKNAMEGIVEN, SEND_ERROR);
-	_uinfo[nickname] = cmd.target[0];
 	if (_registd == false &&
 		_uinfo[username].empty() == false &&
 		_uinfo[hostname].empty() == false && 
@@ -161,7 +159,21 @@ void	Client::_Nick(Command &cmd)
 		_uinfo[realname].empty() == false)
 		_registd = true;
 
-	SendData("NICK " + _uinfo[nickname] + "\r\n");
+	string from;
+	if (_uinfo[nickname].empty() == false) {
+		std::cout << "here " << _uinfo[nickname] << std::endl;
+		from = _uinfo[nickname];
+		if (_uinfo[username].empty() == false)
+			from += "!" + _uinfo[username];
+		if (_uinfo[hostname].empty() == false)
+			from += "@" + _uinfo[hostname];
+	}
+	else {
+		from = SERVER_NAME;
+	}
+	_uinfo[nickname] = cmd.target[0];
+
+	SendData(from, "NICK " + _uinfo[nickname] + "\r\n");
 }
 
 void	Client::_Pass(Command &cmd)
@@ -289,12 +301,12 @@ void	Client::ParseRecv(const string &buf)
 	return ;
 }
 
-void Client::SendData(const string &s) const
+void Client::SendData(const string &from, const string &msg) const
 {
-	string msg = ":" + SERVER_NAME + " " + s;
-	std::cout << "Sending data :[" << msg << "]" << std::endl;
-	ssize_t ret = send(_fd, msg.data(), msg.size(), 0);
-	if (ret == -1)
+	string s = ":" + from + " " + msg;
+
+	std::cout << "Sending data :[" << s << "]" << std::endl;
+	if (send(_fd, s.data(), s.size(), 0) == -1)
 		std::cerr << "⚠️ warning : send err" << std::endl;
 }
 

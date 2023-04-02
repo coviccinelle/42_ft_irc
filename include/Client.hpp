@@ -51,7 +51,7 @@ class Client
 
 		/* Public Methods */
 		int								AcceptClient(int listener); // Return socket fd for socker communication
-		void 							SendData(const string &s) const; // Use send(2) method to send data back to client
+		void 							SendData(const string &from, const string &s) const; // Use send(2) method to send data back to client
 
 		void							ExecCommand(Command &cmd); // Switch case
 		void							ParseRecv(const string &buf); // Parse the cmd received by the server
