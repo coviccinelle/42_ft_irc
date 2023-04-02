@@ -3,6 +3,7 @@
 Command::Command(void) :
 	message(""),
 	prefix(""),
+	params(""),
 	user(""),
 	host(""),
 	nickname(""),
@@ -20,6 +21,7 @@ Command::Command(Command const &src)
 {
 	message = src.message;
 	prefix = src.prefix;
+	params = src.params;
 	user = src.user;
 	host = src.host;
 	nickname = src.nickname;
@@ -39,6 +41,7 @@ Command &Command::operator=(Command const &rhs)
 
 	message = rhs.message;
 	prefix = rhs.prefix;
+	params = rhs.params;
 	user = rhs.user;
 	host = rhs.host;
 	nickname = rhs.nickname;
@@ -54,6 +57,7 @@ void Command::Debug()
 {
 	std::cout << "===========[ DEBUG ]===========" << std::endl;
 	std::cout << "Message :[" << message << "]" << std::endl;
+	std::cout << "Params :[" << params << "]" << std::endl;
 	std::cout << "Prefix :[" << prefix << "]" << std::endl;
 	std::cout << "User :[" << user << "]" << std::endl;
 	std::cout << "Host :[" << host << "]" << std::endl;

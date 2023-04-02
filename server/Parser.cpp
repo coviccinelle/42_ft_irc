@@ -248,6 +248,7 @@ void	Parser::_Param()
 	_Wrapper();
 	if (_current != space)
 		throw irc_error("parsing failed: _Param: space expected", ERR_PARAM);
+	std::string::iterator start = _it + 1;
 	if (_current != eoi)
 		_Target();
 	while (_current != eoi)
@@ -256,6 +257,7 @@ void	Parser::_Param()
 			throw irc_error("parsing failed: _Param: space expected", ERR_PARAM);
 		_Middle();
 	}
+	_cmd.params = string(start, _it);
 }
 
 void Parser::_Message()

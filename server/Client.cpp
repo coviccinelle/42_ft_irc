@@ -9,7 +9,7 @@ Client::Client() :
 	_buf(""),
 	_cmds(0),
 	_mapCmd(),
-	_validPass(false),
+	_registd(false),
 	_uinfo(INF_CLI_SIZE),
 	_clients(NULL)
 {
@@ -26,7 +26,7 @@ Client::Client(const string &pass, const std::map< int, Client > &clients) :
 	_buf(""),
 	_cmds(0),
 	_mapCmd(),
-	_validPass(false),
+	_registd(false),
 	_uinfo(INF_CLI_SIZE),
 	_clients(&clients)
 {
@@ -55,7 +55,7 @@ Client::Client(Client const &src)
 	_cmds = src._cmds;
 	_mapCmd = src._mapCmd;
 
-	_validPass = src._validPass;
+	_registd = src._registd;
 	_uinfo = src._uinfo;
 
 	_clients = src._clients;
@@ -76,7 +76,7 @@ Client &Client::operator=(Client const &rhs)
 	_cmds = rhs._cmds;
 	_mapCmd = rhs._mapCmd;
 
-	_validPass = rhs._validPass;
+	_registd = rhs._registd;
 	_uinfo = rhs._uinfo;
 
 	_clients = rhs._clients;
@@ -122,6 +122,8 @@ const std::vector< Command >	&Client::GetCmds() const
 
 void	Client::_User(Command &cmd)
 {
+	if (_uinfo[password] != _servPass)
+		throw irc_error(ERR_NEEDMOREPARAMS("PASS"), CLOSE_CONNECTION);
 	if (cmd.middle.size() == 0)
 	{
 		SendData(ERR_NEEDMOREPARAMS(cmd.command));
@@ -139,37 +141,36 @@ void	Client::_User(Command &cmd)
 		_uinfo[hostname] = cmd.middle[1];
 		_uinfo[servername] = cmd.middle[2];
 		_uinfo[realname] = cmd.trailing;
+		if (_uinfo[nickname].empty() == false)
+			_registd = true;
 		SendData(RPL_WELCOME(_uinfo[nickname], _uinfo[username], _uinfo[hostname]));
 	}
 }
 
 void	Client::_Nick(Command &cmd)
 {
-	if (_validPass == false)
-		throw irc_error(string(":server@127.0.0.1") + string(" please register PASS before retry.\r\n"), SEND_ERROR);
+	if (_uinfo[password] != _servPass)
+		throw irc_error(ERR_NEEDMOREPARAMS("PASS"), CLOSE_CONNECTION);
 	if (cmd.target.size() != 1)
 		throw irc_error(ERR_NONICKNAMEGIVEN, SEND_ERROR);
 	_uinfo[nickname] = cmd.target[0];
-	string msg = ":" + _uinfo[nickname];
-	if (_uinfo[username].empty() == false)
-		msg += "!" + _uinfo[username];
-	if (_uinfo[hostname].empty() == false)
-		msg += "@" + _uinfo[hostname];
-	msg +=  + " NICK " + _uinfo[nickname] + "\r\n";
-	SendData(msg);
-	std::cout << "NICK has been set to " << _uinfo[nickname] << std::endl;
+	if (_registd == false &&
+		_uinfo[username].empty() == false &&
+		_uinfo[hostname].empty() == false && 
+		_uinfo[servername].empty() == false && 
+		_uinfo[realname].empty() == false)
+		_registd = true;
+
+	SendData("NICK " + _uinfo[nickname] + "\r\n");
 }
 
 void	Client::_Pass(Command &cmd)
 {
 	if (cmd.middle.size() < 1)
 		throw irc_error(ERR_NEEDMOREPARAMS(cmd.middle[0]), SEND_ERROR);
-	if (_validPass)
+	if (_registd)
 		throw irc_error(ERR_ALREADYREGISTERED, SEND_ERROR);
-	if (cmd.middle[0] != _servPass)
-		throw irc_error(string(":") + _ip + string(" invalid password please retry.\r\n"), SEND_ERROR);
-	std::cout << "ℹ️  irc server:\033[0;32m valid pass \033[0;37mfrom " << _ip << " on socket " << _fd << std::endl;
-	_validPass = true;
+	_uinfo[password] = cmd.params;
 }
 
 void	Client::_Ping(Command &cmd)
@@ -288,8 +289,9 @@ void	Client::ParseRecv(const string &buf)
 	return ;
 }
 
-void Client::SendData(const string &msg) const
+void Client::SendData(const string &s) const
 {
+	string msg = ":" + SERVER_NAME + " " + s;
 	std::cout << "Sending data :[" << msg << "]" << std::endl;
 	ssize_t ret = send(_fd, msg.data(), msg.size(), 0);
 	if (ret == -1)

@@ -4,20 +4,15 @@
 #include "../utils/utils.hpp"
 #include "../include/irc_error.hpp"
 #include "../include/Parser.hpp"
-
-# define RPL_WELCOME(nick, user, host) ("001 " + nick + " :Welcome to the Internet Relay Network " + nick + "!" + user + "@" + host + "\r\n")
-# define ERR_NEEDMOREPARAMS(command) ("461 " + command + " :Not enough parameters\r\n")
-# define ERR_ALREADYREGISTERED "462 :You may not reregister\r\n"
-# define ERR_NONICKNAMEGIVEN "431 :No nickname given\r\n"
-# define ERR_NICKNAMEINUSE(nick) ("433 " + nick + ":Nickname is already in use\r\n")
-# define ERR_ERRONEUSNICKNAME(nick) ("432 " + nick + " :Erroneous nickname\r\n")
+#include "../include/Errors.hpp"
 
 // Size of InfoClient enum below
-#define INF_CLI_SIZE 5
+#define INF_CLI_SIZE 6
 
 // List of infos on a client
 enum InfoClient {
-	nickname = 0,
+	password = 0,
+	nickname,
 	username,
 	hostname,
 	servername,
@@ -56,7 +51,7 @@ class Client
 
 		/* Public Methods */
 		int								AcceptClient(int listener); // Return socket fd for socker communication
-		void 							SendData(const string &msg) const; // Use send(2) method to send data back to client
+		void 							SendData(const string &s) const; // Use send(2) method to send data back to client
 
 		void							ExecCommand(Command &cmd); // Switch case
 		void							ParseRecv(const string &buf); // Parse the cmd received by the server
@@ -91,7 +86,7 @@ class Client
 		std::map< string, CmdVal >		_mapCmd; // mapping between cmd names and integer; used for switch case.
 
 		/* Client info */
-		bool							_validPass; // tell if PASS authentification has been done
+		bool							_registd;
 		vec_str							_uinfo; // nickname, username, hostname ... See InfoClient above for all available field.
 
 		/* Utils */
