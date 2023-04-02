@@ -294,6 +294,7 @@ void	Parser::_ParseInit()
 	_cmd.command = "";
 	_cmd.middle.clear();
 	_cmd.target.clear();
+	_cmd.tailing =
 }
 
 const std::vector< Token >	&Parser::Tokens() const

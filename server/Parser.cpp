@@ -205,6 +205,7 @@ void	Parser::_Middle()
 	if (_current == colon)
 	{
 		_Trailing();
+		_cmd.trailing = string(start + 1, _it);
 		return ;
 	}
 	while (_current != space && _current != eoi)
@@ -238,12 +239,8 @@ void	Parser::_Target()
 
 void	Parser::_Trailing()
 {
-	string::iterator	start = _it + 1;
-	_Wrapper();
 	while (_current != eoi)
 		_Wrapper();
-	_cmd.trailing = string(start, _it);
-	std::cout << "HERERERERE" << _cmd.trailing << std::endl;
 }
 
 void	Parser::_Param()
@@ -295,6 +292,7 @@ void	Parser::_ParseInit()
 	_cmd.command = "";
 	_cmd.middle.clear();
 	_cmd.target.clear();
+	_cmd.trailing = "";
 }
 
 const std::vector< Token >	&Parser::Tokens() const

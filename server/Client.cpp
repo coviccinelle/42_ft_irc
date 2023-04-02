@@ -128,7 +128,7 @@ void	Client::_User(Command &cmd)
 		return ;
 	}
 	//TODO: SendData(ERR_ALREADYREGISTERED);
-	if (cmd.middle.size() < 4 || _uinfo[nickname].empty() || cmd.trailing.empty() == true)
+	if (cmd.middle.size() < 3 || _uinfo[nickname].empty() || cmd.trailing.empty() == true)
 	{
 		std::cout << "Invalid param" << std::endl;
 		return ;
