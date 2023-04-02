@@ -11,6 +11,8 @@
 # define ERR_NONICKNAMEGIVEN "431 :No nickname given\r\n"
 # define ERR_NICKNAMEINUSE(nick) ("433 " + nick + ":Nickname is already in use\r\n")
 # define ERR_ERRONEUSNICKNAME(nick) ("432 " + nick + " :Erroneous nickname\r\n")
+# define ERR_NORECIPIENT(command) ("411 :No recipient given " + command + "\r\n") 
+# define ERR_NOSUCHNICK(invitenick) ("401 " + invitenick + " :No such nick/channel\r\n")
 
 // Size of InfoClient enum below
 #define INF_CLI_SIZE 5
@@ -33,7 +35,8 @@ enum CmdVal {
 	PASS,
 	NICK,
 	USER,
-	PING
+	PING,
+	PRIVMSG
 };
 
 /* 
@@ -75,6 +78,7 @@ class Client
 		void							_Nick(Command &cmd); // Parse NICK cmd
 		void							_User(Command &cmd); // Parse USER cmd
 		void							_Ping(Command &cmd); // Parse PING cmd
+		void							_PrivMsg(Command &cmd); // Pars PrivMsg cmd
 		void							_ParseBuf(const string &buf);
 		void							ValidNickname(const string &nick);
 

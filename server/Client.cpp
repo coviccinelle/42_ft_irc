@@ -35,6 +35,7 @@ Client::Client(const string &pass, const std::map< int, Client > &clients) :
 	_mapCmd.insert(std::make_pair(string("PASS"), PASS));
 	_mapCmd.insert(std::make_pair(string("NICK"), NICK));
 	_mapCmd.insert(std::make_pair(string("USER"), USER));
+	_mapCmd.insert(std::make_pair(string("PRIVMSG"), PRIVMSG));
 	return ;
 }
 
@@ -128,7 +129,7 @@ void	Client::_User(Command &cmd)
 		return ;
 	}
 	//TODO: SendData(ERR_ALREADYREGISTERED);
-	if (cmd.middle.size() < 4 || _uinfo[nickname].empty()/* || cmd.trailing.empty() == true*/)
+	if (cmd.middle.size() < 3 || _uinfo[nickname].empty() || cmd.trailing.empty() == true)
 	{
 		std::cout << "Invalid param" << std::endl;
 		return ;
@@ -138,7 +139,7 @@ void	Client::_User(Command &cmd)
 		_uinfo[username] = cmd.middle[0];
 		_uinfo[hostname] = cmd.middle[1];
 		_uinfo[servername] = cmd.middle[2];
-		cmd.trailing = cmd.middle[3];
+		//cmd.trailing = cmd.middle[3];
 		_uinfo[realname] = cmd.trailing;
 		SendData(RPL_WELCOME(_uinfo[nickname], _uinfo[username], _uinfo[hostname]));
 	}
@@ -176,6 +177,26 @@ void	Client::_Pass(Command &cmd)
 void	Client::_Ping(Command &cmd)
 {
 	(void)cmd;
+	/*
+	(void)cmd;
+	std::cout << "ping command received" << std::endl;
+	*/
+}
+
+void	Client::_PrivMsg(Command &cmd)
+{
+	(void)cmd;
+	std::cout << "Hello i'm PrivMsg" << std::endl;
+	if (cmd.target.empty())
+	{
+		std::cout << "NO RECIPIENT moth*r Flower " << std::endl;
+		throw irc_error(ERR_NORECIPIENT(cmd.message), SEND_ERROR);
+	}
+	else
+		std::cout << "PRINTING target pls = " << cmd.target[0] << std::endl;
+//		ALREALDY HANDLE by irssi but not net cat
+		//throw irc_error(ERR_NEEDMOREPARAMS(cmd.middle[0]), SEND_ERROR);
+
 	/*
 	(void)cmd;
 	std::cout << "ping command received" << std::endl;
@@ -234,6 +255,11 @@ void	Client::ExecCommand(Command &cmd)
 		case USER:
 		{
 			_User(cmd);
+			break ;
+		}
+		case PRIVMSG:
+		{
+			_PrivMsg(cmd);
 			break ;
 		}
 		default :
