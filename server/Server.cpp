@@ -17,7 +17,8 @@ Server::Server(const std::string &port, const std::string &pass) :
 	_password(pass),
 	_listener(0),
 	_pollfds(1),
-	_poll_count(0)
+	_poll_count(0),
+	_mapCmd()
 {
 }
 
@@ -33,6 +34,117 @@ Server::~Server()
  * Only waiting for ipv4 connection now
  *
 */
+
+void Server::SendData(int fd, const string &from, const string &msg) const
+{
+	string s = ":" + from + " " + msg;
+
+	std::cout << "Sending data :[" << s << "]" << std::endl;
+	if (send(fd, s.data(), s.size(), 0) == -1)
+		std::cerr << "⚠️ warning : send err" << std::endl;
+}
+
+void	Server::_User(Command &cmd, Client &client)
+{
+	vec_str	ui = client.GetUinfo();
+
+	if (ui[password] != _password)
+		throw irc_error(ERR_NEEDMOREPARAMS("PASS"), CLOSE_CONNECTION);
+	if (cmd.middle.size() == 0)
+	{
+		SendData(client.GetFd(), SERVER_NAME, ERR_NEEDMOREPARAMS(cmd.command));
+		return ;
+	}
+	//TODO: SendData(ERR_ALREADYREGISTERED);
+	if (cmd.middle.size() < 3 || ui[nickname].empty() || cmd.trailing.empty() == true)
+	{
+		std::cout << "Invalid param" << std::endl;
+		return ;
+	}
+	else
+	{
+		ui[username] = cmd.middle[0];
+		ui[hostname] = cmd.middle[2];
+		ui[realname] = cmd.trailing;
+		if (ui[nickname].empty() == false)
+			client.SetRegistd();
+		client.SetUinfo(ui);
+		SendData(client.GetFd(), SERVER_NAME, RPL_WELCOME(ui[nickname], ui[username], ui[hostname]));
+	}
+}
+
+void	Server::_Nick(Command &cmd, Client &client)
+{
+	vec_str			ui = client.GetUinfo();
+
+	if (ui[password] != _password)
+		throw irc_error(ERR_NEEDMOREPARAMS("PASS"), CLOSE_CONNECTION);
+	if (cmd.target.size() != 1)
+		throw irc_error(ERR_NONICKNAMEGIVEN, SEND_ERROR);
+	if (client.IsRegistd() == false &&
+		ui[username].empty() == false &&
+		ui[hostname].empty() == false && 
+		ui[servername].empty() == false && 
+		ui[realname].empty() == false)
+		client.SetRegistd();
+
+	string from;
+	if (ui[nickname].empty() == false) {
+		from = ui[nickname];
+		if (ui[username].empty() == false)
+			from += "!" + ui[username];
+		if (ui[hostname].empty() == false)
+			from += "@" + ui[hostname];
+	}
+	else {
+		from = SERVER_NAME;
+	}
+	ui[nickname] = cmd.target[0];
+	client.SetUinfo(ui);
+
+	SendData(client.GetFd(), from, "NICK " + ui[nickname] + "\r\n");
+}
+
+void	Server::_Pass(Command &cmd, Client &client)
+{
+	vec_str			ui = client.GetUinfo();
+
+	if (cmd.middle.size() < 1)
+		throw irc_error(ERR_NEEDMOREPARAMS(cmd.middle[0]), SEND_ERROR);
+	if (client.IsRegistd())
+		throw irc_error(ERR_ALREADYREGISTERED, SEND_ERROR);
+	ui[password] = cmd.params;
+	client.SetUinfo(ui);
+}
+
+void	Server::_Ping(Command &cmd, Client &client)
+{
+	(void)cmd;
+	(void)client;
+	/*
+	(void)cmd;
+	std::cout << "ping command received" << std::endl;
+	*/
+}
+
+void	Server::_CapLs(Command &cmd, Client &client)
+{
+	(void)cmd;
+	(void)client;
+	/*
+	if (cmd.size() != 2 || cmd[1] != "LS")
+	{
+		std::cout << "CAP LS invalid" << std::endl;
+		return ;
+	}
+	else
+	{
+		std::cout << "CAP LS ok" << std::endl;
+		return ;
+	}
+	*/
+}
+
 
 void	Server::AwaitingConnectionQueue()
 {
@@ -131,11 +243,11 @@ void	Server::_ReceiveData(struct pollfd &pfd)
 			catch (irc_error &e)
 			{
 				if (e.code() == CLOSE_CONNECTION)
-					{ client.SendData(SERVER_NAME, e.what()); _CloseConnection(pfd); }
+					{ SendData(client.GetFd(), SERVER_NAME, e.what()); _CloseConnection(pfd); }
 				else if (e.code() == NO_SEND)
 					std::cout << e.what() << std::endl;
 				else if (e.code() == SEND_ERROR)
-					client.SendData(SERVER_NAME, e.what());
+					SendData(client.GetFd(), SERVER_NAME, e.what());
 			}
 		}
 	}

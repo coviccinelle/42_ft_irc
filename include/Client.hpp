@@ -51,7 +51,6 @@ class Client
 
 		/* Public Methods */
 		int								AcceptClient(int listener); // Return socket fd for socker communication
-		void 							SendData(const string &from, const string &s) const; // Use send(2) method to send data back to client
 
 		void							ExecCommand(Command &cmd); // Switch case
 		void							ParseRecv(const string &buf); // Parse the cmd received by the server
@@ -62,14 +61,13 @@ class Client
 		const string					&GetIp() const;
 		cst_vec_str						&GetUinfo() const;
 		const std::list< Command >		&GetCmds() const;
+		bool							IsRegistd() const;
+
+		void							SetUinfo(const vec_str &uinfo);
+		void							SetRegistd();
 
 	private:
 		/* Private Methods */
-		void							_CapLs(Command &cmd);// Parse CAP LS cmd
-		void							_Pass(Command &cmd); // Parse PASS cmd
-		void							_Nick(Command &cmd); // Parse NICK cmd
-		void							_User(Command &cmd); // Parse USER cmd
-		void							_Ping(Command &cmd); // Parse PING cmd
 		void							_ParseBuf(const string &buf);
 		void							ValidNickname(const string &nick);
 
