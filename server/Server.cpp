@@ -179,9 +179,7 @@ void	Server::_Ping(const Command &cmd, Client &client)
 	*/
 }
 
-
-//*_FindNickname(const Command &cmd, Client &client); //check if there's a nickname like this in the list of client's nicknames
-Client* Server::_FindNickname(const string &nick, Client *skip) //check if there's a nickname like this in the list of client's nicknames
+Client* Server::_FindNickname(const string &nick, Client *skip) 
 {
 	for (std::map<int, Client>::iterator it = _clients.begin(); it != _clients.end(); ++it)
 	{
@@ -194,32 +192,32 @@ Client* Server::_FindNickname(const string &nick, Client *skip) //check if there
 void	Server::_PrivMsg(const Command &cmd, Client &client)
 {
 	vec_str			ui = client.GetUinfo();
+	Client			*receiver;
 
 	std::cout << "Hello i'm PrivMsg" << std::endl;
 
-	if (cmd.middle.size() < 0)
+	if (cmd.middle.size() == 0)
 	{
 		std::cout << "NO RECIPIENT moth*r Flower " << std::endl;
 		return AddData(SERVER_NAME, ERR_NORECIPIENT(cmd.message));
 	}
 	else if (cmd.middle.size() > 1)
-		throw irc_error(ERR_TOOMANYTARGETS(cmd.middle[1], cmd.message), SEND_ERROR);
+		return AddData(SERVER_NAME, ERR_TOOMANYTARGETS(cmd.middle[1], cmd.message));
 	else if (cmd.trailing.empty())
-		throw irc_error(ERR_NOTEXTTOSEND, SEND_ERROR);
-//	else if (cmd.target == notfound)
-//		throw irc_error(ERR_NOSUCHNICK, SEND_ERROR);
+		return AddData(SERVER_NAME, ERR_NOTEXTTOSEND);
+	else if ((receiver = _FindNickname(cmd.target[0])) == NULL)
+		return AddData(SERVER_NAME, ERR_NOSUCHNICK(cmd.target[0]));
 //	else if (cmd.target.status == away)
 //		throw irc_error(RPL_AWAY, SEND_ERROR);
 	else
 		std::cout << "Message to send: " << cmd.trailing << std::endl;
+	const string msg = "PRIVMSG " + cmd.target[0] + " :" + cmd.trailing;
+//			:nickname!user@host PRIVMSG target_nickname :Message
 
-//		ERR_NORECIPIENT                 ERR_NOTEXTTOSEND
+	AddData(client.GetPrefix(), msg); 
+
 //		ERR_CANNOTSENDTOCHAN            ERR_NOTOPLEVEL
-//		ERR_WILDTOPLEVEL                ERR_TOOMANYTARGETS
-//		ERR_NOSUCHNICK					RPL_AWAY
-
-//	ui[password] = cmd.params;
-//	client.SetUinfo(ui);
+//		ERR_WILDTOPLEVEL          		RPL_AWAY
 }
 
 void	Server::_CapLs(const Command &cmd, Client &client)

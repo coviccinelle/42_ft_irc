@@ -30,7 +30,7 @@ class Server
 {
 	public:
 		/* Coplien */
-		Server(const std::string &port = "5555", const std::string &pass = "admin");
+		Server(const std::string &port, const std::string &pas);
 		~Server();
 
 		void		AwaitingConnectionQueue();

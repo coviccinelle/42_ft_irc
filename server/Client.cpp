@@ -112,6 +112,12 @@ cst_vec_str	&Client::GetUinfo() const
 	return (_uinfo);
 }
 
+const string	&Client::GetPrefix() const
+{
+	static const string s = string(GetUinfo()[nickname] + "!" + GetUinfo()[username] + "@" + GetUinfo()[hostname]);
+	return (s);
+}
+
 const std::list< Command >	&Client::GetCmds() const
 {
 	return (_cmds);

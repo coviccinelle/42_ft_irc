@@ -47,6 +47,7 @@ class Client
 		int								GetFd(void) const;
 		const string					&GetIp() const;
 		cst_vec_str						&GetUinfo() const;
+		const string					&GetPrefix() const;
 		const std::list< Command >		&GetCmds() const;
 		bool							IsRegistd() const;
 		void							PopCmd();
