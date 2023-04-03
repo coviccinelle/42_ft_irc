@@ -8,8 +8,7 @@ Client::Client() :
 	_servPass(""),
 	_buf(""),
 	_cmds(0),
-	_mapCmd(),
-	_validPass(false),
+	_registd(false),
 	_uinfo(INF_CLI_SIZE),
 	_clients(NULL)
 {
@@ -25,16 +24,11 @@ Client::Client(const string &pass, const std::map< int, Client > &clients) :
 	_servPass(pass),
 	_buf(""),
 	_cmds(0),
-	_mapCmd(),
-	_validPass(false),
+	_registd(false),
 	_uinfo(INF_CLI_SIZE),
 	_clients(&clients)
 {
 	memset(&_addr, 0, sizeof(_addr));
-	_mapCmd.insert(std::make_pair(string("CAP"), CAP));
-	_mapCmd.insert(std::make_pair(string("PASS"), PASS));
-	_mapCmd.insert(std::make_pair(string("NICK"), NICK));
-	_mapCmd.insert(std::make_pair(string("USER"), USER));
 	return ;
 }
 
@@ -53,9 +47,8 @@ Client::Client(Client const &src)
 
 	_buf = src._buf;
 	_cmds = src._cmds;
-	_mapCmd = src._mapCmd;
 
-	_validPass = src._validPass;
+	_registd = src._registd;
 	_uinfo = src._uinfo;
 
 	_clients = src._clients;
@@ -74,9 +67,8 @@ Client &Client::operator=(Client const &rhs)
 
 	_buf = rhs._buf;
 	_cmds = rhs._cmds;
-	_mapCmd = rhs._mapCmd;
 
-	_validPass = rhs._validPass;
+	_registd = rhs._registd;
 	_uinfo = rhs._uinfo;
 
 	_clients = rhs._clients;
@@ -110,135 +102,36 @@ const string	&Client::GetIp() const
 	return (_ip);
 }
 
+bool	Client::IsRegistd() const
+{
+	return (_registd);
+}
+
 cst_vec_str	&Client::GetUinfo() const
 {
 	return (_uinfo);
 }
 
-const std::vector< Command >	&Client::GetCmds() const
+const std::list< Command >	&Client::GetCmds() const
 {
 	return (_cmds);
 }
 
-void	Client::_User(Command &cmd)
+void	Client::SetUinfo(const vec_str &uinfo)
 {
-	if (cmd.middle.size() == 0)
-	{
-		SendData(ERR_NEEDMOREPARAMS(cmd.command));
+	if (&uinfo == &_uinfo)
 		return ;
-	}
-	//TODO: SendData(ERR_ALREADYREGISTERED);
-	if (cmd.middle.size() < 4 || _uinfo[nickname].empty()/* || cmd.trailing.empty() == true*/)
-	{
-		std::cout << "Invalid param" << std::endl;
-		return ;
-	}
-	else
-	{
-		_uinfo[username] = cmd.middle[0];
-		_uinfo[hostname] = cmd.middle[1];
-		_uinfo[servername] = cmd.middle[2];
-		cmd.trailing = cmd.middle[3];
-		_uinfo[realname] = cmd.trailing;
-		SendData(RPL_WELCOME(_uinfo[nickname], _uinfo[username], _uinfo[hostname]));
-	}
+	_uinfo = uinfo;
 }
 
-void	Client::_Nick(Command &cmd)
+void	Client::SetRegistd()
 {
-	if (_validPass == false)
-		throw irc_error(string(":server@127.0.0.1") + string(" please register PASS before retry.\r\n"), SEND_ERROR);
-	if (cmd.target.size() != 1)
-		throw irc_error(ERR_NONICKNAMEGIVEN, SEND_ERROR);
-	_uinfo[nickname] = cmd.target[0];
-	string msg = ":" + _uinfo[nickname];
-	if (_uinfo[username].empty() == false)
-		msg += "!" + _uinfo[username];
-	if (_uinfo[hostname].empty() == false)
-		msg += "@" + _uinfo[hostname];
-	msg +=  + " NICK " + _uinfo[nickname] + "\r\n";
-	SendData(msg);
-	std::cout << "NICK has been set to " << _uinfo[nickname] << std::endl;
+	_registd = true;
 }
 
-void	Client::_Pass(Command &cmd)
+void	Client::PopCmd()
 {
-	if (cmd.middle.size() < 1)
-		throw irc_error(ERR_NEEDMOREPARAMS(cmd.middle[0]), SEND_ERROR);
-	if (_validPass)
-		throw irc_error(ERR_ALREADYREGISTERED, SEND_ERROR);
-	if (cmd.middle[0] != _servPass)
-		throw irc_error(string(":") + _ip + string(" invalid password please retry.\r\n"), SEND_ERROR);
-	std::cout << "ℹ️  irc server:\033[0;32m valid pass \033[0;37mfrom " << _ip << " on socket " << _fd << std::endl;
-	_validPass = true;
-}
-
-void	Client::_Ping(Command &cmd)
-{
-	(void)cmd;
-	/*
-	(void)cmd;
-	std::cout << "ping command received" << std::endl;
-	*/
-}
-
-void	Client::_CapLs(Command &cmd)
-{
-	(void)cmd;
-	/*
-	if (cmd.size() != 2 || cmd[1] != "LS")
-	{
-		std::cout << "CAP LS invalid" << std::endl;
-		return ;
-	}
-	else
-	{
-		std::cout << "CAP LS ok" << std::endl;
-		return ;
-	}
-	*/
-}
-
-// Mapping between string comands name and enum type ex: "PASS" (string) -> PASS (int)
-// Used for switch case
-CmdVal	Client::ResolveOption(const string &input)
-{
-	if (input.empty())
-		return (UNKNOWN);
-	std::map<string, CmdVal >::const_iterator it(_mapCmd.find(input));
-	if(it != _mapCmd.end())
-		return (it->second);
-	return (UNKNOWN); 
-}
-
-void	Client::ExecCommand(Command &cmd)
-{
-	cmd.Debug();
-	switch (ResolveOption(cmd.command))
-	{
-		case CAP:
-		{
-			_CapLs(cmd);
-			break ;
-		}
-		case PASS:
-		{
-			_Pass(cmd);
-			break ;
-		}
-		case NICK:
-		{
-			_Nick(cmd);
-			break ;
-		}
-		case USER:
-		{
-			_User(cmd);
-			break ;
-		}
-		default :
-			std::cout << "Unknow command" << std::endl;
-	}
+	_cmds.pop_front();
 }
 
 void	Client::_ParseBuf(const string &buf)
@@ -248,17 +141,14 @@ void	Client::_ParseBuf(const string &buf)
 	size_t pos;
 	_buf += buf;
 	if ((pos = _buf.find_last_of("\n")) == string::npos)
-	{
-		std::cout << "RETURN" << std::endl;
 		return ;
-	}
 	raw_cmds = Split(string(_buf.begin(), _buf.begin() + pos), "\r\n");
 	_buf = trim(string(_buf.begin() + pos, _buf.end()));
 	for (vec_str::iterator it = raw_cmds.begin(); it != raw_cmds.end(); ++it)
 	{
 		try
 		{
-			_cmds.push_back(_parser.Parse(*it));
+			_cmds.push_back(_parser.Parse(trim(*it)));
 		}
 		catch (irc_error &e)
 		{
@@ -270,42 +160,14 @@ void	Client::_ParseBuf(const string &buf)
 
 void	Client::ParseRecv(const string &buf)
 {
-	std::cout << "_buf: "  << _buf << std::endl;
 	_ParseBuf(buf);
-	std::cout << "end" << std::endl; 
-	std::cout << "_buf: "  << _buf << std::endl;
-	std::cout << "end" << std::endl; 
 	if (_cmds.empty())
 	{
 		std::cerr << "⚠️  warning : empty commands" << std::endl;
 		return ;
 	}
 
-	while (_cmds.empty() == 0)
-	{
-		// printer
-		for (std::vector< Command >::const_iterator j = _cmds.begin(); j != _cmds.end(); ++j)
-			std::cout <<  "[" << j->command << "]";
-		std::cout << std::endl;
-		try {
-			ExecCommand(_cmds[0]);
-		}
-		catch (irc_error &e)
-		{
-			_cmds.erase(_cmds.begin());
-			throw;
-		}
-		_cmds.erase(_cmds.begin());
-	}
 	return ;
-}
-
-void Client::SendData(const string &msg) const
-{
-	std::cout << "[" << msg << "]" << std::endl;
-	ssize_t ret = send(_fd, msg.data(), msg.size(), 0);
-	if (ret == -1)
-		std::cerr << "⚠️ warning : send err" << std::endl;
 }
 
 void	Client::ValidNickname(const string &nick)

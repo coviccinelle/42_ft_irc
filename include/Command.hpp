@@ -10,10 +10,11 @@ class Command
 		Command(Command const &src);
 		Command	&operator=(Command const &rhs);
 		
-		void	Debug();
+		void	Debug() const;
 
 		string					message;
 		string					prefix;
+		string					params;
 		string					user;
 		string					host;
 		string					nickname;
