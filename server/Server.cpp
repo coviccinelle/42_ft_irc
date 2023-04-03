@@ -194,6 +194,8 @@ void	Server::_PrivMsg(const Command &cmd, Client &client)
 		throw irc_error(ERR_NOTEXTTOSEND, SEND_ERROR);
 	else if (_FindNickname(cmd.target[0]) == NULL)
 		throw irc_error(ERR_NOSUCHNICK(cmd.target[0]), SEND_ERROR);
+
+//	SendData(
 //	else if (cmd.target.status == away)
 //		throw irc_error(RPL_AWAY, SEND_ERROR);
 	else
