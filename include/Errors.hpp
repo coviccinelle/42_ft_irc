@@ -47,8 +47,7 @@
 # define ERR_CANNOTSENDTOCHAN(nick, chan) ("404 " + nick + " " + chan + " :Cannot send to channel\r\n")
 # define ERR_USERSDONTMATCH(nick) ("502 " + nick + " :Cannot change change mode for other users\r\n")
 # define ERR_USERONCHANNEL(nick, invitenick, chan) ("443 " + nick + " " + invitenick + " " + chan + ":is already on channel\r\n")
-
-
 # define ERR_NORECIPIENT(command) ("411 :No recipient given " + command + "\r\n") 
+# define ERR_NOTEXTTOSEND "412 :No text to send\r\n"
 # define ERR_NOSUCHNICK(invitenick) ("401 " + invitenick + " :No such nick/channel\r\n")
 #endif

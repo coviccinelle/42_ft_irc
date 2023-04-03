@@ -204,6 +204,12 @@ void	Client::_PrivMsg(Command &cmd)
 		std::cout << "NO RECIPIENT moth*r Flower " << std::endl;
 		throw irc_error(ERR_NORECIPIENT(cmd.message), SEND_ERROR);
 	}
+//	else if (cmd.trailing.size() == 0)
+	else if (cmd.middle.size() == 1)
+	{
+		std::cout << "No text to send" << std::endl;
+		throw irc_error(ERR_NOTEXTTOSEND, SEND_ERROR);
+	}
 	else
 		std::cout << "PRINTING target pls = " << cmd.target[0] << std::endl;
 //		ALREALDY HANDLE by irssi but not net cat
