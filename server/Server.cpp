@@ -167,8 +167,6 @@ void	Server::_Ping(const Command &cmd, Client &client)
 	*/
 }
 
-
-//*_FindNickname(const Command &cmd, Client &client); //check if there's a nickname like this in the list of client's nicknames
 Client* Server::_FindNickname(const string &nick) //check if there's a nickname like this in the list of client's nicknames
 {
 	for (std::map<int, Client>::iterator it = _clients.begin(); it != _clients.end(); ++it)
@@ -194,8 +192,8 @@ void	Server::_PrivMsg(const Command &cmd, Client &client)
 		throw irc_error(ERR_TOOMANYTARGETS(cmd.middle[1], cmd.message), SEND_ERROR);
 	else if (cmd.trailing.empty())
 		throw irc_error(ERR_NOTEXTTOSEND, SEND_ERROR);
-//	else if (cmd.target == notfound)
-//		throw irc_error(ERR_NOSUCHNICK, SEND_ERROR);
+	else if (_FindNickname(cmd.target[0]) == NULL)
+		throw irc_error(ERR_NOSUCHNICK(cmd.target[0]), SEND_ERROR);
 //	else if (cmd.target.status == away)
 //		throw irc_error(RPL_AWAY, SEND_ERROR);
 	else
