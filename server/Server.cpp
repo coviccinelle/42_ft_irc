@@ -106,9 +106,8 @@ void	Server::_User(const Command &cmd, Client &client)
 		ui[username] = cmd.middle[0];
 		ui[hostname] = cmd.middle[2];
 		ui[realname] = cmd.trailing;
-		if (ui[nickname].empty() == false)
-			client.SetRegistd();
 		client.SetUinfo(ui);
+		client.SetRegistd();
 		SendData(client.GetFd(), SERVER_NAME, RPL_WELCOME(ui[nickname], ui[username], ui[hostname]));
 	}
 }
@@ -121,12 +120,8 @@ void	Server::_Nick(const Command &cmd, Client &client)
 		throw irc_error(ERR_NEEDMOREPARAMS("PASS"), CLOSE_CONNECTION);
 	if (cmd.target.size() != 1)
 		throw irc_error(ERR_NONICKNAMEGIVEN, SEND_ERROR);
-	if (client.IsRegistd() == false &&
-		ui[username].empty() == false &&
-		ui[hostname].empty() == false && 
-		ui[servername].empty() == false && 
-		ui[realname].empty() == false)
-		client.SetRegistd();
+	if (_parser.isValidNick(cmd.target[0]) == false)
+		throw irc_error(ERR_ERRONEUSNICKNAME(cmd.target[0]), SEND_ERROR);
 
 	string from;
 	if (ui[nickname].empty() == false) {
@@ -141,6 +136,7 @@ void	Server::_Nick(const Command &cmd, Client &client)
 	}
 	ui[nickname] = cmd.target[0];
 	client.SetUinfo(ui);
+	client.SetRegistd();
 
 	SendData(client.GetFd(), from, "NICK " + ui[nickname] + "\r\n");
 }
@@ -324,6 +320,8 @@ void	Server::_ReceiveData(struct pollfd &pfd)
 					std::cout << e.what() << std::endl;
 				else if (e.code() == SEND_ERROR)
 					SendData(client.GetFd(), SERVER_NAME, e.what());
+				else
+					std::cout << "⚠️  Unhandle exception catch !!! WARNING : " << e.what() << std::endl;
 			}
 		}
 	}

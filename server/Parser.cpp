@@ -54,7 +54,7 @@ bool is_fstate(string::const_iterator it, int skip)
 	else if (*it == '&' && skip != amp) return (true);
 	else if (*it == '+' && skip != plus) return (true);
 	else if (*it == SPACE && skip != space) return (true);
-	else if (isalpha(*it) && skip != letter) { return (true); }
+	else if (isalpha(*it) && skip != letter) return (true);
 	else if (isdigit(*it) && skip != digit)	return (true);
 	else if (isspecial(it) && skip != special) return (true);
 	return (false);
@@ -313,4 +313,26 @@ Command	Parser::Parse(const string &str)
 	_Message();
 	//_cmd.Debug();
 	return (_cmd);
+}
+
+bool	Parser::isValidNick(const string &str)
+{
+	if (str.size() < 1 || str.size() > 9)
+		return (false);
+	_input = str;
+	_it = --_input.begin();
+
+	_Wrapper();
+	if (_current != letter && _current != special)
+		return (false);
+	while (_current != eoi)
+	{
+		if (_current != letter &&
+			_current != digit &&
+			_current != special &&
+			_current != dash)
+			return (false);
+		_Wrapper();
+	}
+	return (true);
 }

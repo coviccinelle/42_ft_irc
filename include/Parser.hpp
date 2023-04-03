@@ -38,6 +38,7 @@ class Parser
 		Parser	&operator=(Parser const &rhs);
 
 		Command						Parse(const string &str);
+		bool						isValidNick(const string &str);
 
 		const std::vector< Token >	&Tokens() const;
 	private:

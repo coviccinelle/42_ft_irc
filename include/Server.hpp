@@ -62,6 +62,7 @@ class Server
 		std::vector< struct pollfd >	_pollfds;
 		int								_poll_count;
 		std::map< string, CmdVal >		_mapCmd; // mapping between cmd names and integer; used for switch case.
+		Parser							_parser;
 };
 
 #endif
