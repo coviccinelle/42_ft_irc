@@ -53,7 +53,7 @@ Command &Command::operator=(Command const &rhs)
 	return (*this);
 }
 
-void Command::Debug()
+void Command::Debug() const
 {
 	std::cout << "===========[ DEBUG ]===========" << std::endl;
 	std::cout << "Message :[" << message << "]" << std::endl;
@@ -64,12 +64,12 @@ void Command::Debug()
 	std::cout << "Nickname :[" << nickname << "]" << std::endl;
 	std::cout << "Command :[" << command << "]" << std::endl;
 	std::cout << "Middle : " << std::endl;
-	for (std::vector<string>::iterator it = middle.begin(); it != middle.end(); ++it)
-		std::cout << " :[" << *it << "]" << std::endl;
+	for (std::vector<string>::const_iterator it = middle.begin(); it != middle.end(); ++it)
+		std::cout << " [" << *it << "]" << std::endl;
 
 	std::cout << "Target : " << std::endl;
-	for (std::vector<string>::iterator it = target.begin(); it != target.end(); ++it)
-		std::cout << " :[" << *it << "]" << std::endl;
+	for (std::vector<string>::const_iterator it = target.begin(); it != target.end(); ++it)
+		std::cout << " [" << *it << "]" << std::endl;
 	std::cout << "Trailing : " << trailing << std::endl;
 	std::cout << "===============================" << std::endl;
 }

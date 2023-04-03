@@ -20,19 +20,6 @@ enum InfoClient {
 	realname
 };
 
-/*
- * Used for switch case evaluation
- */
-enum CmdVal {
-	UNKNOWN = 0,
-	CAP,
-	PASS,
-	NICK,
-	USER,
-	PING,
-	PRIVMSG
-};
-
 /* 
  * 
  * This class hold all information about a connected client.
@@ -53,26 +40,22 @@ class Client
 
 		/* Public Methods */
 		int								AcceptClient(int listener); // Return socket fd for socker communication
-		void 							SendData(const string &from, const string &s) const; // Use send(2) method to send data back to client
 
-		void							ExecCommand(Command &cmd); // Switch case
 		void							ParseRecv(const string &buf); // Parse the cmd received by the server
-		CmdVal							ResolveOption(const string &input); // Return a enum code for switch case eval
 
 		/* Getters */
 		int								GetFd(void) const;
 		const string					&GetIp() const;
 		cst_vec_str						&GetUinfo() const;
-		const std::vector< Command >			&GetCmds() const;
+		const std::list< Command >		&GetCmds() const;
+		bool							IsRegistd() const;
+		void							PopCmd();
+
+		void							SetUinfo(const vec_str &uinfo);
+		void							SetRegistd();
 
 	private:
 		/* Private Methods */
-		void							_CapLs(Command &cmd);// Parse CAP LS cmd
-		void							_Pass(Command &cmd); // Parse PASS cmd
-		void							_Nick(Command &cmd); // Parse NICK cmd
-		void							_User(Command &cmd); // Parse USER cmd
-		void							_Ping(Command &cmd); // Parse PING cmd
-		void							_PrivMsg(Command &cmd); // Pars PrivMsg cmd
 		void							_ParseBuf(const string &buf);
 		void							ValidNickname(const string &nick);
 
@@ -85,8 +68,7 @@ class Client
 
 		/* Commands */
 		string							_buf;
-		std::vector< Command >			_cmds; // Commands that need to be process
-		std::map< string, CmdVal >		_mapCmd; // mapping between cmd names and integer; used for switch case.
+		std::list< Command >			_cmds; // Commands that need to be process
 
 		/* Client info */
 		bool							_registd;

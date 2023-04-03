@@ -8,7 +8,6 @@ Client::Client() :
 	_servPass(""),
 	_buf(""),
 	_cmds(0),
-	_mapCmd(),
 	_registd(false),
 	_uinfo(INF_CLI_SIZE),
 	_clients(NULL)
@@ -25,17 +24,11 @@ Client::Client(const string &pass, const std::map< int, Client > &clients) :
 	_servPass(pass),
 	_buf(""),
 	_cmds(0),
-	_mapCmd(),
 	_registd(false),
 	_uinfo(INF_CLI_SIZE),
 	_clients(&clients)
 {
 	memset(&_addr, 0, sizeof(_addr));
-	_mapCmd.insert(std::make_pair(string("CAP"), CAP));
-	_mapCmd.insert(std::make_pair(string("PASS"), PASS));
-	_mapCmd.insert(std::make_pair(string("NICK"), NICK));
-	_mapCmd.insert(std::make_pair(string("USER"), USER));
-	_mapCmd.insert(std::make_pair(string("PRIVMSG"), PRIVMSG));
 	return ;
 }
 
@@ -54,7 +47,6 @@ Client::Client(Client const &src)
 
 	_buf = src._buf;
 	_cmds = src._cmds;
-	_mapCmd = src._mapCmd;
 
 	_registd = src._registd;
 	_uinfo = src._uinfo;
@@ -75,7 +67,6 @@ Client &Client::operator=(Client const &rhs)
 
 	_buf = rhs._buf;
 	_cmds = rhs._cmds;
-	_mapCmd = rhs._mapCmd;
 
 	_registd = rhs._registd;
 	_uinfo = rhs._uinfo;
@@ -111,178 +102,36 @@ const string	&Client::GetIp() const
 	return (_ip);
 }
 
+bool	Client::IsRegistd() const
+{
+	return (_registd);
+}
+
 cst_vec_str	&Client::GetUinfo() const
 {
 	return (_uinfo);
 }
 
-const std::vector< Command >	&Client::GetCmds() const
+const std::list< Command >	&Client::GetCmds() const
 {
 	return (_cmds);
 }
 
-void	Client::_User(Command &cmd)
+void	Client::SetUinfo(const vec_str &uinfo)
 {
-	if (_uinfo[password] != _servPass)
-		throw irc_error(ERR_NEEDMOREPARAMS("PASS"), CLOSE_CONNECTION);
-	if (cmd.middle.size() == 0)
-	{
-		SendData(SERVER_NAME, ERR_NEEDMOREPARAMS(cmd.command));
+	if (&uinfo == &_uinfo)
 		return ;
-	}
-	//TODO: SendData(ERR_ALREADYREGISTERED);
-	if (cmd.middle.size() < 3 || _uinfo[nickname].empty() || cmd.trailing.empty() == true)
-	{
-		std::cout << "Invalid param" << std::endl;
-		return ;
-	}
-	else
-	{
-		_uinfo[username] = cmd.middle[0];
-		_uinfo[hostname] = cmd.middle[1];
-		_uinfo[servername] = cmd.middle[2];
-		_uinfo[realname] = cmd.trailing;
-		if (_uinfo[nickname].empty() == false)
-			_registd = true;
-		SendData(SERVER_NAME, RPL_WELCOME(_uinfo[nickname], _uinfo[username], _uinfo[hostname]));
-	}
+	_uinfo = uinfo;
 }
 
-void	Client::_Nick(Command &cmd)
+void	Client::SetRegistd()
 {
-	if (_uinfo[password] != _servPass)
-		throw irc_error(ERR_NEEDMOREPARAMS("PASS"), CLOSE_CONNECTION);
-	if (cmd.target.size() != 1)
-		throw irc_error(ERR_NONICKNAMEGIVEN, SEND_ERROR);
-	if (_registd == false &&
-		_uinfo[username].empty() == false &&
-		_uinfo[hostname].empty() == false && 
-		_uinfo[servername].empty() == false && 
-		_uinfo[realname].empty() == false)
-		_registd = true;
-
-	string from;
-	if (_uinfo[nickname].empty() == false) {
-		from = _uinfo[nickname];
-		if (_uinfo[username].empty() == false)
-			from += "!" + _uinfo[username];
-		if (_uinfo[hostname].empty() == false)
-			from += "@" + _uinfo[hostname];
-	}
-	else {
-		from = SERVER_NAME;
-	}
-	_uinfo[nickname] = cmd.target[0];
-
-	SendData(from, "NICK " + _uinfo[nickname] + "\r\n");
+	_registd = true;
 }
 
-void	Client::_Pass(Command &cmd)
+void	Client::PopCmd()
 {
-	if (cmd.middle.size() < 1)
-		throw irc_error(ERR_NEEDMOREPARAMS(cmd.middle[0]), SEND_ERROR);
-	if (_registd)
-		throw irc_error(ERR_ALREADYREGISTERED, SEND_ERROR);
-	_uinfo[password] = cmd.params;
-}
-
-void	Client::_Ping(Command &cmd)
-{
-	(void)cmd;
-	/*
-	(void)cmd;
-	std::cout << "ping command received" << std::endl;
-	*/
-}
-
-void	Client::_PrivMsg(Command &cmd)
-{
-	(void)cmd;
-	std::cout << "Hello i'm PrivMsg" << std::endl;
-	if (cmd.target.empty())
-	{
-		std::cout << "NO RECIPIENT moth*r Flower " << std::endl;
-		throw irc_error(ERR_NORECIPIENT(cmd.message), SEND_ERROR);
-	}
-//	else if (cmd.trailing.size() == 0)
-	else if (cmd.middle.size() == 1)
-	{
-		std::cout << "No text to send" << std::endl;
-		throw irc_error(ERR_NOTEXTTOSEND, SEND_ERROR);
-	}
-	else
-		std::cout << "PRINTING target pls = " << cmd.target[0] << std::endl;
-//		ALREALDY HANDLE by irssi but not net cat
-		//throw irc_error(ERR_NEEDMOREPARAMS(cmd.middle[0]), SEND_ERROR);
-
-	/*
-	(void)cmd;
-	std::cout << "ping command received" << std::endl;
-	*/
-}
-
-void	Client::_CapLs(Command &cmd)
-{
-	(void)cmd;
-	/*
-	if (cmd.size() != 2 || cmd[1] != "LS")
-	{
-		std::cout << "CAP LS invalid" << std::endl;
-		return ;
-	}
-	else
-	{
-		std::cout << "CAP LS ok" << std::endl;
-		return ;
-	}
-	*/
-}
-
-// Mapping between string comands name and enum type ex: "PASS" (string) -> PASS (int)
-// Used for switch case
-CmdVal	Client::ResolveOption(const string &input)
-{
-	if (input.empty())
-		return (UNKNOWN);
-	std::map<string, CmdVal >::const_iterator it(_mapCmd.find(input));
-	if(it != _mapCmd.end())
-		return (it->second);
-	return (UNKNOWN); 
-}
-
-void	Client::ExecCommand(Command &cmd)
-{
-	cmd.Debug();
-	switch (ResolveOption(cmd.command))
-	{
-		case CAP:
-		{
-			_CapLs(cmd);
-			break ;
-		}
-		case PASS:
-		{
-			_Pass(cmd);
-			break ;
-		}
-		case NICK:
-		{
-			_Nick(cmd);
-			break ;
-		}
-		case USER:
-		{
-			_User(cmd);
-			break ;
-		}
-		case PRIVMSG:
-		{
-			_PrivMsg(cmd);
-			break ;
-		}
-		default :
-			std::cout << "Unknow command" << std::endl;
-	}
+	_cmds.pop_front();
 }
 
 void	Client::_ParseBuf(const string &buf)
@@ -318,28 +167,7 @@ void	Client::ParseRecv(const string &buf)
 		return ;
 	}
 
-	while (_cmds.empty() == 0)
-	{
-		try {
-			ExecCommand(_cmds[0]);
-		}
-		catch (irc_error &e)
-		{
-			_cmds.erase(_cmds.begin());
-			throw;
-		}
-		_cmds.erase(_cmds.begin());
-	}
 	return ;
-}
-
-void Client::SendData(const string &from, const string &msg) const
-{
-	string s = ":" + from + " " + msg;
-
-	std::cout << "Sending data :[" << s << "]" << std::endl;
-	if (send(_fd, s.data(), s.size(), 0) == -1)
-		std::cerr << "⚠️ warning : send err" << std::endl;
 }
 
 void	Client::ValidNickname(const string &nick)
