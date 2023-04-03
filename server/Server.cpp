@@ -75,15 +75,6 @@ void	Server::_ExecCommand(const Command &cmd, Client &client)
 	}
 }
 
-void Server::SendData(int fd, const string &from, const string &msg) const
-{
-	string s = ":" + from + " " + msg;
-
-	std::cout << "Sending data :[" << s << "]" << std::endl;
-	if (send(fd, s.data(), s.size(), 0) == -1)
-		std::cerr << "⚠️ warning : send err" << std::endl;
-}
-
 void	Server::_User(const Command &cmd, Client &client)
 {
 	vec_str	ui = client.GetUinfo();
@@ -109,7 +100,7 @@ void	Server::_User(const Command &cmd, Client &client)
 		if (ui[nickname].empty() == false)
 			client.SetRegistd();
 		client.SetUinfo(ui);
-		SendData(client.GetFd(), SERVER_NAME, RPL_WELCOME(ui[nickname], ui[username], ui[hostname]));
+		SendData(client.GetFd(), SERVER_NAME + " ", RPL_WELCOME(ui[nickname], ui[username], ui[hostname]));
 	}
 }
 
@@ -177,6 +168,15 @@ Client* Server::_FindNickname(const string &nick) //check if there's a nickname 
 	return (NULL);
 }
 
+void Server::SendData(int fd, const string &from, const string &msg) const
+{
+	string s = ":" + from + "" + msg;
+
+	std::cout << "Sending data :[" << s << "]" << std::endl;
+	if (send(fd, s.data(), s.size(), 0) == -1)
+		std::cerr << "⚠️ warning : send err" << std::endl;
+}
+
 void	Server::_PrivMsg(const Command &cmd, Client &client)
 {
 	vec_str			ui = client.GetUinfo();
@@ -194,12 +194,14 @@ void	Server::_PrivMsg(const Command &cmd, Client &client)
 		throw irc_error(ERR_NOTEXTTOSEND, SEND_ERROR);
 	else if (_FindNickname(cmd.target[0]) == NULL)
 		throw irc_error(ERR_NOSUCHNICK(cmd.target[0]), SEND_ERROR);
-
-//	SendData(
 //	else if (cmd.target.status == away)
 //		throw irc_error(RPL_AWAY, SEND_ERROR);
 	else
 		std::cout << "Message to send: " << cmd.trailing << std::endl;
+	const string from = " PRIVMSG " + cmd.target[0] + " :";
+//			:nickname!user@host PRIVMSG target_nickname :Message
+
+	SendData(client.GetFd(), client.GetPrefix() + from, cmd.trailing); 
 
 //		ERR_CANNOTSENDTOCHAN            ERR_NOTOPLEVEL
 //		ERR_WILDTOPLEVEL          		RPL_AWAY
