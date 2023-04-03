@@ -57,7 +57,6 @@ class Client
 	private:
 		/* Private Methods */
 		void							_ParseBuf(const string &buf);
-		void							ValidNickname(const string &nick);
 
 		/* Connection Info */
 		int								_fd; // Connection socket

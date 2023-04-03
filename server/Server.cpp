@@ -122,6 +122,8 @@ void	Server::_Nick(const Command &cmd, Client &client)
 		throw irc_error(ERR_NONICKNAMEGIVEN, SEND_ERROR);
 	if (_parser.isValidNick(cmd.target[0]) == false)
 		throw irc_error(ERR_ERRONEUSNICKNAME(cmd.target[0]), SEND_ERROR);
+	if (_FindNickname(cmd.target[0]) == NULL)
+		throw irc_error(ERR_NICKNAMEINUSE(cmd.target[0]), SEND_ERROR);
 
 	string from;
 	if (ui[nickname].empty() == false) {

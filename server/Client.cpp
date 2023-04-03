@@ -169,26 +169,6 @@ void	Client::ParseRecv(const string &buf)
 	return ;
 }
 
-void	Client::ValidNickname(const string &nick)
-{
-	if (nick.size() > 9)
-		throw irc_error(ERR_ERRONEUSNICKNAME(nick), SEND_ERROR);
-	string s("-_[]{}\\`|");
-	for (string::const_iterator i = nick.begin(); i != nick.end(); ++i)
-	{
-		if (std::isalnum(*i) == 0 && s.find(*i) == string::npos)
-			throw irc_error(ERR_ERRONEUSNICKNAME(nick), SEND_ERROR);
-	}
-	for (std::map< int, Client >::const_iterator it = _clients->begin(); it != _clients->end(); ++it)
-	{
-		if (&it->second != this && it->second.GetUinfo()[nickname] == nick)
-		{
-			_uinfo[nickname] = "";
-			throw irc_error(ERR_NICKNAMEINUSE(nick), SEND_ERROR);
-		}
-	}
-}
-
 // Non-member Function
 
 void	*GetInAddr(struct sockaddr *sa)
