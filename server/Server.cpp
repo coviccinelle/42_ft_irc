@@ -167,6 +167,18 @@ void	Server::_Ping(const Command &cmd, Client &client)
 	*/
 }
 
+
+//*_FindNickname(const Command &cmd, Client &client); //check if there's a nickname like this in the list of client's nicknames
+Client* Server::_FindNickname(const string &nick) //check if there's a nickname like this in the list of client's nicknames
+{
+	for (std::map<int, Client>::iterator it = _clients.begin(); it != _clients.end(); ++it)
+	{
+		if (it->second.GetUinfo()[nickname] == nick)
+			return (&it->second);
+	}
+	return (NULL);
+}
+
 void	Server::_PrivMsg(const Command &cmd, Client &client)
 {
 	vec_str			ui = client.GetUinfo();
