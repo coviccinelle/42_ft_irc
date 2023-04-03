@@ -50,4 +50,7 @@
 # define ERR_NORECIPIENT(command) ("411 :No recipient given " + command + "\r\n") 
 # define ERR_NOTEXTTOSEND "412 :No text to send\r\n"
 # define ERR_NOSUCHNICK(invitenick) ("401 " + invitenick + " :No such nick/channel\r\n")
+# define ERR_TOOMANYTARGETS(target, msg) (target + ":407 recipients. " + msg + " ⚠️ \r\n") 
+//⚠️ 
+
 #endif

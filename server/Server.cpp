@@ -178,13 +178,21 @@ void	Server::_PrivMsg(const Command &cmd, Client &client)
 		std::cout << "NO RECIPIENT moth*r Flower " << std::endl;
 		throw irc_error(ERR_NORECIPIENT(cmd.message), SEND_ERROR);
 	}
+	else if (cmd.middle.size() > 1)
+		throw irc_error(ERR_TOOMANYTARGETS(cmd.middle[1], cmd.message), SEND_ERROR);
 	else if (cmd.trailing.empty())
-	{
-		std::cout << "No Text To send!!!" << std::endl;
 		throw irc_error(ERR_NOTEXTTOSEND, SEND_ERROR);
-	}
+//	else if (cmd.target == notfound)
+//		throw irc_error(ERR_NOSUCHNICK, SEND_ERROR);
+//	else if (cmd.target.status == away)
+//		throw irc_error(RPL_AWAY, SEND_ERROR);
 	else
 		std::cout << "Message to send: " << cmd.trailing << std::endl;
+
+//		ERR_NORECIPIENT                 ERR_NOTEXTTOSEND
+//		ERR_CANNOTSENDTOCHAN            ERR_NOTOPLEVEL
+//		ERR_WILDTOPLEVEL                ERR_TOOMANYTARGETS
+//		ERR_NOSUCHNICK					RPL_AWAY
 
 //	ui[password] = cmd.params;
 //	client.SetUinfo(ui);
