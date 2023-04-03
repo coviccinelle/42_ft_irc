@@ -12,6 +12,7 @@ Server::Server(const std::string &port, const std::string &pass) :
 	_mapCmd.insert(std::make_pair(string("PASS"), PASS));
 	_mapCmd.insert(std::make_pair(string("NICK"), NICK));
 	_mapCmd.insert(std::make_pair(string("USER"), USER));
+	_mapCmd.insert(std::make_pair(string("PRIVMSG"), PRIVMSG));
 }
 
 Server::~Server()
@@ -62,6 +63,11 @@ void	Server::_ExecCommand(const Command &cmd, Client &client)
 		case USER:
 		{
 			_User(cmd, client);
+			break ;
+		}
+		case PRIVMSG:
+		{
+			_PrivMsg(cmd, client);
 			break ;
 		}
 		default :
@@ -159,6 +165,29 @@ void	Server::_Ping(const Command &cmd, Client &client)
 	(void)cmd;
 	std::cout << "ping command received" << std::endl;
 	*/
+}
+
+void	Server::_PrivMsg(const Command &cmd, Client &client)
+{
+	vec_str			ui = client.GetUinfo();
+
+	std::cout << "Hello i'm PrivMsg" << std::endl;
+
+	if (cmd.middle.size() < 0)
+	{
+		std::cout << "NO RECIPIENT moth*r Flower " << std::endl;
+		throw irc_error(ERR_NORECIPIENT(cmd.message), SEND_ERROR);
+	}
+	else if (cmd.trailing.empty())
+	{
+		std::cout << "No Text To send!!!" << std::endl;
+		throw irc_error(ERR_NOTEXTTOSEND, SEND_ERROR);
+	}
+	else
+		std::cout << "Message to send: " << cmd.trailing << std::endl;
+
+//	ui[password] = cmd.params;
+//	client.SetUinfo(ui);
 }
 
 void	Server::_CapLs(const Command &cmd, Client &client)
@@ -273,6 +302,13 @@ void	Server::_ReceiveData(struct pollfd &pfd)
 			
 			try {
 				client.ParseRecv(string(buf));
+			}
+			catch (irc_error &e)
+			{
+				std::cout << "⚠️  " <<  e.what() << std::endl;
+				return ;
+			}
+			try {
 				while (client.GetCmds().empty() == 0)
 				{
 					_ExecCommand(*client.GetCmds().begin(), client);
@@ -287,6 +323,7 @@ void	Server::_ReceiveData(struct pollfd &pfd)
 					std::cout << e.what() << std::endl;
 				else if (e.code() == SEND_ERROR)
 					SendData(client.GetFd(), SERVER_NAME, e.what());
+				client.PopCmd();
 			}
 		}
 	}

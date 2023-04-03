@@ -152,7 +152,6 @@ void	Client::_ParseBuf(const string &buf)
 		}
 		catch (irc_error &e)
 		{
-			std::cout << e.what() << std::endl;
 			throw ;
 		}
 	}

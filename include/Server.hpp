@@ -17,7 +17,8 @@ enum CmdVal {
 	PASS,
 	NICK,
 	USER,
-	PING
+	PING,
+	PRIVMSG
 };
 
 /*
@@ -52,6 +53,7 @@ class Server
 		void 		_Nick(const Command &cmd, Client &client); // Parse NICK cmd
 		void 		_User(const Command &cmd, Client &client); // Parse USER cmd
 		void 		_Ping(const Command &cmd, Client &client); // Parse PING cmd
+		void 		_PrivMsg(const Command &cmd, Client &client); // Parse PRIVMSG cmd
 
 		std::string 					_portNumber;
 		std::string 					_password;
