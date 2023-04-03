@@ -54,8 +54,8 @@ class Server
 		void 		_User(const Command &cmd, Client &client); // Parse USER cmd
 		void 		_Ping(const Command &cmd, Client &client); // Parse PING cmd
 		void 		_PrivMsg(const Command &cmd, Client &client); // Parse PRIVMSG cmd
-																  //
-		Client*	_FindNickname(const string &nick); //check if there's a nickname like this in the list of client's nicknames
+
+		Client*		_FindNickname(const string &nick); //check if there's a nickname like this in the list of client's nicknames
 
 		std::string 					_portNumber;
 		std::string 					_password;

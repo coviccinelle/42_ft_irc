@@ -183,7 +183,7 @@ void	Server::_PrivMsg(const Command &cmd, Client &client)
 
 	std::cout << "Hello i'm PrivMsg" << std::endl;
 
-	if (cmd.middle.size() < 0)
+	if (cmd.middle.size() == 0)
 	{
 		std::cout << "NO RECIPIENT moth*r Flower " << std::endl;
 		throw irc_error(ERR_NORECIPIENT(cmd.message), SEND_ERROR);
@@ -199,13 +199,8 @@ void	Server::_PrivMsg(const Command &cmd, Client &client)
 	else
 		std::cout << "Message to send: " << cmd.trailing << std::endl;
 
-//		ERR_NORECIPIENT                 ERR_NOTEXTTOSEND
 //		ERR_CANNOTSENDTOCHAN            ERR_NOTOPLEVEL
-//		ERR_WILDTOPLEVEL                ERR_TOOMANYTARGETS
-//		ERR_NOSUCHNICK					RPL_AWAY
-
-//	ui[password] = cmd.params;
-//	client.SetUinfo(ui);
+//		ERR_WILDTOPLEVEL          		RPL_AWAY
 }
 
 void	Server::_CapLs(const Command &cmd, Client &client)
