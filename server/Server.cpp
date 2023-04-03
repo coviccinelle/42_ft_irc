@@ -317,13 +317,13 @@ void	Server::_ReceiveData(struct pollfd &pfd)
 			}
 			catch (irc_error &e)
 			{
+				client.PopCmd();
 				if (e.code() == CLOSE_CONNECTION)
 					{ SendData(client.GetFd(), SERVER_NAME, e.what()); _CloseConnection(pfd); }
 				else if (e.code() == NO_SEND)
 					std::cout << e.what() << std::endl;
 				else if (e.code() == SEND_ERROR)
 					SendData(client.GetFd(), SERVER_NAME, e.what());
-				client.PopCmd();
 			}
 		}
 	}
