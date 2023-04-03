@@ -13,7 +13,7 @@ Client::Client() :
 	_clients(NULL)
 {
 	// Containers are going to complain if not existing
-	std::cout << "Warning: Coplien only but should never be called" << std::endl;
+	std::cout << "WARNING: Client default constructor called: If you see this message something's wrong. Coplien only but should never be called" << std::endl;
 }
 
 Client::Client(const string &pass, const std::map< int, Client > &clients) :

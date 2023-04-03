@@ -37,7 +37,8 @@ class Server
 		void		InitConnectionLoop();
 		void 		Logs() const;
 		void 		ConnectionLoop();
-		void 		SendData(int fd, const string &from, const string &s) const;
+		void 		SendData(int fd);
+		void		AddData(const string &from, const string &message);
 
 	private: 
 		void		_AcceptNewConnection();
@@ -55,7 +56,7 @@ class Server
 		void 		_Ping(const Command &cmd, Client &client); // Parse PING cmd
 		void 		_PrivMsg(const Command &cmd, Client &client); // Parse PRIVMSG cmd
 																  //
-		Client*	_FindNickname(const string &nick); //check if there's a nickname like this in the list of client's nicknames
+		Client*	_FindNickname(const string &nick, Client *skip = NULL); //check if there's a nickname like this in the list of client's nicknames
 
 		std::string 					_portNumber;
 		std::string 					_password;
@@ -65,6 +66,7 @@ class Server
 		int								_poll_count;
 		std::map< string, CmdVal >		_mapCmd; // mapping between cmd names and integer; used for switch case.
 		Parser							_parser;
+		string							_data;
 };
 
 #endif

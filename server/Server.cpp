@@ -6,7 +6,8 @@ Server::Server(const std::string &port, const std::string &pass) :
 	_listener(0),
 	_pollfds(1),
 	_poll_count(0),
-	_mapCmd()
+	_mapCmd(),
+	_data("")
 {
 	_mapCmd.insert(std::make_pair(string("CAP"), CAP));
 	_mapCmd.insert(std::make_pair(string("PASS"), PASS));
@@ -75,13 +76,17 @@ void	Server::_ExecCommand(const Command &cmd, Client &client)
 	}
 }
 
-void Server::SendData(int fd, const string &from, const string &msg) const
+void Server::SendData(int fd)
 {
-	string s = ":" + from + " " + msg;
-
-	std::cout << "Sending data :[" << s << "]" << std::endl;
-	if (send(fd, s.data(), s.size(), 0) == -1)
+	std::cout << "Sending data :[" << _data << "]" << std::endl;
+	if (send(fd, _data.data(), _data.size(), 0) == -1)
 		std::cerr << "⚠️ warning : send err" << std::endl;
+	_data.clear();
+}
+
+void	Server::AddData(const string &from, const string &message)
+{
+	_data += ":" + from + " " + message;
 }
 
 void	Server::_User(const Command &cmd, Client &client)
@@ -89,14 +94,11 @@ void	Server::_User(const Command &cmd, Client &client)
 	vec_str	ui = client.GetUinfo();
 
 	if (ui[password] != _password)
-		throw irc_error(ERR_NEEDMOREPARAMS("PASS"), CLOSE_CONNECTION);
+		return AddData(SERVER_NAME, ERR_NEEDMOREPARAMS("PASS"));
 	if (cmd.middle.size() == 0)
-	{
-		SendData(client.GetFd(), SERVER_NAME, ERR_NEEDMOREPARAMS(cmd.command));
-		return ;
-	}
+		return AddData(SERVER_NAME, ERR_NEEDMOREPARAMS(cmd.command));
 	//TODO: SendData(ERR_ALREADYREGISTERED);
-	if (cmd.middle.size() < 3 || ui[nickname].empty() || cmd.trailing.empty() == true)
+	if (cmd.middle.size() < 3 || cmd.trailing.empty() == true)
 	{
 		std::cout << "Invalid param" << std::endl;
 		return ;
@@ -107,8 +109,11 @@ void	Server::_User(const Command &cmd, Client &client)
 		ui[hostname] = cmd.middle[2];
 		ui[realname] = cmd.trailing;
 		client.SetUinfo(ui);
-		client.SetRegistd();
-		SendData(client.GetFd(), SERVER_NAME, RPL_WELCOME(ui[nickname], ui[username], ui[hostname]));
+		if (client.IsRegistd() == false && ui[nickname].empty() == false)
+		{
+			client.SetRegistd();
+			AddData(SERVER_NAME, RPL_WELCOME(ui[nickname], ui[username], ui[hostname]));
+		}
 	}
 }
 
@@ -117,13 +122,18 @@ void	Server::_Nick(const Command &cmd, Client &client)
 	vec_str			ui = client.GetUinfo();
 
 	if (ui[password] != _password)
-		throw irc_error(ERR_NEEDMOREPARAMS("PASS"), CLOSE_CONNECTION);
+		return AddData(SERVER_NAME, ERR_NEEDMOREPARAMS("PASS"));
 	if (cmd.target.size() != 1)
-		throw irc_error(ERR_NONICKNAMEGIVEN, SEND_ERROR);
+		return AddData(SERVER_NAME, ERR_NONICKNAMEGIVEN);
 	if (_parser.isValidNick(cmd.target[0]) == false)
-		throw irc_error(ERR_ERRONEUSNICKNAME(cmd.target[0]), SEND_ERROR);
-	if (_FindNickname(cmd.target[0]) == NULL)
-		throw irc_error(ERR_NICKNAMEINUSE(cmd.target[0]), SEND_ERROR);
+		return AddData(SERVER_NAME, ERR_ERRONEUSNICKNAME(cmd.target[0]));
+	if (_FindNickname(cmd.target[0], &client) != NULL)
+	{
+		string tmp = "*";
+		if (ui[nickname].empty() == false)
+			tmp = ui[nickname];
+		return AddData(SERVER_NAME, ERR_NICKNAMEINUSE(tmp, cmd.target[0]));
+	}
 
 	string from;
 	if (ui[nickname].empty() == false) {
@@ -138,9 +148,13 @@ void	Server::_Nick(const Command &cmd, Client &client)
 	}
 	ui[nickname] = cmd.target[0];
 	client.SetUinfo(ui);
-	client.SetRegistd();
-
-	SendData(client.GetFd(), from, "NICK " + ui[nickname] + "\r\n");
+	string data;
+	AddData(from, "NICK " + ui[nickname] + "\r\n");
+	if (client.IsRegistd() == false && ui[username].empty() == false)
+	{
+		client.SetRegistd();
+		AddData(SERVER_NAME, RPL_WELCOME(ui[nickname], ui[username], ui[hostname]));
+	}
 }
 
 void	Server::_Pass(const Command &cmd, Client &client)
@@ -148,9 +162,9 @@ void	Server::_Pass(const Command &cmd, Client &client)
 	vec_str			ui = client.GetUinfo();
 
 	if (cmd.middle.size() < 1)
-		throw irc_error(ERR_NEEDMOREPARAMS(cmd.middle[0]), SEND_ERROR);
+		return AddData(SERVER_NAME, ERR_NEEDMOREPARAMS(cmd.middle[0]));
 	if (client.IsRegistd())
-		throw irc_error(ERR_ALREADYREGISTERED, SEND_ERROR);
+		return AddData(SERVER_NAME, ERR_ALREADYREGISTERED);
 	ui[password] = cmd.params;
 	client.SetUinfo(ui);
 }
@@ -167,11 +181,11 @@ void	Server::_Ping(const Command &cmd, Client &client)
 
 
 //*_FindNickname(const Command &cmd, Client &client); //check if there's a nickname like this in the list of client's nicknames
-Client* Server::_FindNickname(const string &nick) //check if there's a nickname like this in the list of client's nicknames
+Client* Server::_FindNickname(const string &nick, Client *skip) //check if there's a nickname like this in the list of client's nicknames
 {
 	for (std::map<int, Client>::iterator it = _clients.begin(); it != _clients.end(); ++it)
 	{
-		if (it->second.GetUinfo()[nickname] == nick)
+		if (&it->second != skip && it->second.GetUinfo()[nickname] == nick)
 			return (&it->second);
 	}
 	return (NULL);
@@ -186,7 +200,7 @@ void	Server::_PrivMsg(const Command &cmd, Client &client)
 	if (cmd.middle.size() < 0)
 	{
 		std::cout << "NO RECIPIENT moth*r Flower " << std::endl;
-		throw irc_error(ERR_NORECIPIENT(cmd.message), SEND_ERROR);
+		return AddData(SERVER_NAME, ERR_NORECIPIENT(cmd.message));
 	}
 	else if (cmd.middle.size() > 1)
 		throw irc_error(ERR_TOOMANYTARGETS(cmd.middle[1], cmd.message), SEND_ERROR);
@@ -326,25 +340,26 @@ void	Server::_ReceiveData(struct pollfd &pfd)
 				std::cout << "⚠️  " <<  e.what() << std::endl;
 				return ;
 			}
-			try {
-				while (client.GetCmds().empty() == 0)
-				{
-					_ExecCommand(*client.GetCmds().begin(), client);
-					client.PopCmd();
-				}
+			while (client.GetCmds().empty() == 0)
+			{
+				_ExecCommand(*client.GetCmds().begin(), client);
+				client.PopCmd();
 			}
+			SendData(pfd.fd);
+				/*
 			catch (irc_error &e)
 			{
 				client.PopCmd();
 				if (e.code() == CLOSE_CONNECTION)
-					{ SendData(client.GetFd(), SERVER_NAME, e.what()); _CloseConnection(pfd); }
+					{ AddData(SERVER_NAME, e.what()); _CloseConnection(pfd); }
 				else if (e.code() == NO_SEND)
 					std::cout << e.what() << std::endl;
 				else if (e.code() == SEND_ERROR)
-					SendData(client.GetFd(), SERVER_NAME, e.what());
+					AddData(SERVER_NAME, e.what());
 				else
 					std::cout << "⚠️  Unhandle exception catch !!! WARNING : " << e.what() << std::endl;
 			}
+			*/
 		}
 	}
 }

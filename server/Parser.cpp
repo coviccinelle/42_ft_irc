@@ -336,3 +336,4 @@ bool	Parser::isValidNick(const string &str)
 	}
 	return (true);
 }
+

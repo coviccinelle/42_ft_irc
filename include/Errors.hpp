@@ -27,7 +27,7 @@
 # define ERR_PASSWDMISMATCH "464 :Password incorrect\r\n"
 # define ERR_NONICKNAMEGIVEN "431 :No nickname given\r\n"
 # define ERR_ERRONEUSNICKNAME(nick) ("432 " + nick + " :Erroneous nickname\r\n")
-# define ERR_NICKNAMEINUSE(nick) ("433 " + nick + ":Nickname is already in use\r\n")
+# define ERR_NICKNAMEINUSE(to, nick) ("433 " + to + " " + nick + " :Nickname is already in use\r\n")
 # define ERR_NOSUCHNICK(invitenick) ("401 " + invitenick + " :No such nick/channel\r\n")
 # define ERR_NOSUCHCHANNEL(channel) ("403 " + channel + " :No such channel\r\n")
 # define RPL_YOUREOPER(nick) ("381 " + nick + " :You are now an IRC operator\r\n")
