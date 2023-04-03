@@ -8,7 +8,6 @@ Client::Client() :
 	_servPass(""),
 	_buf(""),
 	_cmds(0),
-	_mapCmd(),
 	_registd(false),
 	_uinfo(INF_CLI_SIZE),
 	_clients(NULL)
@@ -25,16 +24,11 @@ Client::Client(const string &pass, const std::map< int, Client > &clients) :
 	_servPass(pass),
 	_buf(""),
 	_cmds(0),
-	_mapCmd(),
 	_registd(false),
 	_uinfo(INF_CLI_SIZE),
 	_clients(&clients)
 {
 	memset(&_addr, 0, sizeof(_addr));
-	_mapCmd.insert(std::make_pair(string("CAP"), CAP));
-	_mapCmd.insert(std::make_pair(string("PASS"), PASS));
-	_mapCmd.insert(std::make_pair(string("NICK"), NICK));
-	_mapCmd.insert(std::make_pair(string("USER"), USER));
 	return ;
 }
 
@@ -53,7 +47,6 @@ Client::Client(Client const &src)
 
 	_buf = src._buf;
 	_cmds = src._cmds;
-	_mapCmd = src._mapCmd;
 
 	_registd = src._registd;
 	_uinfo = src._uinfo;
@@ -74,7 +67,6 @@ Client &Client::operator=(Client const &rhs)
 
 	_buf = rhs._buf;
 	_cmds = rhs._cmds;
-	_mapCmd = rhs._mapCmd;
 
 	_registd = rhs._registd;
 	_uinfo = rhs._uinfo;
@@ -137,46 +129,9 @@ void	Client::SetRegistd()
 	_registd = true;
 }
 
-// Mapping between string comands name and enum type ex: "PASS" (string) -> PASS (int)
-// Used for switch case
-CmdVal	Client::ResolveOption(const string &input)
+void	Client::PopCmd()
 {
-	if (input.empty())
-		return (UNKNOWN);
-	std::map<string, CmdVal >::const_iterator it(_mapCmd.find(input));
-	if(it != _mapCmd.end())
-		return (it->second);
-	return (UNKNOWN); 
-}
-
-void	Client::ExecCommand(Command &cmd)
-{
-	cmd.Debug();
-	switch (ResolveOption(cmd.command))
-	{
-		case CAP:
-		{
-			_CapLs(cmd);
-			break ;
-		}
-		case PASS:
-		{
-			_Pass(cmd);
-			break ;
-		}
-		case NICK:
-		{
-			_Nick(cmd);
-			break ;
-		}
-		case USER:
-		{
-			_User(cmd);
-			break ;
-		}
-		default :
-			std::cout << "Unknow command" << std::endl;
-	}
+	_cmds.pop_front();
 }
 
 void	Client::_ParseBuf(const string &buf)
@@ -212,18 +167,6 @@ void	Client::ParseRecv(const string &buf)
 		return ;
 	}
 
-	while (_cmds.empty() == 0)
-	{
-		try {
-			ExecCommand(*_cmds.begin());
-		}
-		catch (irc_error &e)
-		{
-			_cmds.pop_front();
-			throw;
-		}
-		_cmds.pop_front();
-	}
 	return ;
 }
 

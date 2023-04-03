@@ -9,6 +9,18 @@
 #define MAX_LISTEN	5
 
 /*
+ * Used for switch case evaluation
+ */
+enum CmdVal {
+	UNKNOWN = 0,
+	CAP,
+	PASS,
+	NICK,
+	USER,
+	PING
+};
+
+/*
  *
  * Manage Client connections and Chanels
  *
@@ -32,11 +44,14 @@ class Server
 		void		_ParseRecv(const string &buf, Client &client);
 		void		_CloseConnection(struct pollfd &pfd);
 
-		void 		_CapLs(Command &cmd, Client &client);// Parse CAP LS cmd
-		void 		_Pass(Command &cmd, Client &client); // Parse PASS cmd
-		void 		_Nick(Command &cmd, Client &client); // Parse NICK cmd
-		void 		_User(Command &cmd, Client &client); // Parse USER cmd
-		void 		_Ping(Command &cmd, Client &client); // Parse PING cmd
+		void		_ExecCommand(const Command &cmd, Client &client); // Switch case
+		CmdVal		_ResolveOption(const string &input); // Return a enum code for switch case eval
+
+		void 		_CapLs(const Command &cmd, Client &client);// Parse CAP LS cmd
+		void 		_Pass(const Command &cmd, Client &client); // Parse PASS cmd
+		void 		_Nick(const Command &cmd, Client &client); // Parse NICK cmd
+		void 		_User(const Command &cmd, Client &client); // Parse USER cmd
+		void 		_Ping(const Command &cmd, Client &client); // Parse PING cmd
 
 		std::string 					_portNumber;
 		std::string 					_password;

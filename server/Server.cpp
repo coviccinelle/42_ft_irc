@@ -1,15 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   Server.cpp                                         :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: jfrancai <marvin@42.fr>                    +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/03/28 11:42:52 by jfrancai          #+#    #+#             */
-/*   Updated: 2023/04/01 15:26:00 by jfrancai         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #include "../include/Server.hpp"
 
 Server::Server(const std::string &port, const std::string &pass) :
@@ -20,6 +8,10 @@ Server::Server(const std::string &port, const std::string &pass) :
 	_poll_count(0),
 	_mapCmd()
 {
+	_mapCmd.insert(std::make_pair(string("CAP"), CAP));
+	_mapCmd.insert(std::make_pair(string("PASS"), PASS));
+	_mapCmd.insert(std::make_pair(string("NICK"), NICK));
+	_mapCmd.insert(std::make_pair(string("USER"), USER));
 }
 
 Server::~Server()
@@ -35,6 +27,48 @@ Server::~Server()
  *
 */
 
+// Mapping between string comands name and enum type ex: "PASS" (string) -> PASS (int)
+// Used for switch case
+CmdVal	Server::_ResolveOption(const string &input)
+{
+	if (input.empty())
+		return (UNKNOWN);
+	std::map<string, CmdVal >::const_iterator it(_mapCmd.find(input));
+	if(it != _mapCmd.end())
+		return (it->second);
+	return (UNKNOWN); 
+}
+
+void	Server::_ExecCommand(const Command &cmd, Client &client)
+{
+	cmd.Debug();
+	switch (_ResolveOption(cmd.command))
+	{
+		case CAP:
+		{
+			_CapLs(cmd, client);
+			break ;
+		}
+		case PASS:
+		{
+			_Pass(cmd, client);
+			break ;
+		}
+		case NICK:
+		{
+			_Nick(cmd, client);
+			break ;
+		}
+		case USER:
+		{
+			_User(cmd, client);
+			break ;
+		}
+		default :
+			std::cout << "Unknow command" << std::endl;
+	}
+}
+
 void Server::SendData(int fd, const string &from, const string &msg) const
 {
 	string s = ":" + from + " " + msg;
@@ -44,7 +78,7 @@ void Server::SendData(int fd, const string &from, const string &msg) const
 		std::cerr << "⚠️ warning : send err" << std::endl;
 }
 
-void	Server::_User(Command &cmd, Client &client)
+void	Server::_User(const Command &cmd, Client &client)
 {
 	vec_str	ui = client.GetUinfo();
 
@@ -73,7 +107,7 @@ void	Server::_User(Command &cmd, Client &client)
 	}
 }
 
-void	Server::_Nick(Command &cmd, Client &client)
+void	Server::_Nick(const Command &cmd, Client &client)
 {
 	vec_str			ui = client.GetUinfo();
 
@@ -105,7 +139,7 @@ void	Server::_Nick(Command &cmd, Client &client)
 	SendData(client.GetFd(), from, "NICK " + ui[nickname] + "\r\n");
 }
 
-void	Server::_Pass(Command &cmd, Client &client)
+void	Server::_Pass(const Command &cmd, Client &client)
 {
 	vec_str			ui = client.GetUinfo();
 
@@ -117,7 +151,7 @@ void	Server::_Pass(Command &cmd, Client &client)
 	client.SetUinfo(ui);
 }
 
-void	Server::_Ping(Command &cmd, Client &client)
+void	Server::_Ping(const Command &cmd, Client &client)
 {
 	(void)cmd;
 	(void)client;
@@ -127,7 +161,7 @@ void	Server::_Ping(Command &cmd, Client &client)
 	*/
 }
 
-void	Server::_CapLs(Command &cmd, Client &client)
+void	Server::_CapLs(const Command &cmd, Client &client)
 {
 	(void)cmd;
 	(void)client;
@@ -238,7 +272,12 @@ void	Server::_ReceiveData(struct pollfd &pfd)
 			Client &client(_clients[pfd.fd]);
 			
 			try {
-				client.ParseRecv(buf);
+				client.ParseRecv(string(buf));
+				while (client.GetCmds().empty() == 0)
+				{
+					_ExecCommand(*client.GetCmds().begin(), client);
+					client.PopCmd();
+				}
 			}
 			catch (irc_error &e)
 			{

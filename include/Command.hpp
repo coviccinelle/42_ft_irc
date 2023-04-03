@@ -10,7 +10,7 @@ class Command
 		Command(Command const &src);
 		Command	&operator=(Command const &rhs);
 		
-		void	Debug();
+		void	Debug() const;
 
 		string					message;
 		string					prefix;

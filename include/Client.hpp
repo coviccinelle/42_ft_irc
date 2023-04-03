@@ -19,18 +19,6 @@ enum InfoClient {
 	realname
 };
 
-/*
- * Used for switch case evaluation
- */
-enum CmdVal {
-	UNKNOWN = 0,
-	CAP,
-	PASS,
-	NICK,
-	USER,
-	PING
-};
-
 /* 
  * 
  * This class hold all information about a connected client.
@@ -52,9 +40,7 @@ class Client
 		/* Public Methods */
 		int								AcceptClient(int listener); // Return socket fd for socker communication
 
-		void							ExecCommand(Command &cmd); // Switch case
 		void							ParseRecv(const string &buf); // Parse the cmd received by the server
-		CmdVal							ResolveOption(const string &input); // Return a enum code for switch case eval
 
 		/* Getters */
 		int								GetFd(void) const;
@@ -62,6 +48,7 @@ class Client
 		cst_vec_str						&GetUinfo() const;
 		const std::list< Command >		&GetCmds() const;
 		bool							IsRegistd() const;
+		void							PopCmd();
 
 		void							SetUinfo(const vec_str &uinfo);
 		void							SetRegistd();
@@ -81,7 +68,6 @@ class Client
 		/* Commands */
 		string							_buf;
 		std::list< Command >			_cmds; // Commands that need to be process
-		std::map< string, CmdVal >		_mapCmd; // mapping between cmd names and integer; used for switch case.
 
 		/* Client info */
 		bool							_registd;
