@@ -213,7 +213,7 @@ void	Server::_PrivMsg(const Command &cmd, Client &client)
 		return AddData(SERVER_NAME, ERR_TOOMANYTARGETS(cmd.middle[1], cmd.message));
 	else if (cmd.trailing.empty())
 		return AddData(SERVER_NAME, ERR_NOTEXTTOSEND);
-	else if ((receiver = _FindNickname(cmd.target[0])) == NULL)
+	else if ((receiver = _FindNickname(cmd.target[0], &client)) == NULL)
 		return AddData(SERVER_NAME, ERR_NOSUCHNICK(cmd.target[0]));
 //	else if (cmd.target.status == away)
 //		throw irc_error(RPL_AWAY, SEND_ERROR);
