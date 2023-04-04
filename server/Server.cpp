@@ -94,7 +94,11 @@ void	Server::_User(const Command &cmd, Client &client)
 	vec_str	ui = client.GetUinfo();
 
 	if (ui[password] != _password)
-		return AddData(SERVER_NAME, ERR_NEEDMOREPARAMS("PASS"));
+	{
+		AddData(SERVER_NAME, ERR_NEEDMOREPARAMS("PASS"));
+		SendData(client.GetFd());
+		throw irc_error("error: invalid password", CLOSE_CONNECTION);
+	}
 	if (cmd.middle.size() == 0)
 		return AddData(SERVER_NAME, ERR_NEEDMOREPARAMS(cmd.command));
 	//TODO: SendData(ERR_ALREADYREGISTERED);
@@ -122,7 +126,11 @@ void	Server::_Nick(const Command &cmd, Client &client)
 	vec_str			ui = client.GetUinfo();
 
 	if (ui[password] != _password)
-		return AddData(SERVER_NAME, ERR_NEEDMOREPARAMS("PASS"));
+	{
+		AddData(SERVER_NAME, ERR_NEEDMOREPARAMS("PASS"));
+		SendData(client.GetFd());
+		throw irc_error("error: invalid password", CLOSE_CONNECTION);
+	}
 	if (cmd.target.size() != 1)
 		return AddData(SERVER_NAME, ERR_NONICKNAMEGIVEN);
 	if (_parser.isValidNick(cmd.target[0]) == false)
@@ -338,10 +346,19 @@ void	Server::_ReceiveData(struct pollfd &pfd)
 				std::cout << "⚠️  " <<  e.what() << std::endl;
 				return ;
 			}
-			while (client.GetCmds().empty() == 0)
+			try {
+				while (client.GetCmds().empty() == 0)
+				{
+					_ExecCommand(*client.GetCmds().begin(), client);
+					client.PopCmd();
+				}
+			}
+			catch (irc_error &e)
 			{
-				_ExecCommand(*client.GetCmds().begin(), client);
 				client.PopCmd();
+				if (e.code() == CLOSE_CONNECTION)
+					return _CloseConnection(pfd);
+				return ;
 			}
 			SendData(pfd.fd);
 				/*
