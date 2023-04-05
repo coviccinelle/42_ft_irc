@@ -370,20 +370,6 @@ void	Server::_ReceiveData(struct pollfd &pfd)
 			}
 			if (_data.empty() == false)
 				SendData(pfd.fd);
-				/*
-			catch (irc_error &e)
-			{
-				client.PopCmd();
-				if (e.code() == CLOSE_CONNECTION)
-					{ AddData(SERVER_NAME, e.what()); _CloseConnection(pfd); }
-				else if (e.code() == NO_SEND)
-					std::cout << e.what() << std::endl;
-				else if (e.code() == SEND_ERROR)
-					AddData(SERVER_NAME, e.what());
-				else
-					std::cout << "⚠️  Unhandle exception catch !!! WARNING : " << e.what() << std::endl;
-			}
-			*/
 		}
 	}
 }
@@ -423,7 +409,7 @@ void Server::ConnectionLoop()
 	std::cout << "port [" << _portNumber << "] password [" << _password << "]" << std::endl;
 	while (1)
 	{
-		if ((_poll_count = poll(_pollfds.data(), _pollfds.size(), -1)) == 10)
+		if ((_poll_count = poll(_pollfds.data(), _pollfds.size(), -1)) == -1)
 			throw irc_error("poll failed");
 		//system("clear");
 		std::cout << "------------[ IRC ]------------" << std::endl;
