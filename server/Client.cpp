@@ -112,7 +112,7 @@ cst_vec_str	&Client::GetUinfo() const
 	return (_uinfo);
 }
 
-const string	Client::GetPrefix() const
+string	Client::GetPrefix() const
 {
 	return (_uinfo[nickname] + "!" + _uinfo[username] + "@" + _uinfo[hostname]);
 }
