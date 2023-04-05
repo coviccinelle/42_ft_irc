@@ -175,8 +175,9 @@ void	Server::_Pass(const Command &cmd, Client &client)
 {
 	vec_str			ui = client.GetUinfo();
 
-	if (cmd.middle.size() < 1)
-		return AddData(SERVER_NAME, ERR_NEEDMOREPARAMS(cmd.middle[0]));
+	std::cout << cmd.middle.size() << std::endl;
+	if (cmd.middle.empty() || cmd.middle.size() < 1)
+		return AddData(SERVER_NAME, ERR_NEEDMOREPARAMS("PASS"));
 	if (client.IsRegistd())
 		return AddData(SERVER_NAME, ERR_ALREADYREGISTERED);
 	ui[password] = cmd.params;
@@ -340,6 +341,7 @@ void	Server::_ReceiveData(struct pollfd &pfd)
 		int ret;
 		char buf[512];
 
+		std::cout << "buf" << std::endl;
 		pfd.events = POLLIN;
 		memset(&buf, 0, sizeof(buf));
 		ret = recv(pfd.fd, buf, sizeof buf, 0); 
@@ -351,13 +353,7 @@ void	Server::_ReceiveData(struct pollfd &pfd)
 		{
 			Client &client(_clients[pfd.fd]);
 			
-			try {
-				client.ParseRecv(string(buf));
-			}
-			catch (irc_error &e)
-			{
-				std::cout << "⚠️  " <<  e.what() << std::endl;
-			}
+			client.ParseRecv(string(buf));
 			try {
 				while (client.GetCmds().empty() == 0)
 				{

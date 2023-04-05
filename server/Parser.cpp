@@ -304,14 +304,18 @@ const std::vector< Token >	&Parser::Tokens() const
 	return (_tokens);
 }
 
-Command	Parser::Parse(const string &str)
+void	Parser::Parse(const string &str)
 {
 	_ParseInit();
 	_input = str;
 	_it = --_input.begin();
-
 	_Message();
-	//_cmd.Debug();
+
+	return ;
+}
+
+const Command	&Parser::GetCommand() const
+{
 	return (_cmd);
 }
 
@@ -336,4 +340,3 @@ bool	Parser::isValidNick(const string &str)
 	}
 	return (true);
 }
-

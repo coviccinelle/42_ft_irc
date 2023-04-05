@@ -153,12 +153,13 @@ void	Client::_ParseBuf(const string &buf)
 	{
 		try
 		{
-			_cmds.push_back(_parser.Parse(trim(*it)));
+			_parser.Parse(trim(*it));
 		}
 		catch (irc_error &e)
 		{
-			throw ;
+			std::cout << "⚠️  " <<  e.what() << std::endl;
 		}
+		_cmds.push_back(_parser.GetCommand());
 	}
 }
 
@@ -166,10 +167,7 @@ void	Client::ParseRecv(const string &buf)
 {
 	_ParseBuf(buf);
 	if (_cmds.empty())
-	{
 		std::cerr << "⚠️  warning : empty commands" << std::endl;
-		return ;
-	}
 
 	return ;
 }
