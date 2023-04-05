@@ -33,7 +33,6 @@ class Client
 	public:
 		/* Coplien */
 		Client(); // Forbidden Client creation without Server clients list reference or no server pass
-		Client(const string &pass, const std::map< int, Client > &clients);
 		~Client();
 		Client(Client const &src);
 		Client	&operator=(Client const &rhs);
@@ -64,7 +63,6 @@ class Client
 		struct sockaddr_storage			_addr;
 		socklen_t						_addrSize;
 		string							_ip;
-		string							_servPass; // Server Password (should be a string ref)
 
 		/* Commands */
 		string							_buf;
@@ -75,7 +73,6 @@ class Client
 		vec_str							_uinfo; // nickname, username, hostname ... See InfoClient above for all available field.
 
 		/* Utils */
-		const std::map< int, Client >	*_clients;
 		Parser							_parser;
 };
 

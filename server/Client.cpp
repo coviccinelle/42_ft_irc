@@ -5,31 +5,12 @@ Client::Client() :
 	_addr(),
 	_addrSize(sizeof(_addr)),
 	_ip(""),
-	_servPass(""),
 	_buf(""),
 	_cmds(0),
 	_registd(false),
-	_uinfo(INF_CLI_SIZE),
-	_clients(NULL)
-{
-	// Containers are going to complain if not existing
-	std::cout << "WARNING: Client default constructor called: If you see this message something's wrong. Coplien only but should never be called" << std::endl;
-}
-
-Client::Client(const string &pass, const std::map< int, Client > &clients) :
-	_fd(0),
-	_addr(),
-	_addrSize(sizeof(_addr)),
-	_ip(""),
-	_servPass(pass),
-	_buf(""),
-	_cmds(0),
-	_registd(false),
-	_uinfo(INF_CLI_SIZE),
-	_clients(&clients)
+	_uinfo(INF_CLI_SIZE)
 {
 	memset(&_addr, 0, sizeof(_addr));
-	return ;
 }
 
 Client::~Client(void)
@@ -43,7 +24,6 @@ Client::Client(Client const &src)
 	memcpy(&_addr, &src._addr, sizeof(src._addr));
 	memcpy(&_addrSize, &src._addrSize, sizeof(src._addrSize));
 	_ip = src._ip;
-	_servPass = src._servPass;
 
 	_buf = src._buf;
 	_cmds = src._cmds;
@@ -51,7 +31,6 @@ Client::Client(Client const &src)
 	_registd = src._registd;
 	_uinfo = src._uinfo;
 
-	_clients = src._clients;
 	return ;
 }
 
@@ -63,7 +42,6 @@ Client &Client::operator=(Client const &rhs)
 	memcpy(&_addr, &rhs._addr, sizeof(rhs._addr));
 	memcpy(&_addrSize, &rhs._addrSize, sizeof(rhs._addrSize));
 	_ip = rhs._ip;
-	_servPass = rhs._servPass;
 
 	_buf = rhs._buf;
 	_cmds = rhs._cmds;
@@ -71,7 +49,6 @@ Client &Client::operator=(Client const &rhs)
 	_registd = rhs._registd;
 	_uinfo = rhs._uinfo;
 
-	_clients = rhs._clients;
 	return (*this);
 }
 

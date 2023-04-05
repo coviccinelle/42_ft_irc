@@ -305,7 +305,7 @@ void	Server::AwaitingConnectionQueue()
 
 void Server::_AcceptNewConnection()
 {
-	Client			client(_password, _clients);
+	Client			client;
 	int				new_fd;
 
 	new_fd = client.AcceptClient(_listener);
