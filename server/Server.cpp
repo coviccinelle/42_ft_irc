@@ -368,7 +368,8 @@ void	Server::_ReceiveData(struct pollfd &pfd)
 					return _CloseConnection(pfd);
 				return ;
 			}
-			SendData(pfd.fd);
+			if (_data.empty() == false)
+				SendData(pfd.fd);
 				/*
 			catch (irc_error &e)
 			{
