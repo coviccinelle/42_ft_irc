@@ -14,6 +14,7 @@ Server::Server(const std::string &port, const std::string &pass) :
 	_mapCmd.insert(std::make_pair(string("NICK"), NICK));
 	_mapCmd.insert(std::make_pair(string("USER"), USER));
 	_mapCmd.insert(std::make_pair(string("PRIVMSG"), PRIVMSG));
+	_mapCmd.insert(std::make_pair(string("MODE"), MODE));
 }
 
 Server::~Server()
@@ -69,6 +70,11 @@ void	Server::_ExecCommand(const Command &cmd, Client &client)
 		case PRIVMSG:
 		{
 			_PrivMsg(cmd, client);
+			break ;
+		}
+		case MODE:
+		{
+			_Mode(cmd, client);
 			break ;
 		}
 		default :
@@ -202,23 +208,17 @@ void	Server::_PrivMsg(const Command &cmd, Client &client)
 	vec_str			ui = client.GetUinfo();
 	Client			*receiver;
 
-	std::cout << "Hello i'm PrivMsg" << std::endl;
-
 	if (cmd.middle.size() == 0)
 	{
 		std::cout << "NO RECIPIENT moth*r Flower " << std::endl;
 		return AddData(SERVER_NAME, ERR_NORECIPIENT(cmd.message));
 	}
-	else if (cmd.middle.size() > 1)
+	if (cmd.middle.size() > 1)
 		return AddData(SERVER_NAME, ERR_TOOMANYTARGETS(cmd.middle[1], cmd.message));
-	else if (cmd.trailing.empty())
+	if (cmd.trailing.empty())
 		return AddData(SERVER_NAME, ERR_NOTEXTTOSEND);
-	else if ((receiver = _FindNickname(cmd.target[0], &client)) == NULL)
+	if ((receiver = _FindNickname(cmd.target[0])) == NULL)
 		return AddData(SERVER_NAME, ERR_NOSUCHNICK(cmd.target[0]));
-//	else if (cmd.target.status == away)
-//		throw irc_error(RPL_AWAY, SEND_ERROR);
-	else
-		std::cout << "Message to send: " << cmd.trailing << std::endl;
 
 	const string msg = "PRIVMSG " + cmd.target[0] + " :" + cmd.trailing + "\r\n";
 //			:nickname!user@host PRIVMSG target_nickname :Message
@@ -231,6 +231,14 @@ void	Server::_PrivMsg(const Command &cmd, Client &client)
 
 //		ERR_CANNOTSENDTOCHAN            ERR_NOTOPLEVEL
 //		ERR_WILDTOPLEVEL          		RPL_AWAY
+}
+
+void	Server::_Mode(const Command &cmd, Client &client)
+{
+	(void)cmd;
+	(void)client;
+	std::cout << "MODE function called" << std::endl;
+	return ;
 }
 
 void	Server::_CapLs(const Command &cmd, Client &client)
@@ -349,7 +357,6 @@ void	Server::_ReceiveData(struct pollfd &pfd)
 			catch (irc_error &e)
 			{
 				std::cout << "⚠️  " <<  e.what() << std::endl;
-				return ;
 			}
 			try {
 				while (client.GetCmds().empty() == 0)
