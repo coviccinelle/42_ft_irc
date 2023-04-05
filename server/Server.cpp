@@ -219,10 +219,15 @@ void	Server::_PrivMsg(const Command &cmd, Client &client)
 //		throw irc_error(RPL_AWAY, SEND_ERROR);
 	else
 		std::cout << "Message to send: " << cmd.trailing << std::endl;
-	const string msg = "PRIVMSG " + cmd.target[0] + " :" + cmd.trailing;
+
+	const string msg = "PRIVMSG " + cmd.target[0] + " :" + cmd.trailing + "\r\n";
 //			:nickname!user@host PRIVMSG target_nickname :Message
 
+	std::cout << "fd : " << client.GetFd() << std::endl;
+	std::cout << "nickname : " << client.GetUinfo()[nickname] << std::endl;
+	std::cout << "prefix : " << client.GetPrefix() << std::endl;
 	AddData(client.GetPrefix(), msg); 
+	SendData(receiver->GetFd());
 
 //		ERR_CANNOTSENDTOCHAN            ERR_NOTOPLEVEL
 //		ERR_WILDTOPLEVEL          		RPL_AWAY
