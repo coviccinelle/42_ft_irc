@@ -13,6 +13,7 @@ Server::Server(const std::string &port, const std::string &pass) :
 	_mapCmd.insert(std::make_pair(string("PASS"), PASS));
 	_mapCmd.insert(std::make_pair(string("NICK"), NICK));
 	_mapCmd.insert(std::make_pair(string("USER"), USER));
+	_mapCmd.insert(std::make_pair(string("PING"), PING));
 	_mapCmd.insert(std::make_pair(string("PRIVMSG"), PRIVMSG));
 }
 
@@ -66,6 +67,11 @@ void	Server::_ExecCommand(const Command &cmd, Client &client)
 			_User(cmd, client);
 			break ;
 		}
+		case PING:
+		{
+			_Ping(cmd, client);
+			break ;
+		}
 		case PRIVMSG:
 		{
 			_PrivMsg(cmd, client);
@@ -78,14 +84,20 @@ void	Server::_ExecCommand(const Command &cmd, Client &client)
 
 void Server::SendData(int fd)
 {
-	std::cout << "Sending data :[" << _data << "]" << std::endl;
+	//I want to print what we send
+	std::cout << "Sending data :[" << _data.data() << "]" << std::endl;
 	if (send(fd, _data.data(), _data.size(), 0) == -1)
 		std::cerr << "⚠️ warning : send err" << std::endl;
 	_data.clear();
 }
 
-void	Server::AddData(const string &from, const string &message)
+void	Server::AddData(const string &from, const string &message, int n)
 {
+	if (n != 0)
+	{
+		_data = message;
+		return ;
+	}
 	_data += ":" + from + " " + message;
 }
 
@@ -179,12 +191,10 @@ void	Server::_Pass(const Command &cmd, Client &client)
 
 void	Server::_Ping(const Command &cmd, Client &client)
 {
-	(void)cmd;
-	(void)client;
-	/*
-	(void)cmd;
 	std::cout << "ping command received" << std::endl;
-	*/
+//	AddData("", "PONG " + cmd.target[0] + " irc", 1);
+	AddData(client.GetPrefix(), "PONG " + cmd.target[0] + " irc");
+	SendData(client.GetFd());
 }
 
 Client* Server::_FindNickname(const string &nick, Client *skip) 
@@ -213,7 +223,7 @@ void	Server::_PrivMsg(const Command &cmd, Client &client)
 		return AddData(SERVER_NAME, ERR_TOOMANYTARGETS(cmd.middle[1], cmd.message));
 	else if (cmd.trailing.empty())
 		return AddData(SERVER_NAME, ERR_NOTEXTTOSEND);
-	else if ((receiver = _FindNickname(cmd.target[0], &client)) == NULL)
+	else if ((receiver = _FindNickname(cmd.target[0])) == NULL)
 		return AddData(SERVER_NAME, ERR_NOSUCHNICK(cmd.target[0]));
 //	else if (cmd.target.status == away)
 //		throw irc_error(RPL_AWAY, SEND_ERROR);

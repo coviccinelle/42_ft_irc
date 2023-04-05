@@ -38,7 +38,7 @@ class Server
 		void 		Logs() const;
 		void 		ConnectionLoop();
 		void 		SendData(int fd);
-		void		AddData(const string &from, const string &message);
+		void		AddData(const string &from, const string &message, int n = 0);
 
 	private: 
 		void		_AcceptNewConnection();
