@@ -191,7 +191,9 @@ void	Server::_Pass(const Command &cmd, Client &client)
 
 void	Server::_Ping(const Command &cmd, Client &client)
 {
-	std::cout << "ping command received" << std::endl;
+	//409    ERR_NOORIGIN ":No origin specified"
+	//402    ERR_NOSUCHSERVER "<server name> :No such server"
+
 	AddData(client.GetPrefix(), "PONG " + cmd.target[0] + " irc\r\n");
 	SendData(client.GetFd());
 }
