@@ -193,7 +193,6 @@ void	Server::_Ping(const Command &cmd, Client &client)
 {
 	//409    ERR_NOORIGIN ":No origin specified"
 	//402    ERR_NOSUCHSERVER "<server name> :No such server"
-
 	AddData(client.GetPrefix(), "PONG " + cmd.target[0] + " irc\r\n");
 	SendData(client.GetFd());
 }
