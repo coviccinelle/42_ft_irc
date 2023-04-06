@@ -1,6 +1,7 @@
 #include "../include/Parser.hpp"
 
-Parser::Parser(void)
+Parser::Parser(void) :
+	_userModes("aiwroOs")
 {
 	return ;
 }
@@ -17,6 +18,7 @@ Parser::Parser(Parser const &src)
 	_tokens = src._tokens;
 	_input = src._input;
 	_cmd = src._cmd;
+	_userModes = src._userModes;
 
 	return ;
 }
@@ -30,6 +32,7 @@ Parser &Parser::operator=(Parser const &rhs)
 	_tokens = rhs._tokens;
 	_input = rhs._input;
 	_cmd = rhs._cmd;
+	_userModes = rhs._userModes;
 
 	return (*this);
 }
@@ -338,5 +341,16 @@ bool	Parser::isValidNick(const string &str)
 			return (false);
 		_Wrapper();
 	}
+	return (true);
+}
+
+bool	Parser::isValidUserMode(const string &str)
+{
+	if (str.size() != 2)
+		return (false);
+	if (str[0] != '+' && str[0] != '-')
+		return (false);
+	if (_userModes.find(str[1]) == std::string::npos)
+		return (false);
 	return (true);
 }

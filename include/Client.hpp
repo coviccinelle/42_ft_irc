@@ -9,6 +9,7 @@
 
 // Size of InfoClient enum below
 #define INF_CLI_SIZE 6
+#define MODE_SIZE 8
 
 // List of infos on a client
 enum InfoClient {
@@ -68,6 +69,7 @@ class Client
 		/* Client info */
 		bool							_registd;
 		vec_str							_uinfo; // nickname, username, hostname ... See InfoClient above for all available field.
+		std::bitset< MODE_SIZE >		_mode;
 
 		/* Utils */
 		Parser							_parser;

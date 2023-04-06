@@ -35,7 +35,6 @@ Command::Command(Command const &src)
 
 Command &Command::operator=(Command const &rhs)
 {
-	std::cout << "Command copy assignment operator called" << std::endl;
 	if (&rhs == this)
 		return (*this);
 

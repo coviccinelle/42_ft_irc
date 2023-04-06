@@ -8,7 +8,8 @@ Client::Client() :
 	_buf(""),
 	_cmds(0),
 	_registd(false),
-	_uinfo(INF_CLI_SIZE)
+	_uinfo(INF_CLI_SIZE),
+	_mode()
 {
 	memset(&_addr, 0, sizeof(_addr));
 }
@@ -30,6 +31,9 @@ Client::Client(Client const &src)
 
 	_registd = src._registd;
 	_uinfo = src._uinfo;
+	_mode = src._mode;
+
+	_parser = src._parser;
 
 	return ;
 }
@@ -48,6 +52,9 @@ Client &Client::operator=(Client const &rhs)
 
 	_registd = rhs._registd;
 	_uinfo = rhs._uinfo;
+	_mode = rhs._mode;
+
+	_parser = rhs._parser;
 
 	return (*this);
 }

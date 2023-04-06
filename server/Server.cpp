@@ -175,7 +175,6 @@ void	Server::_Pass(const Command &cmd, Client &client)
 {
 	vec_str			ui = client.GetUinfo();
 
-	std::cout << cmd.middle.size() << std::endl;
 	if (cmd.middle.empty() || cmd.middle.size() < 1)
 		return AddData(SERVER_NAME, ERR_NEEDMOREPARAMS("PASS"));
 	if (client.IsRegistd())
@@ -238,8 +237,18 @@ void	Server::_Mode(const Command &cmd, Client &client)
 {
 	(void)cmd;
 	(void)client;
-	std::cout << "MODE function called" << std::endl;
-	return ;
+	if (cmd.middle.size() == 0)
+		return (AddData(SERVER_NAME, ERR_NEEDMOREPARAMS("MODE")));
+	if (cmd.target[0] != client.GetUinfo()[nickname])
+		return (AddData(SERVER_NAME, ERR_USERSDONTMATCH(cmd.target[0])));
+	if (cmd.middle.size() == 1)
+	{
+		std::cout << "current flag is +i" << std::endl;
+		return ;
+	}
+	if (_parser.isValidUserMode(cmd.target[0]) == false)
+		return (AddData(SERVER_NAME, ERR_UMODEUNKNOWNFLAG));
+	return (AddData(SERVER_NAME, RPL_UMODEIS(cmd.middle[1])));
 }
 
 void	Server::_CapLs(const Command &cmd, Client &client)
