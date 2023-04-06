@@ -192,7 +192,6 @@ void	Server::_Pass(const Command &cmd, Client &client)
 void	Server::_Ping(const Command &cmd, Client &client)
 {
 	std::cout << "ping command received" << std::endl;
-//	AddData("", "PONG " + cmd.target[0] + " irc", 1);
 	AddData(client.GetPrefix(), "PONG " + cmd.target[0] + " irc\r\n");
 	SendData(client.GetFd());
 }
