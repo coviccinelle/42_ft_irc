@@ -16,7 +16,6 @@ enum InfoClient {
 	nickname,
 	username,
 	hostname,
-	servername,
 	realname
 };
 
@@ -38,8 +37,7 @@ class Client
 		Client	&operator=(Client const &rhs);
 
 		/* Public Methods */
-		int								AcceptClient(int listener); // Return socket fd for socker communication
-
+		int								AcceptClient(int listener); // Return socket fd for socket communication
 		void							ParseRecv(const string &buf); // Parse the cmd received by the server
 
 		/* Getters */
@@ -53,7 +51,6 @@ class Client
 
 		void							SetUinfo(const vec_str &uinfo);
 		void							SetRegistd();
-
 	private:
 		/* Private Methods */
 		void							_ParseBuf(const string &buf);

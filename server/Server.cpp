@@ -396,8 +396,6 @@ void Server::Logs() const
 			std::cout << "		User: " << it->second.GetUinfo()[username] << std::endl;
 		if (it->second.GetUinfo()[hostname].empty() == false)
 			std::cout << "		Host: " << it->second.GetUinfo()[hostname] << std::endl;
-		if (it->second.GetUinfo()[servername].empty() == false)
-			std::cout << "		Server: " << it->second.GetUinfo()[servername] << std::endl;
 		if (it->second.GetUinfo()[realname].empty() == false)
 			std::cout << "		Realname: " << it->second.GetUinfo()[realname] << std::endl;
 	}
