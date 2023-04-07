@@ -245,13 +245,13 @@ void	Parser::_Trailing()
 void	Parser::_Param()
 {
 	_Wrapper();
+	if (_current == eoi)
+		return ;
 	if (_current != space)
 		throw irc_error("parsing failed: _Param: space expected", ERR_PARAM);
 	std::string::iterator start = _it + 1;
-	//if (_current == space)// OR 	
 	if (_current != eoi)
 		_Target();
-	//target and also the first middle
 	while (_current != eoi)
 	{
 		if (_current != space)
