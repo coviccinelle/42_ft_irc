@@ -69,7 +69,7 @@ void	Server::_ExecCommand(const Command &cmd, Client &client)
 		}
 		case PING:
 		{
-			_Ping(cmd, client);
+			_Pong(cmd, client);
 			break ;
 		}
 		case PRIVMSG:
@@ -189,7 +189,7 @@ void	Server::_Pass(const Command &cmd, Client &client)
 	client.SetUinfo(ui);
 }
 
-void	Server::_Ping(const Command &cmd, Client &client)
+void	Server::_Pong(const Command &cmd, Client &client)
 {
 	//409    ERR_NOORIGIN ":No origin specified"
 	//402    ERR_NOSUCHSERVER "<server name> :No such server"
