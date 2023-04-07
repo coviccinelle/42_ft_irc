@@ -11,6 +11,7 @@
 #include <vector>
 #include <map>
 #include <list>
+#include <bitset>
 
 #include <fcntl.h> // pour les flags F_SETFL et O_NONBLOCK
 #include <sys/types.h>
@@ -21,6 +22,7 @@
 #include <arpa/inet.h>
 
 #define SERVER_NAME string("irc")
+#define USER_MODE string("aiwroOs")
 
 typedef std::string 						string;
 

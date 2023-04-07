@@ -18,7 +18,8 @@ enum CmdVal {
 	NICK,
 	USER,
 	PING,
-	PRIVMSG
+	PRIVMSG,
+	MODE
 };
 
 /*
@@ -49,14 +50,14 @@ class Server
 		void		_ExecCommand(const Command &cmd, Client &client); // Switch case
 		CmdVal		_ResolveOption(const string &input); // Return a enum code for switch case eval
 
-		void 		_CapLs(const Command &cmd, Client &client);// Parse CAP LS cmd
-		void 		_Pass(const Command &cmd, Client &client); // Parse PASS cmd
-		void 		_Nick(const Command &cmd, Client &client); // Parse NICK cmd
-		void 		_User(const Command &cmd, Client &client); // Parse USER cmd
-		void 		_Pong(const Command &cmd, Client &client); // Parse PING cmd
-		void 		_PrivMsg(const Command &cmd, Client &client); // Parse PRIVMSG cmd
-																  //
-		Client*	_FindNickname(const string &nick, Client *skip = NULL); //check if there's a nickname like this in the list of client's nicknames
+		void 		_CapLs(const Command &cmd, Client &client);
+		void 		_Pass(const Command &cmd, Client &client);
+		void 		_Nick(const Command &cmd, Client &client);
+		void 		_User(const Command &cmd, Client &client);
+		void 		_Pong(const Command &cmd, Client &client);
+		void 		_PrivMsg(const Command &cmd, Client &client);
+		void		_Mode(const Command &cmd, Client &client);
+		Client*		_FindNickname(const string &nick, Client *skip = NULL); //check if there's a nickname like this in the list of client's nicknames
 
 		std::string 					_portNumber;
 		std::string 					_password;

@@ -15,6 +15,7 @@ Server::Server(const std::string &port, const std::string &pass) :
 	_mapCmd.insert(std::make_pair(string("USER"), USER));
 	_mapCmd.insert(std::make_pair(string("PING"), PING));
 	_mapCmd.insert(std::make_pair(string("PRIVMSG"), PRIVMSG));
+	_mapCmd.insert(std::make_pair(string("MODE"), MODE));
 }
 
 Server::~Server()
@@ -75,6 +76,11 @@ void	Server::_ExecCommand(const Command &cmd, Client &client)
 		case PRIVMSG:
 		{
 			_PrivMsg(cmd, client);
+			break ;
+		}
+		case MODE:
+		{
+			_Mode(cmd, client);
 			break ;
 		}
 		default :
@@ -181,8 +187,8 @@ void	Server::_Pass(const Command &cmd, Client &client)
 {
 	vec_str			ui = client.GetUinfo();
 
-	if (cmd.middle.size() < 1)
-		return AddData(SERVER_NAME, ERR_NEEDMOREPARAMS(cmd.middle[0]));
+	if (cmd.middle.empty() || cmd.middle.size() < 1)
+		return AddData(SERVER_NAME, ERR_NEEDMOREPARAMS("PASS"));
 	if (client.IsRegistd())
 		return AddData(SERVER_NAME, ERR_ALREADYREGISTERED);
 	ui[password] = cmd.params;
@@ -212,23 +218,17 @@ void	Server::_PrivMsg(const Command &cmd, Client &client)
 	vec_str			ui = client.GetUinfo();
 	Client			*receiver;
 
-	std::cout << "Hello i'm PrivMsg" << std::endl;
-
 	if (cmd.middle.size() == 0)
 	{
 		std::cout << "NO RECIPIENT moth*r Flower " << std::endl;
 		return AddData(SERVER_NAME, ERR_NORECIPIENT(cmd.message));
 	}
-	else if (cmd.middle.size() > 1)
+	if (cmd.middle.size() > 1)
 		return AddData(SERVER_NAME, ERR_TOOMANYTARGETS(cmd.middle[1], cmd.message));
-	else if (cmd.trailing.empty())
+	if (cmd.trailing.empty())
 		return AddData(SERVER_NAME, ERR_NOTEXTTOSEND);
-	else if ((receiver = _FindNickname(cmd.target[0])) == NULL)
+	if ((receiver = _FindNickname(cmd.target[0])) == NULL)
 		return AddData(SERVER_NAME, ERR_NOSUCHNICK(cmd.target[0]));
-//	else if (cmd.target.status == away)
-//		throw irc_error(RPL_AWAY, SEND_ERROR);
-	else
-		std::cout << "Message to send: " << cmd.trailing << std::endl;
 
 	const string msg = "PRIVMSG " + cmd.target[0] + " :" + cmd.trailing + "\r\n";
 //			:nickname!user@host PRIVMSG target_nickname :Message
@@ -241,6 +241,21 @@ void	Server::_PrivMsg(const Command &cmd, Client &client)
 
 //		ERR_CANNOTSENDTOCHAN            ERR_NOTOPLEVEL
 //		ERR_WILDTOPLEVEL          		RPL_AWAY
+}
+
+void	Server::_Mode(const Command &cmd, Client &client)
+{
+	if (cmd.middle.size() == 0)
+		return (AddData(SERVER_NAME, ERR_NEEDMOREPARAMS("MODE")));
+	if (cmd.target[0] != client.GetUinfo()[nickname])
+		return (AddData(SERVER_NAME, ERR_USERSDONTMATCH(cmd.target[0])));
+	if (cmd.middle.size() > 1)
+	{
+		if (_parser.ParseUserMode(cmd.middle[1]) == false)
+			return (AddData(SERVER_NAME, ERR_UMODEUNKNOWNFLAG(cmd.middle[1])));
+		client.SetMode(cmd.middle[1]);
+	}
+	return (AddData(SERVER_NAME, RPL_UMODEIS(client.GetUinfo()[username] + " " + client.GetStrMode())));
 }
 
 void	Server::_CapLs(const Command &cmd, Client &client)
@@ -306,7 +321,7 @@ void	Server::AwaitingConnectionQueue()
 
 void Server::_AcceptNewConnection()
 {
-	Client			client(_password, _clients);
+	Client			client;
 	int				new_fd;
 
 	new_fd = client.AcceptClient(_listener);
@@ -342,6 +357,7 @@ void	Server::_ReceiveData(struct pollfd &pfd)
 		int ret;
 		char buf[512];
 
+		std::cout << "buf" << std::endl;
 		pfd.events = POLLIN;
 		memset(&buf, 0, sizeof(buf));
 		ret = recv(pfd.fd, buf, sizeof buf, 0); 
@@ -353,14 +369,7 @@ void	Server::_ReceiveData(struct pollfd &pfd)
 		{
 			Client &client(_clients[pfd.fd]);
 			
-			try {
-				client.ParseRecv(string(buf));
-			}
-			catch (irc_error &e)
-			{
-				std::cout << "⚠️  " <<  e.what() << std::endl;
-				return ;
-			}
+			client.ParseRecv(string(buf));
 			try {
 				while (client.GetCmds().empty() == 0)
 				{
@@ -375,21 +384,8 @@ void	Server::_ReceiveData(struct pollfd &pfd)
 					return _CloseConnection(pfd);
 				return ;
 			}
-			SendData(pfd.fd);
-				/*
-			catch (irc_error &e)
-			{
-				client.PopCmd();
-				if (e.code() == CLOSE_CONNECTION)
-					{ AddData(SERVER_NAME, e.what()); _CloseConnection(pfd); }
-				else if (e.code() == NO_SEND)
-					std::cout << e.what() << std::endl;
-				else if (e.code() == SEND_ERROR)
-					AddData(SERVER_NAME, e.what());
-				else
-					std::cout << "⚠️  Unhandle exception catch !!! WARNING : " << e.what() << std::endl;
-			}
-			*/
+			if (_data.empty() == false)
+				SendData(pfd.fd);
 		}
 	}
 }
@@ -416,8 +412,6 @@ void Server::Logs() const
 			std::cout << "		User: " << it->second.GetUinfo()[username] << std::endl;
 		if (it->second.GetUinfo()[hostname].empty() == false)
 			std::cout << "		Host: " << it->second.GetUinfo()[hostname] << std::endl;
-		if (it->second.GetUinfo()[servername].empty() == false)
-			std::cout << "		Server: " << it->second.GetUinfo()[servername] << std::endl;
 		if (it->second.GetUinfo()[realname].empty() == false)
 			std::cout << "		Realname: " << it->second.GetUinfo()[realname] << std::endl;
 	}
@@ -429,7 +423,7 @@ void Server::ConnectionLoop()
 	std::cout << "port [" << _portNumber << "] password [" << _password << "]" << std::endl;
 	while (1)
 	{
-		if ((_poll_count = poll(_pollfds.data(), _pollfds.size(), -1)) == 10)
+		if ((_poll_count = poll(_pollfds.data(), _pollfds.size(), -1)) == -1)
 			throw irc_error("poll failed");
 		//system("clear");
 		std::cout << "------------[ IRC ]------------" << std::endl;

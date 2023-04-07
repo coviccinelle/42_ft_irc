@@ -51,6 +51,9 @@
 # define ERR_NOTEXTTOSEND "412 :No text to send\r\n"
 # define ERR_NOSUCHNICK(invitenick) ("401 " + invitenick + " :No such nick/channel\r\n")
 # define ERR_TOOMANYTARGETS(target, msg) (target + ":407 recipients. " + msg + " ⚠️ \r\n") 
+# define ERR_UMODEUNKNOWNFLAG(flag)("501 " + flag + " :Unknown MODE flag\r\n")
+# define RPL_UMODEIS(mode) ("221 " + mode + "\r\n")
+
 //⚠️ 
 # define ERR_NOORIGIN ("409 :No origin specified\r\n")
 # define ERR_NOSUCHSERVER(servername) ("402 " + servername + " :No such server\r\n")

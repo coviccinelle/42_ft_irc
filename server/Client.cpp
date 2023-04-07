@@ -5,31 +5,13 @@ Client::Client() :
 	_addr(),
 	_addrSize(sizeof(_addr)),
 	_ip(""),
-	_servPass(""),
 	_buf(""),
 	_cmds(0),
 	_registd(false),
 	_uinfo(INF_CLI_SIZE),
-	_clients(NULL)
-{
-	// Containers are going to complain if not existing
-	std::cout << "WARNING: Client default constructor called: If you see this message something's wrong. Coplien only but should never be called" << std::endl;
-}
-
-Client::Client(const string &pass, const std::map< int, Client > &clients) :
-	_fd(0),
-	_addr(),
-	_addrSize(sizeof(_addr)),
-	_ip(""),
-	_servPass(pass),
-	_buf(""),
-	_cmds(0),
-	_registd(false),
-	_uinfo(INF_CLI_SIZE),
-	_clients(&clients)
+	_mode()
 {
 	memset(&_addr, 0, sizeof(_addr));
-	return ;
 }
 
 Client::~Client(void)
@@ -43,15 +25,16 @@ Client::Client(Client const &src)
 	memcpy(&_addr, &src._addr, sizeof(src._addr));
 	memcpy(&_addrSize, &src._addrSize, sizeof(src._addrSize));
 	_ip = src._ip;
-	_servPass = src._servPass;
 
 	_buf = src._buf;
 	_cmds = src._cmds;
 
 	_registd = src._registd;
 	_uinfo = src._uinfo;
+	_mode = src._mode;
 
-	_clients = src._clients;
+	_parser = src._parser;
+
 	return ;
 }
 
@@ -63,15 +46,16 @@ Client &Client::operator=(Client const &rhs)
 	memcpy(&_addr, &rhs._addr, sizeof(rhs._addr));
 	memcpy(&_addrSize, &rhs._addrSize, sizeof(rhs._addrSize));
 	_ip = rhs._ip;
-	_servPass = rhs._servPass;
 
 	_buf = rhs._buf;
 	_cmds = rhs._cmds;
 
 	_registd = rhs._registd;
 	_uinfo = rhs._uinfo;
+	_mode = rhs._mode;
 
-	_clients = rhs._clients;
+	_parser = rhs._parser;
+
 	return (*this);
 }
 
@@ -139,6 +123,43 @@ void	Client::PopCmd()
 	_cmds.pop_front();
 }
 
+const std::bitset< MODE_SIZE >	&Client::GetMode() const
+{
+	return (_mode);
+}
+
+string	Client::GetStrMode() const
+{
+	string res;
+
+	for (int i = 0; i < MODE_SIZE; ++i)
+	{
+		if (_mode[i])
+			res += USER_MODE[i];
+	}
+	return (res);
+}
+
+void	Client::SetMode(const string &mode)
+{
+	bool state = false;
+
+	for (string::const_iterator it = mode.begin(); it != mode.end(); ++it)
+	{
+		if (*it == '+')
+			state = true;
+		else if (*it == '-')
+			state = false;
+		else
+		{
+			if (state == true)
+				_mode.set(USER_MODE.find(*it), true);
+			else
+				_mode.set(USER_MODE.find(*it), false);
+		}
+	}
+}
+
 void	Client::_ParseBuf(const string &buf)
 {
 	vec_str	raw_cmds;
@@ -153,23 +174,26 @@ void	Client::_ParseBuf(const string &buf)
 	{
 		try
 		{
-			_cmds.push_back(_parser.Parse(trim(*it)));
+			_parser.Parse(trim(*it));
 		}
 		catch (irc_error &e)
 		{
-			throw ;
+			std::cout << "⚠️  " <<  e.what() << std::endl;
 		}
+		_cmds.push_back(_parser.GetCommand());
 	}
 }
 
 void	Client::ParseRecv(const string &buf)
 {
-	_ParseBuf(buf);
-	if (_cmds.empty())
-	{
-		std::cerr << "⚠️  warning : empty commands" << std::endl;
+	if (buf == "\n" || buf == "\r\n")
+	{	
+		std::cerr << "⚠️  warning : \\r\\n only" << std::endl;
 		return ;
 	}
+	_ParseBuf(buf);
+	if (_cmds.empty())
+		std::cerr << "⚠️  warning : empty commands" << std::endl;
 
 	return ;
 }

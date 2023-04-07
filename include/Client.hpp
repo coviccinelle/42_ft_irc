@@ -9,6 +9,7 @@
 
 // Size of InfoClient enum below
 #define INF_CLI_SIZE 6
+#define MODE_SIZE 8
 
 // List of infos on a client
 enum InfoClient {
@@ -16,7 +17,6 @@ enum InfoClient {
 	nickname,
 	username,
 	hostname,
-	servername,
 	realname
 };
 
@@ -33,14 +33,12 @@ class Client
 	public:
 		/* Coplien */
 		Client(); // Forbidden Client creation without Server clients list reference or no server pass
-		Client(const string &pass, const std::map< int, Client > &clients);
 		~Client();
 		Client(Client const &src);
 		Client	&operator=(Client const &rhs);
 
 		/* Public Methods */
-		int								AcceptClient(int listener); // Return socket fd for socker communication
-
+		int								AcceptClient(int listener); // Return socket fd for socket communication
 		void							ParseRecv(const string &buf); // Parse the cmd received by the server
 
 		/* Getters */
@@ -49,12 +47,14 @@ class Client
 		cst_vec_str						&GetUinfo() const;
 		string							GetPrefix() const;
 		const std::list< Command >		&GetCmds() const;
+		const std::bitset< MODE_SIZE >	&GetMode() const;
+		string							GetStrMode() const;
 		bool							IsRegistd() const;
 		void							PopCmd();
 
 		void							SetUinfo(const vec_str &uinfo);
 		void							SetRegistd();
-
+		void							SetMode(const string &mode);
 	private:
 		/* Private Methods */
 		void							_ParseBuf(const string &buf);
@@ -64,7 +64,6 @@ class Client
 		struct sockaddr_storage			_addr;
 		socklen_t						_addrSize;
 		string							_ip;
-		string							_servPass; // Server Password (should be a string ref)
 
 		/* Commands */
 		string							_buf;
@@ -73,9 +72,9 @@ class Client
 		/* Client info */
 		bool							_registd;
 		vec_str							_uinfo; // nickname, username, hostname ... See InfoClient above for all available field.
+		std::bitset< MODE_SIZE >		_mode;
 
 		/* Utils */
-		const std::map< int, Client >	*_clients;
 		Parser							_parser;
 };
 
