@@ -19,7 +19,8 @@ enum CmdVal {
 	USER,
 	PING,
 	PRIVMSG,
-	MODE
+	MODE,
+	NOTICE
 };
 
 /*
@@ -57,6 +58,7 @@ class Server
 		void 		_Pong(const Command &cmd, Client &client);
 		void 		_PrivMsg(const Command &cmd, Client &client);
 		void		_Mode(const Command &cmd, Client &client);
+		void		_Notice(const Command &cmd, Client &client);
 		Client*		_FindNickname(const string &nick, Client *skip = NULL); //check if there's a nickname like this in the list of client's nicknames
 
 		std::string 					_portNumber;

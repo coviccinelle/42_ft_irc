@@ -56,13 +56,15 @@ class Client
 		void							SetRegistd();
 		void							SetMode(const string &mode);
 
-		bool							isAway() const;
-		bool							isInvisible() const;
-		bool							isWallops() const;
-		bool							isRestricted() const;
-		bool							isOperator() const;
-		bool							isLocalOperator() const;
-		bool							isServNotice() const;
+		// User Mode info
+		bool							isAway() const; // +a
+		bool							isInvisible() const; // +i
+		bool							isWallops() const; // +w
+		bool							isRestricted() const; // +r
+		bool							isOperator() const; // +o
+		bool							isLocalOperator() const; // +O
+		bool							isServNotice() const; // +s
+
 	private:
 		/* Private Methods */
 		void							_ParseBuf(const string &buf);
