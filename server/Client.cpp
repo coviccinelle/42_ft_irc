@@ -123,6 +123,43 @@ void	Client::PopCmd()
 	_cmds.pop_front();
 }
 
+const std::bitset< MODE_SIZE >	&Client::GetMode() const
+{
+	return (_mode);
+}
+
+string	Client::GetStrMode() const
+{
+	string res;
+
+	for (int i = 0; i < MODE_SIZE; ++i)
+	{
+		if (_mode[i])
+			res += USER_MODE[i];
+	}
+	return (res);
+}
+
+void	Client::SetMode(const string &mode)
+{
+	bool state = false;
+
+	for (string::const_iterator it = mode.begin(); it != mode.end(); ++it)
+	{
+		if (*it == '+')
+			state = true;
+		else if (*it == '-')
+			state = false;
+		else
+		{
+			if (state == true)
+				_mode.set(USER_MODE.find(*it), true);
+			else
+				_mode.set(USER_MODE.find(*it), false);
+		}
+	}
+}
+
 void	Client::_ParseBuf(const string &buf)
 {
 	vec_str	raw_cmds;

@@ -235,20 +235,19 @@ void	Server::_PrivMsg(const Command &cmd, Client &client)
 
 void	Server::_Mode(const Command &cmd, Client &client)
 {
-	(void)cmd;
-	(void)client;
 	if (cmd.middle.size() == 0)
 		return (AddData(SERVER_NAME, ERR_NEEDMOREPARAMS("MODE")));
 	if (cmd.target[0] != client.GetUinfo()[nickname])
 		return (AddData(SERVER_NAME, ERR_USERSDONTMATCH(cmd.target[0])));
-	if (cmd.middle.size() == 1)
+	if (cmd.middle.size() > 1)
 	{
-		std::cout << "current flag is +i" << std::endl;
-		return ;
+		std::cout << "hello" << std::endl;
+		if (_parser.ParseUserMode(cmd.middle[1]) == false)
+			return (AddData(SERVER_NAME, ERR_UMODEUNKNOWNFLAG(cmd.middle[1])));
+		std::cout << "hello" << std::endl;
+		client.SetMode(cmd.middle[1]);
 	}
-	if (_parser.isValidUserMode(cmd.target[0]) == false)
-		return (AddData(SERVER_NAME, ERR_UMODEUNKNOWNFLAG));
-	return (AddData(SERVER_NAME, RPL_UMODEIS(cmd.middle[1])));
+	return (AddData(SERVER_NAME, RPL_UMODEIS(client.GetUinfo()[username] + " " + client.GetStrMode())));
 }
 
 void	Server::_CapLs(const Command &cmd, Client &client)

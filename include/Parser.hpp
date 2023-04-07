@@ -41,7 +41,7 @@ class Parser
 		bool						isValidNick(const string &str);
 		const Command				&GetCommand() const;
 		const std::vector< Token >	&Tokens() const;
-		bool						isValidUserMode(const string &str);
+		bool						ParseUserMode(const string &str);
 
 	private:
 		Token					_GetToken();
@@ -64,7 +64,6 @@ class Parser
 		std::vector< Token >	_tokens;
 		string					_input;
 		Command					_cmd;
-		string					_userModes;
 };
 
 bool	isspecial(string::const_iterator it);

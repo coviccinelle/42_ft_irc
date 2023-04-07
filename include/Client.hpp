@@ -47,11 +47,14 @@ class Client
 		cst_vec_str						&GetUinfo() const;
 		string							GetPrefix() const;
 		const std::list< Command >		&GetCmds() const;
+		const std::bitset< MODE_SIZE >	&GetMode() const;
+		string							GetStrMode() const;
 		bool							IsRegistd() const;
 		void							PopCmd();
 
 		void							SetUinfo(const vec_str &uinfo);
 		void							SetRegistd();
+		void							SetMode(const string &mode);
 	private:
 		/* Private Methods */
 		void							_ParseBuf(const string &buf);
