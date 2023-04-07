@@ -15,6 +15,7 @@ Server::Server(const std::string &port, const std::string &pass) :
 	_mapCmd.insert(std::make_pair(string("USER"), USER));
 	_mapCmd.insert(std::make_pair(string("PING"), PING));
 	_mapCmd.insert(std::make_pair(string("PRIVMSG"), PRIVMSG));
+	_mapCmd.insert(std::make_pair(string("NOTICE"), NOTICE));
 }
 
 Server::~Server()
@@ -75,6 +76,11 @@ void	Server::_ExecCommand(const Command &cmd, Client &client)
 		case PRIVMSG:
 		{
 			_PrivMsg(cmd, client);
+			break ;
+		}
+		case NOTICE:
+		{
+			_Notice(cmd, client);
 			break ;
 		}
 		default :
@@ -207,9 +213,27 @@ Client* Server::_FindNickname(const string &nick, Client *skip)
 	return (NULL);
 }
 
+void	Server::_Notice(const Command &cmd, Client &client)
+{
+	(void)client;
+	Client			*receiver;
+	if (cmd.trailing.empty()) //no text to send
+		return ;
+	for (std::vector<string>::const_iterator it = cmd.target.begin(); it != cmd.target.end(); ++it)
+	{
+		if ((receiver = _FindNickname(*it)) == NULL)
+			continue ;
+		else
+		{
+			string msg = "NOTICE " + *it + " :" + cmd.trailing + "\r\n";
+			AddData(SERVER_NAME, msg);
+			SendData(receiver->GetFd());
+		}
+	}
+}
+
 void	Server::_PrivMsg(const Command &cmd, Client &client)
 {
-	vec_str			ui = client.GetUinfo();
 	Client			*receiver;
 
 	std::cout << "Hello i'm PrivMsg" << std::endl;

@@ -18,7 +18,8 @@ enum CmdVal {
 	NICK,
 	USER,
 	PING,
-	PRIVMSG
+	PRIVMSG,
+	NOTICE
 };
 
 /*
@@ -55,6 +56,7 @@ class Server
 		void 		_User(const Command &cmd, Client &client); // Parse USER cmd
 		void 		_Ping(const Command &cmd, Client &client); // Parse PING cmd
 		void 		_PrivMsg(const Command &cmd, Client &client); // Parse PRIVMSG cmd
+		void 		_Notice(const Command &cmd, Client &client); // Parse PRIVMSG cmd
 																  //
 		Client*	_FindNickname(const string &nick, Client *skip = NULL); //check if there's a nickname like this in the list of client's nicknames
 
