@@ -348,10 +348,9 @@ bool	Parser::ParseUserMode(const string &str)
 		return (false);
 	while (it != str.end())
 	{
-		if (*it != '+' && *it != '-' &&
-			(USER_MODE.find(*it) == std::string::npos ||
-			*it == 'a' ||
-			*it == 's'))
+		if (*it != '+' &&
+			*it != '-' &&
+			USER_MODE.find(*it) == std::string::npos)
 			return (false);
 		++it;
 	}

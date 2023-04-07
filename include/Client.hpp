@@ -55,6 +55,14 @@ class Client
 		void							SetUinfo(const vec_str &uinfo);
 		void							SetRegistd();
 		void							SetMode(const string &mode);
+
+		bool							isAway() const;
+		bool							isInvisible() const;
+		bool							isWallops() const;
+		bool							isRestricted() const;
+		bool							isOperator() const;
+		bool							isLocalOperator() const;
+		bool							isServNotice() const;
 	private:
 		/* Private Methods */
 		void							_ParseBuf(const string &buf);

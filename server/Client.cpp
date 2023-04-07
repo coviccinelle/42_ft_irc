@@ -152,6 +152,12 @@ void	Client::SetMode(const string &mode)
 			state = false;
 		else
 		{
+			if (*it == 'a' && isOperator() == false)
+				throw irc_error("NOTICE " + _uinfo[nickname] + " :The flag 'a' SHALL NOT be toggled by the user using the MODE command, instead use of the AWAY command is REQUIRED.\r\n", ERR_NOTOPE);
+			if (state == true && (*it == 'o' || *it == 'O'))
+				throw irc_error("NOTICE " + _uinfo[nickname] + " :Please be more creative :) You will not grant yourself Operator's privilege that easily.\r\n", ERR_NOTOPE);
+			if (state == false && *it == 'r')
+				throw irc_error("NOTICE " + _uinfo[nickname] + " :You are in restricted mode.\r\n", ERR_NOTOPE);
 			if (state == true)
 				_mode.set(USER_MODE.find(*it), true);
 			else
@@ -196,6 +202,41 @@ void	Client::ParseRecv(const string &buf)
 		std::cerr << "⚠️  warning : empty commands" << std::endl;
 
 	return ;
+}
+
+bool	Client::isAway() const
+{
+	return (_mode[USER_MODE.find('a')]);
+}
+
+bool	Client::isInvisible() const
+{
+	return (_mode[USER_MODE.find('i')]);
+}
+
+bool	Client::isWallops() const
+{
+	return (_mode[USER_MODE.find('w')]);
+}
+
+bool	Client::isRestricted() const
+{
+	return (_mode[USER_MODE.find('r')]);
+}
+
+bool	Client::isOperator() const
+{
+	return (_mode[USER_MODE.find('o')]);
+}
+
+bool	Client::isLocalOperator() const
+{
+	return (_mode[USER_MODE.find('O')]);
+}
+
+bool	Client::isServNotice() const
+{
+	return (_mode[USER_MODE.find('s')]);
 }
 
 // Non-member Function

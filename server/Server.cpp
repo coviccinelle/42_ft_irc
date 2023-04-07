@@ -175,7 +175,8 @@ void	Server::_Nick(const Command &cmd, Client &client)
 	ui[nickname] = cmd.target[0];
 	client.SetUinfo(ui);
 	string data;
-	AddData(from, "NICK " + ui[nickname] + "\r\n");
+	if (client.IsRegistd() == true)
+		AddData(from, "NICK " + ui[nickname] + "\r\n");
 	if (client.IsRegistd() == false && ui[username].empty() == false)
 	{
 		client.SetRegistd();
@@ -253,7 +254,13 @@ void	Server::_Mode(const Command &cmd, Client &client)
 	{
 		if (_parser.ParseUserMode(cmd.middle[1]) == false)
 			return (AddData(SERVER_NAME, ERR_UMODEUNKNOWNFLAG(cmd.middle[1])));
-		client.SetMode(cmd.middle[1]);
+		try {
+			client.SetMode(cmd.middle[1]);
+		}
+		catch (irc_error &e)
+		{
+			return (AddData(SERVER_NAME, e.what()));
+		}
 		return (AddData(SERVER_NAME, string("MODE ") + client.GetUinfo()[nickname] + " " + cmd.middle[1] + "\r\n"));
 	}
 	return (AddData(SERVER_NAME, RPL_UMODEIS(client.GetUinfo()[nickname], client.GetStrMode())));

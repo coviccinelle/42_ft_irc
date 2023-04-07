@@ -21,6 +21,7 @@ enum Errors {
 	ERR_MIDDLE,
 	ERR_PARAM,
 	ERR_MESSAGE,
+	ERR_NOTOPE
 };
 
 class irc_error: public std::exception
