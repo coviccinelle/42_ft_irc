@@ -254,8 +254,9 @@ void	Server::_Mode(const Command &cmd, Client &client)
 		if (_parser.ParseUserMode(cmd.middle[1]) == false)
 			return (AddData(SERVER_NAME, ERR_UMODEUNKNOWNFLAG(cmd.middle[1])));
 		client.SetMode(cmd.middle[1]);
+		return (AddData(SERVER_NAME, string("MODE ") + client.GetUinfo()[nickname] + " " + cmd.middle[1] + "\r\n"));
 	}
-	return (AddData(SERVER_NAME, RPL_UMODEIS(client.GetUinfo()[username] + " " + client.GetStrMode())));
+	return (AddData(SERVER_NAME, RPL_UMODEIS(client.GetUinfo()[nickname], client.GetStrMode())));
 }
 
 void	Server::_CapLs(const Command &cmd, Client &client)
