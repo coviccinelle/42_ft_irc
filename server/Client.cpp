@@ -204,11 +204,6 @@ void	Client::ParseRecv(const string &buf)
 	return ;
 }
 
-bool	Client::isAway() const
-{
-	return (_mode[USER_MODE.find('a')]);
-}
-
 bool	Client::isInvisible() const
 {
 	return (_mode[USER_MODE.find('i')]);
@@ -219,19 +214,9 @@ bool	Client::isWallops() const
 	return (_mode[USER_MODE.find('w')]);
 }
 
-bool	Client::isRestricted() const
-{
-	return (_mode[USER_MODE.find('r')]);
-}
-
 bool	Client::isOperator() const
 {
 	return (_mode[USER_MODE.find('o')]);
-}
-
-bool	Client::isLocalOperator() const
-{
-	return (_mode[USER_MODE.find('O')]);
 }
 
 bool	Client::isServNotice() const

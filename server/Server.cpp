@@ -1,8 +1,9 @@
 #include "../include/Server.hpp"
 
-Server::Server(const std::string &port, const std::string &pass) :
+Server::Server(const string &port, const string &pass, const string &operPass) :
 	_portNumber(port),
 	_password(pass),
+	_operPass(operPass),
 	_listener(0),
 	_pollfds(1),
 	_poll_count(0),
@@ -17,6 +18,7 @@ Server::Server(const std::string &port, const std::string &pass) :
 	_mapCmd.insert(std::make_pair(string("PRIVMSG"), PRIVMSG));
 	_mapCmd.insert(std::make_pair(string("MODE"), MODE));
 	_mapCmd.insert(std::make_pair(string("NOTICE"), NOTICE));
+	_mapCmd.insert(std::make_pair(string("OPER"), OPER));
 }
 
 Server::~Server()
@@ -87,6 +89,11 @@ void	Server::_ExecCommand(const Command &cmd, Client &client)
 		case NOTICE:
 		{
 			_Notice(cmd, client);
+			break ;
+		}
+		case OPER:
+		{
+			_Oper(cmd, client);
 			break ;
 		}
 		default :
@@ -210,6 +217,16 @@ void	Server::_Pong(const Command &cmd, Client &client)
 	SendData(client.GetFd());
 }
 
+Client* Server::_FindUsername(const string &name, Client *skip) 
+{
+	for (std::map<int, Client>::iterator it = _clients.begin(); it != _clients.end(); ++it)
+	{
+		if (&it->second != skip && it->second.GetUinfo()[username] == name)
+			return (&it->second);
+	}
+	return (NULL);
+}
+
 Client* Server::_FindNickname(const string &nick, Client *skip) 
 {
 	for (std::map<int, Client>::iterator it = _clients.begin(); it != _clients.end(); ++it)
@@ -261,6 +278,19 @@ void	Server::_PrivMsg(const Command &cmd, Client &client)
 	std::cout << "prefix : " << client.GetPrefix() << std::endl;
 	AddData(client.GetPrefix(), msg); 
 	SendData(receiver->GetFd());
+}
+
+
+void Server::_Oper(const Command &cmd, Client &client)
+{
+	if (cmd.middle.size() < 1)
+		return (AddData(SERVER_NAME, ERR_NEEDMOREPARAMS("MODE")));
+	if (cmd.middle.size() < 2 || _operPass != string(cmd.params.begin() + (cmd.middle[0].size() + 1), cmd.params.end()))
+		return (AddData(SERVER_NAME, ERR_PASSWDMISMATCH));
+	if (client.GetUinfo()[nickname] != cmd.middle[0])
+		return (AddData(SERVER_NAME, ERR_NOOPERHOST(client.GetUinfo()[nickname])));
+	AddData(SERVER_NAME, string("MODE ") + client.GetUinfo()[nickname] + " +o\r\n");
+	AddData(SERVER_NAME, RPL_YOUREOPER(client.GetUinfo()[nickname]));
 }
 
 void	Server::_Mode(const Command &cmd, Client &client)

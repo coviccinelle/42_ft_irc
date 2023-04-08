@@ -9,7 +9,6 @@
 
 // Size of InfoClient enum below
 #define INF_CLI_SIZE 6
-#define MODE_SIZE 8
 
 // List of infos on a client
 enum InfoClient {
@@ -57,12 +56,9 @@ class Client
 		void							SetMode(const string &mode);
 
 		// User Mode info
-		bool							isAway() const; // +a
 		bool							isInvisible() const; // +i
 		bool							isWallops() const; // +w
-		bool							isRestricted() const; // +r
 		bool							isOperator() const; // +o
-		bool							isLocalOperator() const; // +O
 		bool							isServNotice() const; // +s
 
 	private:
