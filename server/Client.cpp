@@ -192,11 +192,6 @@ void	Client::_ParseBuf(const string &buf)
 
 void	Client::ParseRecv(const string &buf)
 {
-	if (buf == "\n" || buf == "\r\n")
-	{	
-		std::cerr << "⚠️  warning : \\r\\n only" << std::endl;
-		return ;
-	}
 	_ParseBuf(buf);
 	if (_cmds.empty())
 		std::cerr << "⚠️  warning : empty commands" << std::endl;
