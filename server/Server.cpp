@@ -271,6 +271,7 @@ void	Server::_PrivMsg(const Command &cmd, Client &client)
 		return AddData(SERVER_NAME, ERR_NOTEXTTOSEND);
 	if ((receiver = _FindNickname(cmd.target[0])) == NULL)
 		return AddData(SERVER_NAME, ERR_NOSUCHNICK(cmd.target[0]));
+	// TODO: Check also in the list of #channels
 
 	const string msg = "PRIVMSG " + cmd.target[0] + " :" + cmd.trailing + "\r\n";
 	std::cout << "fd : " << client.GetFd() << std::endl;
