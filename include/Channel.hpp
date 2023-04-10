@@ -59,6 +59,13 @@
  * 			Safe channels which prefix is '!'
  * */
 
+// Modify if needed or remove
+enum defaultReturn {
+	ERR_SOMETHING,
+	ERR_NOCHANMODES,
+	ERR_CHANOPRIVSNEEDED,
+	RPL_SOMETHING
+};
 
 //  Use bitwise or and bitwise and to retrive specific mode
 //  Flag for the member to be added in specific list
@@ -85,10 +92,12 @@ enum channelMode {
 	CHAN_EXCEPTION = 1 << 12 // e
 };
 
+typedef std::list< Client >::iterator	lst_iterator;
+
 class Channel
 {
 	private:
-		Client				_creator; // Should have only one creator (not possible to set it by user)
+		Client				*_creator; // Should have only one creator (not possible to set it by user)
 									  // even if creator itself want to set an another one.
 
 		std::list< Client >	_chanop; // Privileged users can do stuff that other cant
@@ -108,7 +117,7 @@ class Channel
 		int					_size; // 0 is unlimited with flag (+l) add limit to channel user only for regular user
 
 		/* Private Methods */
-		int					_validPrefix(const string& chanstring) const;
+		int					_validPrefix(const char& chanstring) const;
 
 		// Add or delete member status to specific user.
 		int					_addUserStatus(const int& mode, const string& name);
@@ -126,11 +135,21 @@ class Channel
 		void				_setChanMode(const char& modif, const int& mode, const string& params);
 
 		// Function to find specific user to specific corresponding list
-		Client&				_findUser(const string& name) const;
-		Client&				_findChanop(const string& name) const;
-		Client&				_findVoice(const string& name) const;
+		lst_iterator		_findUserIter(const string& name);
+		lst_iterator		_findChanopIter(const string& name);
+		lst_iterator		_findVoiceIter(const string& name);
 
-		// Function to compare if client exist in the coresponding list
+		Client&				_findUser(const string& name);
+		Client&				_findChanop(const string& name);
+		Client&				_findVoice(const string& name);
+
+		// Function to compare if client exist in the coresponding list throught nickname
+		bool				_compareCreator(const string& name) const;
+		bool				_compareVoice(const string& name) const;
+		bool				_compareChanop(const string& name) const;
+		bool				_compareUser(const string& name) const;
+
+		// Function to compare if client exist in the coresponding list throught client
 		bool				_compareCreator(const Client& client) const;
 		bool				_compareVoice(const Client& client) const;
 		bool				_compareChanop(const Client& client) const;
@@ -141,17 +160,19 @@ class Channel
 	public:
 		/* Coplien */
 		Channel();
-		Channel(const string& chanstring, const Client& client); // Create channel object without channel mask
+		Channel(string& chanstring, const Client& client); // Create channel object without channel mask
 		Channel(const Channel& chan);
 		~Channel();
 		Channel&	operator=(const Channel& rhs);
 
 		/* Public Methods */
-		void	sendMessage(const string& msg, int length, const Client& clientSend) const;
+		void	sendMessage(const string& msg, const Client& clientSend) const;
 		int		setMemberStatus(char modif, int mode, const Client& clientSend, const string& params);
 		int		setChanMode(char modif, int mode, const Client& clientSend, const string& params);
 		int		joinChannel(const Client& toAccept);
 		int		leaveChannel(const Client& toAccept);
+
+		friend std::ostream&	operator<<(std::ostream& lhs, const Channel& rhs);
 };
 
 #endif

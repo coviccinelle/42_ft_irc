@@ -1,4 +1,5 @@
 #include "../include/Server.hpp"
+#include "../include/Channel.hpp"
 
 Server::Server(const string &port, const string &pass, const string &operPass) :
 	_portNumber(port),

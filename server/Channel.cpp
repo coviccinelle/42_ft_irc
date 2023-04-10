@@ -19,9 +19,8 @@ Channel::Channel(void):
 // @params:
 // 	- chanstring: should be parse and passed as a 50 length string.
 //	- client: should be the client who did JOIN command and Channel must not exist.
-Channel::Channel(const string& chanstring, const Client& client)
+Channel::Channel(string& chanstring, const Client& client)
 {
-	// lower all chanstring because it's case insensitive
 	for (string::iterator it = chanstring.begin(); it != chanstring.end(); it++)
 		*it = tolower(*it);
 	_size = 0;
@@ -33,7 +32,7 @@ Channel::Channel(const string& chanstring, const Client& client)
 
 	if (chanstring[0] == '!') // safe channel is created with '!' prefix
 	{
-		_creator = client;
+		_creator = new Client(client);
 		_chanop.push_back(client);
 		_user.push_back(client);
 		_safe = true; // if true channel is safe channel (can only be accessed by a user who know the name+pass)
@@ -41,7 +40,7 @@ Channel::Channel(const string& chanstring, const Client& client)
 	else if (chanstring[0] == '+') // create a modeless channel with '+' prefix
 	{
 		_creator = NULL;
-		_user.push_back(client)
+		_user.push_back(client);
 		_modeless = true; // if true not possible to have chanop and channel flags other than +t
 		_safe = false;
 	}
@@ -56,6 +55,12 @@ Channel::Channel(const string& chanstring, const Client& client)
 	_mode |= CHAN_TOPIC;
 }
 
+Channel::~Channel(void)
+{
+	if (_creator)
+		delete _creator;
+}
+
 Channel::Channel(const Channel& chan)
 {
 	*this = chan;
@@ -63,7 +68,7 @@ Channel::Channel(const Channel& chan)
 
 Channel&	Channel::operator=(const Channel& rhs)
 {
-	if (*this == rhs)
+	if (this == &rhs)
 		return (*this);
 
 	this->_creator = rhs._creator;
@@ -85,25 +90,52 @@ Channel&	Channel::operator=(const Channel& rhs)
 
 /* Private Methods */
 
-Client&	Channel::_findUser(const string& name) const
+lst_iterator	Channel::_findUserIter(const string& name)
 {
-	for (std::list<Client>::iterator it = _user.begin(); it != _user.end(); it++)
+	lst_iterator	it;
+	for (it = _user.begin(); it != _user.end(); it++)
+		if (it->GetUinfo()[nickname] == name)
+			return (it);
+	return (it);
+}
+
+Client&	Channel::_findUser(const string& name)
+{
+	for (lst_iterator it = _user.begin(); it != _user.end(); it++)
 		if (it->GetUinfo()[nickname] == name)
 			return (*it);
 	return (*(_user.end()));
 }
 
-Client&	Channel::_findChanop(const string& name) const
+lst_iterator	Channel::_findChanopIter(const string& name)
 {
-	for (std::list<Client>::iterator it = _chanop.begin(); it != _chanop.end(); it++)
+	lst_iterator	it;
+	for (it = _chanop.begin(); it != _chanop.end(); it++)
+		if (it->GetUinfo()[nickname] == name)
+			return (it);
+	return (it);
+}
+
+Client&	Channel::_findChanop(const string& name)
+{
+	for (lst_iterator it = _chanop.begin(); it != _chanop.end(); it++)
 		if (it->GetUinfo()[nickname] == name)
 			return (*it);
 	return (*(_chanop.end()));
 }
 
-Client&	Channel::_findVoice(const string& name) const
+lst_iterator	Channel::_findVoiceIter(const string& name)
 {
-	for (std::list<Client>::iterator it = _voice.begin(); it != _voice.end(); it++)
+	lst_iterator	it;
+	for (lst_iterator it = _voice.begin(); it != _voice.end(); it++)
+		if (it->GetUinfo()[nickname] == name)
+			return (it);
+	return (it);
+}
+
+Client&	Channel::_findVoice(const string& name)
+{
+	for (lst_iterator it = _voice.begin(); it != _voice.end(); it++)
 		if (it->GetUinfo()[nickname] == name)
 			return (*it);
 	return (*(_voice.end()));
@@ -111,9 +143,9 @@ Client&	Channel::_findVoice(const string& name) const
 
 // TO CHANGE:
 // Need to check for wildcards and also username, hostname.
-bool	Channel::_findBan(const Client& client) const
+bool	Channel::_compareBan(const Client& client) const
 {
-	for (std::list<Client>::iterator it = _ban.begin(); it != _ban.end(); it++)
+	for (std::list<Client>::const_iterator it = _ban.begin(); it != _ban.end(); it++)
 		if (client.GetUinfo()[nickname] == it->GetUinfo()[nickname])
 			return (true);
 	return (false);
@@ -121,40 +153,71 @@ bool	Channel::_findBan(const Client& client) const
 
 // TO CHANGE:
 // Need to check for wildcards and also username, hostname.
-Client&	Channel::_findException(const Client& client) const
+bool	Channel::_compareException(const Client& client) const
 {
-	for (std::list<Client>::iterator it = _exception.begin(); it != _exception.end(); it++)
+	for (std::list<Client>::const_iterator it = _exception.begin(); it != _exception.end(); it++)
 		if (client.GetUinfo()[nickname] == it->GetUinfo()[nickname])
 			return (true);
+	return (false);
+}
+
+bool	Channel::_compareCreator(const string& name) const
+{
+	if (_creator)
+		return (_creator->GetUinfo()[nickname] == name);
 	return (false);
 }
 
 bool	Channel::_compareCreator(const Client& client) const
 {
 	if (_creator)
-		return (_creator.GetUinfo()[nickname] == client.GetUinfo()[nickname]);
+		return (_creator->GetUinfo()[nickname] == client.GetUinfo()[nickname]);
+	return (false);
+}
+
+bool	Channel::_compareChanop(const string& name) const
+{
+	for (std::list<Client>::const_iterator it = _chanop.begin(); it != _chanop.end(); it++)
+		if (it->GetUinfo()[nickname] == name)
+			return (true);
 	return (false);
 }
 
 bool	Channel::_compareChanop(const Client& client) const
 {
-	for (std::list<Client>::iterator it = _chanop.begin(); it != _chanop.end(); it++)
+	for (std::list<Client>::const_iterator it = _chanop.begin(); it != _chanop.end(); it++)
 		if (it->GetUinfo()[nickname] == client.GetUinfo()[nickname])
+			return (true);
+	return (false);
+}
+
+bool	Channel::_compareVoice(const string& name) const
+{
+	for (std::list<Client>::const_iterator it = _voice.begin(); it != _voice.end(); it++)
+		if (it->GetUinfo()[nickname] == name)
 			return (true);
 	return (false);
 }
 
 bool	Channel::_compareVoice(const Client& client) const
 {
-	for (std::list<Client>::iterator it = _voice.begin(); it != _voice.end(); it++)
+	for (std::list<Client>::const_iterator it = _voice.begin(); it != _voice.end(); it++)
 		if (it->GetUinfo()[nickname] == client.GetUinfo()[nickname])
+			return (true);
+	return (false);
+}
+
+bool	Channel::_compareUser(const string& name) const
+{
+	for (std::list<Client>::const_iterator it = _user.begin(); it != _user.end(); it++)
+		if (it->GetUinfo()[nickname] == name)
 			return (true);
 	return (false);
 }
 
 bool	Channel::_compareUser(const Client& client) const
 {
-	for (std::list<Client>::iterator it = _user.begin(); it != _user.end(); it++)
+	for (std::list<Client>::const_iterator it = _user.begin(); it != _user.end(); it++)
 		if (it->GetUinfo()[nickname] == client.GetUinfo()[nickname])
 			return (true);
 	return (false);
@@ -242,7 +305,7 @@ void	Channel::_setChanMode(const char& modif, const int& mode)
 	if (modif == '-')
 		_delMode(mode);
 	else if (modif == '+')
-		_addMode(mode)
+		_addMode(mode);
 }
 
 // TO CHANGE:
@@ -266,7 +329,6 @@ void	Channel::_setChanMode(const char& modif, const int& mode, const string& par
 		_delMode(mode);
 	else if (modif == '+')
 		_addMode(mode);
-
 }
 
 
@@ -278,18 +340,18 @@ void	Channel::_setChanMode(const char& modif, const int& mode, const string& par
 //  - msg: message to send to other client present in channel.
 //  - client: client that is currently sending the message to channel.
 void	Channel::_sendToAll(const string& msg, const Client& client) const
-
-	for (std::list<Client>::iterator it = _user.begin(); it != _user.end(); it++)
+{
+	for (std::list<Client>::const_iterator it = _user.begin(); it != _user.end(); it++)
 		if (client.GetUinfo()[nickname] != it->GetUinfo()[nickname])
 			it->SendData(msg);
-	for (std::list<Client>::iterator it = _chanop.begin(); it != _chanop.end(); it++)
+	for (std::list<Client>::const_iterator it = _chanop.begin(); it != _chanop.end(); it++)
 		if (client.GetUinfo()[nickname] != it->GetUinfo()[nickname])
 			it->SendData(msg);
-	for (std::list<Client>::iterator it = _voice.begin(); it != _voice.end(); it++)
+	for (std::list<Client>::const_iterator it = _voice.begin(); it != _voice.end(); it++)
 		if (client.GetUinfo()[nickname] != it->GetUinfo()[nickname])
 			it->SendData(msg);
-	if (_creator != NULL && client.GetUinfo()[nickname] != _creator)
-		_creator.SendData(msg);
+	if (_creator != NULL && client.GetUinfo()[nickname] != _creator->GetUinfo()[nickname])
+		_creator->SendData(msg);
 }
 
 // @params:
@@ -315,22 +377,24 @@ int	Channel::_validPrefix(const char& prefix) const
 // 	Return value doens't exist those are placeholder for the moment
 int	Channel::_delUserStatus(const int& mode, const string& name)
 {
+	lst_iterator	ret;
+
 	if (name.empty())
 		return (ERR_SOMETHING);
 
 	if (mode & MEM_VOICE)
 	{
-		Client&	ret = _findVoice(name);
-		if (&ret == &(*(_voice.end())))
+		ret = _findVoiceIter(name);
+		if (ret == _voice.end())
 			return (ERR_SOMETHING);
-		_voice.remove(ret);
+		_voice.erase(ret);
 	}
 	if (mode & MEM_CHANOP)
 	{
-		Client&	ret = _findChanop(name);
-		if (&ret == &(*(_chanop.end())))
+		ret = _findChanopIter(name);
+		if (ret == _chanop.end())
 			return (ERR_SOMETHING);
-		_chanop.remove(ret);
+		_chanop.erase(ret);
 	}
 	return (RPL_SOMETHING);
 }
@@ -346,15 +410,15 @@ int	Channel::_delUserStatus(const int& mode, const string& name)
 // 	Return value doens't exist those are placeholder for the moment
 int	Channel::_addUserStatus(const int& mode, const string& name)
 {
-	Client&	ret = name.empty() == false ? _findUser(name) : *(_user.end());
+	lst_iterator ret = name.empty() == false ? _findUserIter(name) : _user.end();
 
-	if (&ret == &(*(_user.end())))
+	if (ret == _user.end())
 		return (ERR_SOMETHING);
 
 	if (mode & MEM_VOICE && !_compareVoice(name))
 	{
-		_voice.push_back(ret);
-		_user.remove(ret); // Remove from _user list, so we have the specific number of user status
+		_voice.push_back(*ret);
+		_user.erase(ret); // Remove from _user list, so we have the specific number of user status
 
 		/* Check if flag +l is set to channel if so change update the _size,
 		 * which is the current size of _user list. */
@@ -363,8 +427,8 @@ int	Channel::_addUserStatus(const int& mode, const string& name)
 	}
 	if (mode & MEM_CHANOP && !_compareChanop(name))
 	{
-		_chanop.push_back(ret);
-		_user.remove(ret);
+		_chanop.push_back(*ret);
+		_user.erase(ret);
 		if (_mode & CHAN_LIMIT)
 			_size = _user.size();
 	}
@@ -413,14 +477,14 @@ int	Channel::setChanMode(char modif, int mode, const Client& clientSend, const s
 	// check if '+' prefix as been given when creating this channel
 	if (_modeless)
 	{
-		msg_err = _chanstring + ":Channel doesn't support modes"
+		msg_err = _chanstring + ":Channel doesn't support modes";
 
 		clientSend.SendData(msg_err);
 		return (ERR_NOCHANMODES);
 	}
 	if (!_compareChanop(clientSend) && !_compareCreator(clientSend))
 	{
-		msg_err = _chanstring + ":You're not channel operator"
+		msg_err = _chanstring + ":You're not channel operator";
 
 		clientSend.SendData(msg_err);
 		return (ERR_CHANOPRIVSNEEDED);
@@ -430,6 +494,7 @@ int	Channel::setChanMode(char modif, int mode, const Client& clientSend, const s
 		_setChanMode(modif, mode);
 	else
 		_setChanMode(modif, mode, params);
+	return (RPL_SOMETHING);
 }
 
 // TO CHANGE:
@@ -451,14 +516,14 @@ int	Channel::setMemberStatus(char modif, int mode, const Client& clientSend, con
 	// check if '+' prefix as been given when creating this channel
 	if (_modeless)
 	{
-		msg_err = _chanstring + ":Channel doesn't support modes"
+		msg_err = _chanstring + ":Channel doesn't support modes";
 
 		clientSend.SendData(msg_err);
 		return (ERR_NOCHANMODES);
 	}
 	if (!_compareChanop(clientSend) && !_compareCreator(clientSend))
 	{
-		msg_err = _chanstring + ":You're not channel operator"
+		msg_err = _chanstring + ":You're not channel operator";
 
 		clientSend.SendData(msg_err);
 		return (ERR_CHANOPRIVSNEEDED);
@@ -467,7 +532,6 @@ int	Channel::setMemberStatus(char modif, int mode, const Client& clientSend, con
 		_addUserStatus(mode, params); // return a value for if failure or not
 	else if (modif == '-')
 		_delUserStatus(mode, params); // same as above
-
 	return (RPL_SOMETHING);
 }
 
@@ -481,10 +545,10 @@ int	Channel::joinChannel(const Client& toAccept)
 	// Need to change the behavior of both _compare function to work for wildcards, username and hostname.
 	// ATM just check nickname.
 	if (_compareBan(toAccept) && !_compareException(toAccept))
-		return (ERR_SOMEHTING);
+		return (ERR_SOMETHING);
 
 	_user.push_back(toAccept);
-	return (RLP_SOMETHING);
+	return (RPL_SOMETHING);
 }
 
 //	TO CHANGE:
@@ -494,11 +558,30 @@ int	Channel::joinChannel(const Client& toAccept)
 //	- toAccept: Client that want to leave the channel
 int	Channel::leaveChannel(const Client& toAccept)
 {
-	Client&	ret = _findUser(toAccept.GetUinfo()[nickname]);
+	lst_iterator	ret = _findUserIter(toAccept.GetUinfo()[nickname]);
 
-	if (ret == &(*(_user.end())))
-		return (ERR_SOMETHING);
-
-	_user.remove(ret);
+	if (ret == _user.end())
+	{
+		ret = _findChanopIter(toAccept.GetUinfo()[nickname]);
+		if (ret == _chanop.end())
+		{
+			ret = _findVoiceIter(toAccept.GetUinfo()[nickname]);
+			if (ret == _voice.end())
+				return (ERR_SOMETHING);
+			_voice.erase(ret);
+		}
+		else
+			_chanop.erase(ret);
+	}
+	else
+		_user.erase(ret);
 	return (RPL_SOMETHING);
+}
+
+std::ostream&	operator<<(std::ostream& lhs, const Channel& rhs)
+{
+	lhs << "Channel: " << rhs._chanstring << std::endl
+		<< "Size: " << rhs._size << std::endl
+		<< "Key: " << rhs._key;
+	return (lhs);
 }
