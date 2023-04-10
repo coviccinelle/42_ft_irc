@@ -231,4 +231,14 @@ namespace {
 		}
 	}
 
+	TEST(ParserJoin, ShouldNOTThrowErrTest)
+	{
+		Parser p;
+
+		p.ParseJoin(":Tot{o-F42!SuperUser@hostname PASS toto");
+		p.ParseJoin(":Tot{o-F42!SuperUser@hostname.web-school.42.fr PASS toto");
+		p.ParseJoin(":Tot{o-F42 PASS toto");
+		p.ParseJoin(":Tot{o-F42 PASS toto!localhost@student-42.fr,tata42,titihoula,huhu bidouille foo bar");
+	}
+
 }  // namespace

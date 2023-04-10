@@ -356,3 +356,65 @@ bool	Parser::ParseUserMode(const string &str)
 	}
 	return (true);
 }
+
+void	Parser::_ChannelId()
+{
+	string::iterator	start = _input.begin();
+	for (int i = 0; i < 5; i++)
+	{
+		if (_it == _input.end() ||
+			isdigit(*_it) == false ||
+			isupper(*_it) == false)
+			throw irc_error("parsing failed: _ChannelId: channelid expected", ERR_CHANNELID);
+		++_it;
+	}
+	_chan.channelid = string(start, _it);
+}
+
+void	Parser::_ChannelPrefix()
+{
+	string::iterator	start = _input.begin();
+	_Wrapper();
+	if (_current != sha &&
+		_current != plus &&
+		_current != excl_mark &&
+		_current != amp)
+		throw irc_error("parsing failed: _ChannelPrefix: sha or plus or excl_mark or amp expected", ERR_CHANNELPREFIX);
+	_chan.prefix = string(start, _it);
+	if (_current == excl_mark)
+		_ChannelId();
+}
+
+void	Parser::_ChannelSuffix()
+{
+	string::iterator	start = _input.begin();
+	while (_current != eoi)
+	{
+		_Wrapper();
+		if (_current == colon)
+			throw irc_error("parsing failed: _ChannelSuffix: chanstring expected", ERR_CHANNELSUFFIX);
+	}
+	_chan.suffix = string(start, _it);
+}
+
+void	Parser::_Channel()
+{
+	string::iterator	start = _input.begin();
+	_ChannelPrefix();
+	if (_current == eoi)
+		throw irc_error("parsing failed: _Channel: chanstring expected", ERR_CHANNEL);
+	while (_current != eoi)
+	{
+		_Wrapper();
+		if (_current == colon)
+			_ChannelSuffix();
+	}
+	_chan.channel = string(start, _it);
+}
+
+void	Parser::ParseJoin(const string &str)
+{
+	_input = str;
+	_it = --_input.begin();
+	_Channel();
+}
