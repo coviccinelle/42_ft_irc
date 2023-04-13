@@ -9,8 +9,20 @@ Server::Server(const string &port, const string &pass, const string &operPass) :
 	_pollfds(1),
 	_poll_count(0),
 	_mapCmd(),
+	_funcTable(),
 	_data("")
 {
+	_funcTable.push_back(&Server::_CapLs);
+	_funcTable.push_back(&Server::_Pass);
+	_funcTable.push_back(&Server::_Nick);
+	_funcTable.push_back(&Server::_User);
+	_funcTable.push_back(&Server::_Pong);
+	_funcTable.push_back(&Server::_PrivMsg);
+	_funcTable.push_back(&Server::_Mode);
+	_funcTable.push_back(&Server::_Notice);
+	_funcTable.push_back(&Server::_Oper);
+	_funcTable.push_back(&Server::_Join);
+	_funcTable.push_back(&Server::_Quit);
 	_mapCmd.insert(std::make_pair(string("CAP"), CAP));
 	_mapCmd.insert(std::make_pair(string("PASS"), PASS));
 	_mapCmd.insert(std::make_pair(string("NICK"), NICK));
@@ -52,66 +64,14 @@ CmdVal	Server::_ResolveOption(const string &input)
 void	Server::_ExecCommand(const Command &cmd, Client &client)
 {
 	cmd.Debug();
-	switch (_ResolveOption(cmd.command))
+
+	int	res = _ResolveOption(cmd.command);
+	if (res == UNKNOWN)
 	{
-		case CAP:
-		{
-			_CapLs(cmd, client);
-			break ;
-		}
-		case PASS:
-		{
-			_Pass(cmd, client);
-			break ;
-		}
-		case NICK:
-		{
-			_Nick(cmd, client);
-			break ;
-		}
-		case USER:
-		{
-			_User(cmd, client);
-			break ;
-		}
-		case PING:
-		{
-			_Pong(cmd, client);
-			break ;
-		}
-		case PRIVMSG:
-		{
-			_PrivMsg(cmd, client);
-			break ;
-		}
-		case MODE:
-		{
-			_Mode(cmd, client);
-			break ;
-		}
-		case NOTICE:
-		{
-			_Notice(cmd, client);
-			break ;
-		}
-		case OPER:
-		{
-			_Oper(cmd, client);
-			break ;
-		}
-		case JOIN:
-		{
-			_Join(cmd, client);
-			break;
-		}
-		case QUIT:
-		{
-			_Quit(cmd, client);
-			break;
-		}
-		default :
-			std::cout << "Unknow command" << std::endl;
+		std::cout << "Unknow command" << std::endl;
+		return ;
 	}
+	CALL_MEMBER_FN(*this, _funcTable[_ResolveOption(cmd.command)]) (cmd, client);
 }
 
 void Server::SendData(int fd)
