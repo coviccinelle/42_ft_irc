@@ -1,0 +1,5 @@
+PASS toto
+NICK toto
+USER toto toto localhost :Toto
+JOIN
+
