@@ -217,9 +217,15 @@ void	Parser::_Target()
 {
 	std::string::iterator start = _it + 1;
 	std::string::iterator start2 = _it + 1;
+	_Wrapper();
+	if (_current == colon)
+	{
+		_Trailing();
+		_cmd.trailing = string(start + 1, _it);
+		return ;
+	}
 	while (1)
 	{
-		_Wrapper();
 		if (_current == colon)
 			throw irc_error("parsing failed: _Target: colon found", ERR_MIDDLE);
 		if (_current == comma)
@@ -233,6 +239,7 @@ void	Parser::_Target()
 			_cmd.middle.push_back(string(start2, _it));
 			return ;
 		}
+		_Wrapper();
 	}
 }
 
@@ -306,6 +313,7 @@ const std::vector< Token >	&Parser::Tokens() const
 
 void	Parser::Parse(const string &str)
 {
+	std::cout << "str : " << str << std::endl; 
 	_ParseInit();
 	_input = str;
 	_it = --_input.begin();

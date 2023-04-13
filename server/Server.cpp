@@ -20,6 +20,7 @@ Server::Server(const string &port, const string &pass, const string &operPass) :
 	_mapCmd.insert(std::make_pair(string("NOTICE"), NOTICE));
 	_mapCmd.insert(std::make_pair(string("OPER"), OPER));
 	_mapCmd.insert(std::make_pair(string("JOIN"), JOIN));
+	_mapCmd.insert(std::make_pair(string("QUIT"), QUIT));
 }
 
 Server::~Server()
@@ -102,6 +103,11 @@ void	Server::_ExecCommand(const Command &cmd, Client &client)
 			_Join(cmd, client);
 			break;
 		}
+		case QUIT:
+		{
+			_Quit(cmd, client);
+			break;
+		}
 		default :
 			std::cout << "Unknow command" << std::endl;
 	}
@@ -126,10 +132,19 @@ void	Server::AddData(const string &from, const string &message, int n)
 	_data += ":" + from + " " + message;
 }
 
+void	Server::_Quit(const Command &cmd, Client &client)
+{
+	(void)cmd;
+	AddData(client.GetPrefix(), "ERROR\r\n");
+	SendData(client.GetFd());
+	throw irc_error("warning: closing connection", CLOSE_CONNECTION);
+}
+
 void	Server::_Join(const Command &cmd, Client &client)
 {
 	(void)cmd;
 	(void)client;
+	std::cout << "join" << std::endl;
 	return ;
 }
 

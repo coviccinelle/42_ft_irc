@@ -23,7 +23,8 @@ enum CmdVal {
 	MODE,
 	NOTICE,
 	OPER,
-	JOIN
+	JOIN,
+	QUIT
 };
 
 /*
@@ -64,6 +65,7 @@ class Server
 		void		_Mode(const Command &cmd, Client &client);
 		void		_Notice(const Command &cmd, Client &client);
 		void		_Join(const Command &cmd, Client &client);
+		void		_Quit(const Command &cmd, Client &client);
 		Client*		_FindNickname(const string &nick, Client *skip = NULL); //check if there's a nickname like this in the list of client's nicknames
 		Client* 	_FindUsername(const string &name, Client *skip = NULL);
 
