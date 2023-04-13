@@ -2,8 +2,6 @@
 # define CHANNEL_HPP
 #include "../utils/utils.hpp"
 #include "Client.hpp"
-#include "Server.hpp"
-#include <list>
 
 /* NOTE:
  * 	NAMESPACE:

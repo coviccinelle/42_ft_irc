@@ -5,6 +5,7 @@
 #include "../include/irc_error.hpp"
 #include "../include/Client.hpp"
 #include "../include/Command.hpp"
+#include "../include/Channel.hpp"
 
 #define MAX_LISTEN	5
 #define SERVER_NAME string("irc")
@@ -83,6 +84,7 @@ class Server
 		std::vector< Fn >				_funcTable;
 		Parser							_parser;
 		string							_data;
+		std::list< Channel >			_channels;
 };
 
 #endif
