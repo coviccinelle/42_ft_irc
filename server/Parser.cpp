@@ -313,7 +313,6 @@ const std::vector< Token >	&Parser::Tokens() const
 
 void	Parser::Parse(const string &str)
 {
-	std::cout << "str : " << str << std::endl; 
 	_ParseInit();
 	_input = str;
 	_it = --_input.begin();
