@@ -21,6 +21,7 @@
 #include <poll.h>
 #include <arpa/inet.h>
 
+#define SERVER_NAME string("irc")
 #define USER_MODE string("iwos")
 #define MODE_SIZE 4
 

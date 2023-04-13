@@ -41,6 +41,7 @@ class Parser
 		void						Parse(const string &str);
 		bool						isValidNick(const string &str);
 		const Command				&GetCommand() const;
+		const ChannelParse 			&GetChan() const;
 		const std::vector< Token >	&Tokens() const;
 		bool						ParseUserMode(const string &str);
 		void						ParseJoin(const string &str);

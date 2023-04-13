@@ -105,7 +105,20 @@ void	Server::_Join(const Command &cmd, Client &client)
 {
 	(void)cmd;
 	(void)client;
-	std::cout << "join" << std::endl;
+
+	if (cmd.params.empty() == true)
+		return AddData(SERVER_NAME, ERR_NEEDMOREPARAMS("JOIN"));
+	try
+	{
+		_parser.ParseJoin(cmd.params);
+		ChannelParse cp = _parser.GetChan();
+		cp.Debug();
+	}
+	catch (irc_error &e)
+	{
+		std::cout << e.what() << std::endl;
+	}
+
 	return ;
 }
 

@@ -98,7 +98,16 @@ cst_vec_str	&Client::GetUinfo() const
 
 string	Client::GetPrefix() const
 {
-	return (_uinfo[nickname] + "!" + _uinfo[username] + "@" + _uinfo[hostname]);
+	string prefix;
+	if (_uinfo[nickname].empty() == false)
+		prefix += _uinfo[nickname] + "!";
+	if (_uinfo[username].empty() == false)
+		prefix += _uinfo[username] + "@";
+	if (_uinfo[hostname].empty() == false)
+		prefix += _uinfo[hostname];
+	if (prefix.empty() == true)
+		prefix = SERVER_NAME;
+	return (prefix);
 }
 
 const std::list< Command >	&Client::GetCmds() const

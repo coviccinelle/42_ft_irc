@@ -326,6 +326,11 @@ const Command	&Parser::GetCommand() const
 	return (_cmd);
 }
 
+const ChannelParse 	&Parser::GetChan() const
+{
+	return (_chan);
+}
+
 bool	Parser::isValidNick(const string &str)
 {
 	if (str.size() < 1 || str.size() > 9)
