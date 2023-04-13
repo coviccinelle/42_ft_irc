@@ -1,12 +1,19 @@
 #include "../include/Parser.hpp"
 
-Parser::Parser(void)
+Parser::Parser(void) : 
+	_it(),
+	_current(error),
+	_tokens(),
+	_cmd(new Command()),
+	_chan(new ChannelParse())
 {
 	return ;
 }
 
 Parser::~Parser(void)
 {
+	delete _cmd;
+	delete _chan;
 	return ;
 }
 
@@ -16,7 +23,8 @@ Parser::Parser(Parser const &src)
 	_current = src._current;
 	_tokens = src._tokens;
 	_input = src._input;
-	_cmd = src._cmd;
+	_cmd = new Command(*src._cmd);
+	_chan = new ChannelParse(*src._chan);
 
 	return ;
 }
@@ -29,7 +37,11 @@ Parser &Parser::operator=(Parser const &rhs)
 	_current = rhs._current;
 	_tokens = rhs._tokens;
 	_input = rhs._input;
-	_cmd = rhs._cmd;
+
+	delete _cmd;
+	delete _chan;
+	_cmd = new Command(*rhs._cmd);
+	_chan = new ChannelParse(*rhs._chan);
 
 	return (*this);
 }
@@ -125,7 +137,7 @@ void	Parser::_Nickname()
 		throw irc_error("parsing failed: _Nickname: letter or special expected", ERR_NICK);
 	while (_current == letter || _current == digit || _current == special || _current == dash)
 		_Wrapper();
-	_cmd.nickname = string(start, _it);
+	_cmd->nickname = string(start, _it);
 }
 
 void	Parser::_Host()
@@ -139,7 +151,7 @@ void	Parser::_Host()
 		_Wrapper();
 		if (_current == space)
 		{
-			_cmd.host = string(start, _it);
+			_cmd->host = string(start, _it);
 			return ;
 		}
 		if (_current != digit &&
@@ -151,7 +163,7 @@ void	Parser::_Host()
 	}
 	if (_current == eoi)
 		throw irc_error("parsing failed: _Host: eoi found", ERR_HOST);
-	_cmd.host = string(start, _it);
+	_cmd->host = string(start, _it);
 }
 
 void	Parser::_User()
@@ -165,13 +177,13 @@ void	Parser::_User()
 		_Wrapper();
 		if (_current == space || _current == at)
 		{
-			_cmd.user = string(start, _it);
+			_cmd->user = string(start, _it);
 			return ;
 		}
 	}
 	if (_current == eoi)
 		throw irc_error("parsing failed: _User: eoi found", ERR_USER);
-	_cmd.user = string(start, _it);
+	_cmd->user = string(start, _it);
 }
 
 void Parser::_Prefix()
@@ -187,7 +199,7 @@ void Parser::_Prefix()
 	}
 	else if (_current == at)
 		_Host();
-	_cmd.prefix = string(start, _it);
+	_cmd->prefix = string(start, _it);
 }
 
 void	Parser::_Command()
@@ -205,12 +217,12 @@ void	Parser::_Middle()
 	if (_current == colon)
 	{
 		_Trailing();
-		_cmd.trailing = string(start + 1, _it);
+		_cmd->trailing = string(start + 1, _it);
 		return ;
 	}
 	while (_current != space && _current != eoi)
 		_Wrapper();
-	_cmd.middle.push_back(string(start, _it));
+	_cmd->middle.push_back(string(start, _it));
 }
 
 void	Parser::_Target()
@@ -221,7 +233,7 @@ void	Parser::_Target()
 	if (_current == colon)
 	{
 		_Trailing();
-		_cmd.trailing = string(start + 1, _it);
+		_cmd->trailing = string(start + 1, _it);
 		return ;
 	}
 	while (1)
@@ -230,13 +242,13 @@ void	Parser::_Target()
 			throw irc_error("parsing failed: _Target: colon found", ERR_MIDDLE);
 		if (_current == comma)
 		{
-			_cmd.target.push_back(string(start, _it));
+			_cmd->target.push_back(string(start, _it));
 			start = _it + 1;
 		}
 		else if (_current == space || _current == eoi)
 		{
-			_cmd.target.push_back(string(start, _it));
-			_cmd.middle.push_back(string(start2, _it));
+			_cmd->target.push_back(string(start, _it));
+			_cmd->middle.push_back(string(start2, _it));
 			return ;
 		}
 		_Wrapper();
@@ -265,7 +277,7 @@ void	Parser::_Param()
 			throw irc_error("parsing failed: _Param: space expected", ERR_PARAM);
 		_Middle();
 	}
-	_cmd.params = string(start, _it);
+	_cmd->params = string(start, _it);
 }
 
 void Parser::_Message()
@@ -281,9 +293,9 @@ void Parser::_Message()
 		_Wrapper();
 	}
 	_Command();
-	_cmd.command = string(start, _it + 1);
+	_cmd->command = string(start, _it + 1);
 	_Param();
-	_cmd.message = string(start, _it);
+	_cmd->message = string(start, _it);
 }
 
 void Parser::_Wrapper()
@@ -292,18 +304,16 @@ void Parser::_Wrapper()
 	_tokens.push_back(_current);
 }
 
-void	Parser::_ParseInit()
+void	Parser::_InitCmd()
 {
-	_cmd.message = "";
-	_cmd.prefix = "";
-	_cmd.user = "";
-	_cmd.host = "";
-	_cmd.nickname = "";
-	_cmd.command = "";
-	_cmd.trailing = "";
-	_cmd.middle.clear();
-	_cmd.target.clear();
-	_cmd.trailing = "";
+	delete _cmd;
+	_cmd = new Command();
+}
+
+void	Parser::_InitChan()
+{
+	delete _chan;
+	_chan = new ChannelParse();
 }
 
 const std::vector< Token >	&Parser::Tokens() const
@@ -313,7 +323,7 @@ const std::vector< Token >	&Parser::Tokens() const
 
 void	Parser::Parse(const string &str)
 {
-	_ParseInit();
+	_InitCmd();
 	_input = str;
 	_it = --_input.begin();
 	_Message();
@@ -323,12 +333,12 @@ void	Parser::Parse(const string &str)
 
 const Command	&Parser::GetCommand() const
 {
-	return (_cmd);
+	return (*_cmd);
 }
 
 const ChannelParse 	&Parser::GetChan() const
 {
-	return (_chan);
+	return (*_chan);
 }
 
 bool	Parser::isValidNick(const string &str)
@@ -380,19 +390,19 @@ void	Parser::_ChannelId()
 			throw irc_error("parsing failed: _ChannelId: channelid expected", ERR_CHANNELID);
 		++_it;
 	}
-	_chan.channelid = string(start, _it);
+	_chan->channelid = string(start, _it);
 }
 
 void	Parser::_ChannelPrefix()
 {
 	string::iterator	start = _input.begin();
 	_Wrapper();
-	if (_current != sha &&
-		_current != plus &&
-		_current != excl_mark &&
+	if (_current != sha ||
+		_current != plus ||
+		_current != excl_mark ||
 		_current != amp)
 		throw irc_error("parsing failed: _ChannelPrefix: sha or plus or excl_mark or amp expected", ERR_CHANNELPREFIX);
-	_chan.prefix = string(start, _it);
+	_chan->prefix = string(start, _it);
 	if (_current == excl_mark)
 		_ChannelId();
 }
@@ -406,7 +416,7 @@ void	Parser::_ChannelSuffix()
 		if (_current == colon)
 			throw irc_error("parsing failed: _ChannelSuffix: chanstring expected", ERR_CHANNELSUFFIX);
 	}
-	_chan.suffix = string(start, _it);
+	_chan->suffix = string(start, _it);
 }
 
 void	Parser::_Channel()
@@ -421,11 +431,12 @@ void	Parser::_Channel()
 		if (_current == colon)
 			_ChannelSuffix();
 	}
-	_chan.channel = string(start, _it);
+	_chan->channel = string(start, _it);
 }
 
 void	Parser::ParseJoin(const string &str)
 {
+	_InitChan();
 	_input = str;
 	_it = --_input.begin();
 	_Channel();

@@ -9,7 +9,8 @@ Client::Client() :
 	_cmds(0),
 	_registd(false),
 	_uinfo(INF_CLI_SIZE),
-	_mode()
+	_mode(),
+	_parser()
 {
 	memset(&_addr, 0, sizeof(_addr));
 }
