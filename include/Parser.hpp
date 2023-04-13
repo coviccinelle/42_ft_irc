@@ -4,6 +4,7 @@
 #include "../utils/utils.hpp"
 #include "../include/irc_error.hpp"
 #include "../include/Command.hpp"
+#include "../include/ChannelParse.hpp"
 
 #define NUL 0x00
 #define SPACE 0x20
@@ -42,6 +43,7 @@ class Parser
 		const Command				&GetCommand() const;
 		const std::vector< Token >	&Tokens() const;
 		bool						ParseUserMode(const string &str);
+		void						ParseJoin(const string &str);
 
 	private:
 		Token					_GetToken();
@@ -59,11 +61,17 @@ class Parser
 		void					_ParseInit();
 		void					_MsgTo();
 
+		void					_Channel();
+		void					_ChannelPrefix();
+		void					_ChannelId();
+		void					_ChannelSuffix();
+
 		string::iterator		_it;
 		Token					_current;
 		std::vector< Token >	_tokens;
 		string					_input;
 		Command					_cmd;
+		ChannelParse			_chan;
 };
 
 bool	isspecial(string::const_iterator it);

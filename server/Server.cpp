@@ -20,6 +20,8 @@ Server::Server(const string &port, const string &pass, const string &operPass) :
 	_mapCmd.insert(std::make_pair(string("MODE"), MODE));
 	_mapCmd.insert(std::make_pair(string("NOTICE"), NOTICE));
 	_mapCmd.insert(std::make_pair(string("OPER"), OPER));
+	_mapCmd.insert(std::make_pair(string("JOIN"), JOIN));
+	_mapCmd.insert(std::make_pair(string("QUIT"), QUIT));
 }
 
 Server::~Server()
@@ -97,6 +99,16 @@ void	Server::_ExecCommand(const Command &cmd, Client &client)
 			_Oper(cmd, client);
 			break ;
 		}
+		case JOIN:
+		{
+			_Join(cmd, client);
+			break;
+		}
+		case QUIT:
+		{
+			_Quit(cmd, client);
+			break;
+		}
 		default :
 			std::cout << "Unknow command" << std::endl;
 	}
@@ -119,6 +131,22 @@ void	Server::AddData(const string &from, const string &message, int n)
 		return ;
 	}
 	_data += ":" + from + " " + message;
+}
+
+void	Server::_Quit(const Command &cmd, Client &client)
+{
+	(void)cmd;
+	AddData(client.GetPrefix(), "ERROR\r\n");
+	SendData(client.GetFd());
+	throw irc_error("warning: closing connection", CLOSE_CONNECTION);
+}
+
+void	Server::_Join(const Command &cmd, Client &client)
+{
+	(void)cmd;
+	(void)client;
+	std::cout << "join" << std::endl;
+	return ;
 }
 
 void	Server::_User(const Command &cmd, Client &client)
@@ -262,10 +290,7 @@ void	Server::_PrivMsg(const Command &cmd, Client &client)
 	Client			*receiver;
 
 	if (cmd.middle.size() == 0)
-	{
-		std::cout << "NO RECIPIENT moth*r Flower " << std::endl;
 		return AddData(SERVER_NAME, ERR_NORECIPIENT(cmd.message));
-	}
 	if (cmd.middle.size() > 1)
 		return AddData(SERVER_NAME, ERR_TOOMANYTARGETS(cmd.middle[1], cmd.message));
 	if (cmd.trailing.empty())
@@ -415,8 +440,6 @@ void	Server::_ReceiveData(struct pollfd &pfd)
 	{
 		int ret;
 		char buf[512];
-
-		std::cout << "buf" << std::endl;
 		pfd.events = POLLIN;
 		memset(&buf, 0, sizeof(buf));
 		ret = recv(pfd.fd, buf, sizeof buf, 0); 

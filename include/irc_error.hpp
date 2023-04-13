@@ -21,7 +21,11 @@ enum Errors {
 	ERR_MIDDLE,
 	ERR_PARAM,
 	ERR_MESSAGE,
-	ERR_NOTOPE
+	ERR_NOTOPE,
+	ERR_CHANNEL,
+	ERR_CHANNELPREFIX,
+	ERR_CHANNELID,
+	ERR_CHANNELSUFFIX
 };
 
 class irc_error: public std::exception
