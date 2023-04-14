@@ -55,7 +55,7 @@
 # define RPL_UMODEIS(user, mode) ("221 " + user + " +" + mode + "\r\n")
 # define RPL_CHANNELMODEIS(chan, mode, param) ("324 " + chan + " " + mode + " " + param + "\r\n")
 # define ERR_NOOPERHOST(nick) ("491 " + nick + " :No O-lines for your host\r\n")
-
+# define ERR_CANTKILLSERVER ("483 :You can't kill a server!\r\n")
 //⚠️ 
 # define ERR_NOORIGIN ("409 :No origin specified\r\n")
 # define ERR_NOSUCHSERVER(servername) ("402 " + servername + " :No such server\r\n")

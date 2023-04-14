@@ -99,22 +99,28 @@ void	Server::_Quit(const Command &cmd, Client &client)
 	(void)cmd;
 	AddData(client.GetPrefix(), "ERROR\r\n");
 	SendData(client.GetFd());
+	//:TODO Send msg after !!! 
 	throw irc_error("⚠️  warning: closing connection", CLOSE_CONNECTION);
 }
 
 void	Server::_Kill(const Command &cmd, Client &client)
 {
-	std::cout << "yoooooo It's me kill" << std::endl;
+	Client *receiver;
+	std::cout << "yoooooo It's me small kill" << std::endl;
 	if (client.isOperator() == false)
 		return (AddData(SERVER_NAME, ERR_NOPRIVILEGES));
-	if (cmd.params.empty() == true)
+	if (cmd.params.empty() == true || cmd.trailing.empty() == true || cmd.target.empty() == true)
 		return AddData(SERVER_NAME, ERR_NEEDMOREPARAMS("KILL"));
-	(void)cmd;
-//	AddData(client.GetPrefix(), "ERROR\r\n");
-//	SendData(client.GetFd());
-//	throw irc_error("⚠️  warning: closing connection", CLOSE_CONNECTION);
-	// ERR_NOPRIVILEGES              ERR_NEEDMOREPARAMS
-	// ERR_NOSUCHNICK                ERR_CANTKILLSERVER
+	if (cmd.target[0] == "irc")
+		return AddData(SERVER_NAME, ERR_CANTKILLSERVER);
+	if ((receiver = _FindNickname(cmd.target[0], &client)) == NULL)
+		return AddData(SERVER_NAME, ERR_NOSUCHNICK(cmd.target[0]));
+
+	std::cout << "Now kill 💀 them! Remember to send msg after" << std::endl;
+	//:TODO Send msg after !!! 
+	AddData(receiver->GetPrefix(), "ERROR\r\n");
+	SendData(receiver->GetFd());
+	throw irc_error("⚠️  warning: closing connection", CLOSE_CONNECTION);
 
 }
 
