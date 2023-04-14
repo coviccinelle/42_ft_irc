@@ -1,7 +1,9 @@
 #ifndef CHANNEL_HPP
 # define CHANNEL_HPP
 #include "../utils/utils.hpp"
-#include "Client.hpp"
+#include "../include/Client.hpp"
+
+class Client;
 
 /* NOTE:
  * 	NAMESPACE:
@@ -90,7 +92,7 @@ enum channelMode {
 	CHAN_EXCEPTION = 1 << 12 // e
 };
 
-typedef std::list< Client >::iterator	lst_iterator;
+typedef std::list< Client* >::iterator	lst_iterator;
 
 class Channel
 {
@@ -98,12 +100,12 @@ class Channel
 		Client				*_creator; // Should have only one creator (not possible to set it by user)
 									  // even if creator itself want to set an another one.
 
-		std::list< Client >	_chanop; // Privileged users can do stuff that other cant
-		std::list< Client >	_voice; // Allow users to talk in moderated channel (m flags)
-		std::list< Client >	_user; // User list present in channel
-		std::list< Client >	_invite; // Invite list use when +i flag is set
-		std::list< Client >	_ban; // Ban list use when ban flag is specified.
-		std::list< Client > _exception; // Exception '+e' list work in conjoncture with ban list allow exception for specific nickname, username, hostname.
+		std::list< Client* >	_chanop; // Privileged users can do stuff that other cant
+		std::list< Client* >	_voice; // Allow users to talk in moderated channel (m flags)
+		std::list< Client* >	_user; // User list present in channel
+		std::list< Client* >	_invite; // Invite list use when +i flag is set
+		std::list< Client* >	_ban; // Ban list use when ban flag is specified.
+		std::list< Client* >	_exception; // Exception '+e' list work in conjoncture with ban list allow exception for specific nickname, username, hostname.
  
 		string				_key; // Key used to access to channel
 		string				_chanstring; // Channel name
@@ -164,11 +166,12 @@ class Channel
 		Channel&	operator=(const Channel& rhs);
 
 		/* Public Methods */
-		void	sendMessage(const string& msg, const Client& clientSend) const;
-		int		setMemberStatus(char modif, int mode, const Client& clientSend, const string& params);
-		int		setChanMode(char modif, int mode, const Client& clientSend, const string& params);
-		int		joinChannel(const Client& toAccept);
-		int		leaveChannel(const Client& toAccept);
+		void			sendMessage(const string& msg, const Client& clientSend) const;
+		int				setMemberStatus(char modif, int mode, const Client& clientSend, const string& params);
+		int				setChanMode(char modif, int mode, const Client& clientSend, const string& params);
+		int				joinChannel(Client& toAccept);
+		int				leaveChannel(Client& toAccept);
+		const string	&GetName() const;
 
 		friend std::ostream&	operator<<(std::ostream& lhs, const Channel& rhs);
 };

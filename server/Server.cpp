@@ -98,7 +98,7 @@ void	Server::_Quit(const Command &cmd, Client &client)
 	(void)cmd;
 	AddData(client.GetPrefix(), "ERROR\r\n");
 	SendData(client.GetFd());
-	throw irc_error("warning: closing connection", CLOSE_CONNECTION);
+	throw irc_error("⚠️  warning: closing connection", CLOSE_CONNECTION);
 }
 
 void	Server::_Join(const Command &cmd, Client &client)
@@ -113,10 +113,13 @@ void	Server::_Join(const Command &cmd, Client &client)
 		_parser.ParseJoin(cmd.params);
 		ChannelParse cp = _parser.GetChan();
 		cp.Debug();
+
+		Channel ch = Channel();
+		_channels.push_back(ch);
 	}
 	catch (irc_error &e)
 	{
-		std::cout << e.what() << std::endl;
+		std::cout << "⚠️  warning: " << e.what() << std::endl;
 	}
 
 	return ;
@@ -469,6 +472,18 @@ void Server::Logs() const
 			std::cout << "		Host: " << it->second.GetUinfo()[hostname] << std::endl;
 		if (it->second.GetUinfo()[realname].empty() == false)
 			std::cout << "		Realname: " << it->second.GetUinfo()[realname] << std::endl;
+		if (it->second.GetChannels().empty() == false)
+		{
+			std::cout << "		Channels: " << std::endl; 
+			for (std::list< Channel* >::const_iterator chan = it->second.GetChannels().begin(); chan != it->second.GetChannels().end(); ++it)
+			{
+				std::cout << (*chan)->GetName();
+				if (++chan != it->second.GetChannels().end())
+					std::cout << ",";
+				--chan;
+			}
+
+		}
 	}
 	std::cout << "=======================" << std::endl;
 }

@@ -4,11 +4,13 @@
 #include "../utils/utils.hpp"
 #include "../include/irc_error.hpp"
 #include "../include/Parser.hpp"
-
+#include "../include/Channel.hpp"
 #include "../include/Errors.hpp"
 
 // Size of InfoClient enum below
 #define INF_CLI_SIZE 6
+
+class Channel;
 
 // List of infos on a client
 enum InfoClient {
@@ -55,6 +57,10 @@ class Client
 		void							SetRegistd();
 		void							SetMode(const string &mode);
 
+		void							RegisterChannel(Channel &chan);
+		void							DeregisterChannel(Channel &chan);
+		const std::list< Channel* >		&GetChannels() const;
+
 		// User Mode info
 		bool							isInvisible() const; // +i
 		bool							isWallops() const; // +w
@@ -74,6 +80,7 @@ class Client
 		/* Commands */
 		string							_buf;
 		std::list< Command >			_cmds; // Commands that need to be process
+		std::list< Channel* >			_channels;
 
 		/* Client info */
 		bool							_registd;

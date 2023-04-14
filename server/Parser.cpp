@@ -397,9 +397,9 @@ void	Parser::_ChannelPrefix()
 {
 	string::iterator	start = _input.begin();
 	_Wrapper();
-	if (_current != sha ||
-		_current != plus ||
-		_current != excl_mark ||
+	if (_current != sha &&
+		_current != plus &&
+		_current != excl_mark &&
 		_current != amp)
 		throw irc_error("parsing failed: _ChannelPrefix: sha or plus or excl_mark or amp expected", ERR_CHANNELPREFIX);
 	_chan->prefix = string(start, _it);

@@ -7,6 +7,7 @@ Client::Client() :
 	_ip(""),
 	_buf(""),
 	_cmds(0),
+	_channels(),
 	_registd(false),
 	_uinfo(INF_CLI_SIZE),
 	_mode(),
@@ -29,6 +30,7 @@ Client::Client(Client const &src)
 
 	_buf = src._buf;
 	_cmds = src._cmds;
+	_channels = src._channels;
 
 	_registd = src._registd;
 	_uinfo = src._uinfo;
@@ -50,6 +52,7 @@ Client &Client::operator=(Client const &rhs)
 
 	_buf = rhs._buf;
 	_cmds = rhs._cmds;
+	_channels = rhs._channels;
 
 	_registd = rhs._registd;
 	_uinfo = rhs._uinfo;
@@ -229,6 +232,21 @@ bool	Client::isServNotice() const
 	return (_mode[USER_MODE.find('s')]);
 }
 
+void	Client::RegisterChannel(Channel &chan)
+{
+	_channels.push_back(&chan);
+}
+
+void	Client::DeregisterChannel(Channel &chan)
+{
+	_channels.remove(&chan);
+}
+
+const std::list< Channel* >	&Client::GetChannels() const
+{
+	return (_channels);
+}
+
 // Non-member Function
 
 void	*GetInAddr(struct sockaddr *sa)
@@ -257,3 +275,4 @@ vec_str	Split(const string &str, const string delimiter)
 		res.push_back(str.substr(start, end - start));
 	return (res);
 }
+
