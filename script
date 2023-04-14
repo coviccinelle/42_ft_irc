@@ -1,6 +1,0 @@
-#!/bin/bash
-
-echo "PASS toto
-NICK toto$1
-USER toto toto localhost :Toto
-" | netcat localhost 5544
