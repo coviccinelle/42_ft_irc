@@ -1,4 +1,5 @@
 #include "../include/Server.hpp"
+#include "../include/Channel.hpp"
 
 Server::Server(const string &port, const string &pass, const string &operPass) :
 	_portNumber(port),
@@ -8,8 +9,20 @@ Server::Server(const string &port, const string &pass, const string &operPass) :
 	_pollfds(1),
 	_poll_count(0),
 	_mapCmd(),
+	_funcTable(),
 	_data("")
 {
+	_funcTable.push_back(&Server::_CapLs);
+	_funcTable.push_back(&Server::_Pass);
+	_funcTable.push_back(&Server::_Nick);
+	_funcTable.push_back(&Server::_User);
+	_funcTable.push_back(&Server::_Pong);
+	_funcTable.push_back(&Server::_PrivMsg);
+	_funcTable.push_back(&Server::_Mode);
+	_funcTable.push_back(&Server::_Notice);
+	_funcTable.push_back(&Server::_Oper);
+	_funcTable.push_back(&Server::_Join);
+	_funcTable.push_back(&Server::_Quit);
 	_mapCmd.insert(std::make_pair(string("CAP"), CAP));
 	_mapCmd.insert(std::make_pair(string("PASS"), PASS));
 	_mapCmd.insert(std::make_pair(string("NICK"), NICK));
@@ -52,66 +65,13 @@ void	Server::_ExecCommand(const Command &cmd, Client &client)
 {
 	cmd.Debug();
 
-	switch (_ResolveOption(cmd.command))
+	int	res = _ResolveOption(cmd.command);
+	if (res == UNKNOWN)
 	{
-		case CAP:
-		{
-			_CapLs(cmd, client);
-			break ;
-		}
-		case PASS:
-		{
-			_Pass(cmd, client);
-			break ;
-		}
-		case NICK:
-		{
-			_Nick(cmd, client);
-			break ;
-		}
-		case USER:
-		{
-			_User(cmd, client);
-			break ;
-		}
-		case PING:
-		{
-			_Pong(cmd, client);
-			break ;
-		}
-		case PRIVMSG:
-		{
-			_PrivMsg(cmd, client);
-			break ;
-		}
-		case MODE:
-		{
-			_Mode(cmd, client);
-			break ;
-		}
-		case NOTICE:
-		{
-			_Notice(cmd, client);
-			break ;
-		}
-		case OPER:
-		{
-			_Oper(cmd, client);
-			break ;
-		}
-		case JOIN:
-		{
-			_Join(cmd, client);
-			break;
-		}
-		case QUIT:
-		{
-			_Quit(cmd, client);
-			break;
-		}
-		default :
-			std::cout << "Unknow command" << std::endl;
+		std::cout << "Unknow command" << std::endl;
+		return ;
 	}
+	CALL_MEMBER_FN(*this, _funcTable[_ResolveOption(cmd.command)]) (cmd, client);
 }
 
 void Server::SendData(int fd)
@@ -138,7 +98,7 @@ void	Server::_Quit(const Command &cmd, Client &client)
 	(void)cmd;
 	AddData(client.GetPrefix(), "ERROR\r\n");
 	SendData(client.GetFd());
-	throw irc_error("warning: closing connection", CLOSE_CONNECTION);
+	throw irc_error("⚠️  warning: closing connection", CLOSE_CONNECTION);
 }
 
 void	Server::_Join(const Command &cmd, Client &client)
@@ -153,10 +113,14 @@ void	Server::_Join(const Command &cmd, Client &client)
 		_parser.ParseJoin(cmd.params);
 		ChannelParse cp = _parser.GetChan();
 		cp.Debug();
+
+		Channel ch = Channel();
+		ch.joinChannel(client);
+		_channels.push_back(ch);
 	}
 	catch (irc_error &e)
 	{
-		std::cout << e.what() << std::endl;
+		std::cout << "⚠️  warning: " << e.what() << std::endl;
 	}
 
 	return ;
@@ -310,6 +274,7 @@ void	Server::_PrivMsg(const Command &cmd, Client &client)
 		return AddData(SERVER_NAME, ERR_NOTEXTTOSEND);
 	if ((receiver = _FindNickname(cmd.target[0])) == NULL)
 		return AddData(SERVER_NAME, ERR_NOSUCHNICK(cmd.target[0]));
+	// TODO: Check also in the list of #channels
 
 	const string msg = "PRIVMSG " + cmd.target[0] + " :" + cmd.trailing + "\r\n";
 	std::cout << "fd : " << client.GetFd() << std::endl;
@@ -508,6 +473,18 @@ void Server::Logs() const
 			std::cout << "		Host: " << it->second.GetUinfo()[hostname] << std::endl;
 		if (it->second.GetUinfo()[realname].empty() == false)
 			std::cout << "		Realname: " << it->second.GetUinfo()[realname] << std::endl;
+		if (it->second.GetChannels().empty() == false)
+		{
+			std::cout << "		Channels: " << std::endl; 
+			for (std::list< Channel* >::const_iterator chan = it->second.GetChannels().begin(); chan != it->second.GetChannels().end(); ++it)
+			{
+				std::cout << (*chan)->GetName();
+				if (++chan != it->second.GetChannels().end())
+					std::cout << ",";
+				--chan;
+			}
+
+		}
 	}
 	std::cout << "=======================" << std::endl;
 }

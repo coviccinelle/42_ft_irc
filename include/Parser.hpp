@@ -10,7 +10,7 @@
 #define SPACE 0x20
 
 enum Token {
-	space,
+	space = 0,
 	nospcl,
 	letter,
 	digit,
@@ -59,20 +59,22 @@ class Parser
 		void					_Middle();
 		void					_Trailing();
 		void					_Target();
-		void					_ParseInit();
+		void					_InitCmd();
+		void					_InitChan();
 		void					_MsgTo();
 
 		void					_Channel();
 		void					_ChannelPrefix();
 		void					_ChannelId();
 		void					_ChannelSuffix();
+		void					_ChannelString();
 
 		string::iterator		_it;
 		Token					_current;
 		std::vector< Token >	_tokens;
 		string					_input;
-		Command					_cmd;
-		ChannelParse			_chan;
+		Command					*_cmd;
+		ChannelParse			*_chan;
 };
 
 bool	isspecial(string::const_iterator it);

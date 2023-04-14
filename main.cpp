@@ -1,4 +1,5 @@
 #include  "include/Server.hpp"
+#include "include/Channel.hpp"
 
 const string& parsePort(const string &port)
 {

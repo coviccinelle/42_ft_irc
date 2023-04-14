@@ -5,16 +5,18 @@
 #include "../include/irc_error.hpp"
 #include "../include/Client.hpp"
 #include "../include/Command.hpp"
+#include "../include/Channel.hpp"
 
 #define MAX_LISTEN	5
 #define SERVER_NAME string("irc")
+
+#define CALL_MEMBER_FN(object,ptrToMember)  ((object).*(ptrToMember))
 
 /*
  * Used for switch case evaluation
  */
 enum CmdVal {
-	UNKNOWN = 0,
-	CAP,
+	CAP = 0,
 	PASS,
 	NICK,
 	USER,
@@ -24,7 +26,8 @@ enum CmdVal {
 	NOTICE,
 	OPER,
 	JOIN,
-	QUIT
+	QUIT,
+	UNKNOWN
 };
 
 /*
@@ -35,6 +38,7 @@ enum CmdVal {
 class Server
 {
 	public:
+		typedef  void (Server::*Fn)(const Command &cmd, Client &client);
 		/* Coplien */
 		Server(const string &port, const string &pass, const string &operPass = "oper");
 		~Server();
@@ -77,8 +81,10 @@ class Server
 		std::vector< struct pollfd >	_pollfds;
 		int								_poll_count;
 		std::map< string, CmdVal >		_mapCmd; // mapping between cmd names and integer; used for switch case.
+		std::vector< Fn >				_funcTable;
 		Parser							_parser;
 		string							_data;
+		std::list< Channel >			_channels;
 };
 
 #endif
