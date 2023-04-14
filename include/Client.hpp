@@ -53,7 +53,8 @@ class Client
 
 		void							SetUinfo(const vec_str &uinfo);
 		void							SetRegistd();
-		void							SetMode(const string &mode);
+		void							SetStrMode(const string &mode);
+		void							SetMode(const char c, bool status);
 
 		// User Mode info
 		bool							isInvisible() const; // +i

@@ -9,7 +9,8 @@ Client::Client() :
 	_cmds(0),
 	_registd(false),
 	_uinfo(INF_CLI_SIZE),
-	_mode()
+	_mode(),
+	_parser()
 {
 	memset(&_addr, 0, sizeof(_addr));
 }
@@ -98,7 +99,16 @@ cst_vec_str	&Client::GetUinfo() const
 
 string	Client::GetPrefix() const
 {
-	return (_uinfo[nickname] + "!" + _uinfo[username] + "@" + _uinfo[hostname]);
+	string prefix;
+	if (_uinfo[nickname].empty() == false)
+		prefix += _uinfo[nickname] + "!";
+	if (_uinfo[username].empty() == false)
+		prefix += _uinfo[username] + "@";
+	if (_uinfo[hostname].empty() == false)
+		prefix += _uinfo[hostname];
+	if (prefix.empty() == true)
+		prefix = SERVER_NAME;
+	return (prefix);
 }
 
 const std::list< Command >	&Client::GetCmds() const
@@ -140,7 +150,12 @@ string	Client::GetStrMode() const
 	return (res);
 }
 
-void	Client::SetMode(const string &mode)
+void	Client::SetMode(const char c, bool status)
+{
+	_mode.set(USER_MODE.find(c), status);
+}
+
+void	Client::SetStrMode(const string &mode)
 {
 	bool state = false;
 
@@ -219,6 +234,7 @@ bool	Client::isServNotice() const
 	return (_mode[USER_MODE.find('s')]);
 }
 
+
 // Non-member Function
 
 void	*GetInAddr(struct sockaddr *sa)
@@ -247,3 +263,4 @@ vec_str	Split(const string &str, const string delimiter)
 		res.push_back(str.substr(start, end - start));
 	return (res);
 }
+
