@@ -1,0 +1,31 @@
+#!/bin/bash
+
+i=100
+wait_time=2
+declare -a pids=()
+
+while [ $i -ge 0 ]
+do
+    echo  "PASS toto
+NICK toto$i
+USER toto toto localhost :Toto
+" | nc localhost 5544 &
+    pids+=($!)
+    i=$(( $i - 1 ))
+done
+
+# Wait for all connections to be established
+sleep $wait_time
+
+# Send QUIT message to each thread
+for pid in "${pids[@]}"
+do
+    echo "QUIT" | nc localhost 5544 &
+done
+
+# Wait for all connections to close
+wait
+
+
+
+

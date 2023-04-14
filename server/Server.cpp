@@ -23,6 +23,7 @@ Server::Server(const string &port, const string &pass, const string &operPass) :
 	_funcTable.push_back(&Server::_Oper);
 	_funcTable.push_back(&Server::_Join);
 	_funcTable.push_back(&Server::_Quit);
+	_funcTable.push_back(&Server::_Kill);
 	_mapCmd.insert(std::make_pair(string("CAP"), CAP));
 	_mapCmd.insert(std::make_pair(string("PASS"), PASS));
 	_mapCmd.insert(std::make_pair(string("NICK"), NICK));
@@ -34,6 +35,7 @@ Server::Server(const string &port, const string &pass, const string &operPass) :
 	_mapCmd.insert(std::make_pair(string("OPER"), OPER));
 	_mapCmd.insert(std::make_pair(string("JOIN"), JOIN));
 	_mapCmd.insert(std::make_pair(string("QUIT"), QUIT));
+	_mapCmd.insert(std::make_pair(string("kill"), KILL));
 }
 
 Server::~Server()
@@ -99,6 +101,22 @@ void	Server::_Quit(const Command &cmd, Client &client)
 	AddData(client.GetPrefix(), "ERROR\r\n");
 	SendData(client.GetFd());
 	throw irc_error("⚠️  warning: closing connection", CLOSE_CONNECTION);
+}
+
+void	Server::_Kill(const Command &cmd, Client &client)
+{
+	std::cout << "yoooooo It's me kill" << std::endl;
+	if (client.isOperator() == false)
+		return (AddData(SERVER_NAME, ERR_NOPRIVILEGES));
+	if (cmd.params.empty() == true)
+		return AddData(SERVER_NAME, ERR_NEEDMOREPARAMS("KILL"));
+	(void)cmd;
+//	AddData(client.GetPrefix(), "ERROR\r\n");
+//	SendData(client.GetFd());
+//	throw irc_error("⚠️  warning: closing connection", CLOSE_CONNECTION);
+	// ERR_NOPRIVILEGES              ERR_NEEDMOREPARAMS
+	// ERR_NOSUCHNICK                ERR_CANTKILLSERVER
+
 }
 
 void	Server::_Join(const Command &cmd, Client &client)
