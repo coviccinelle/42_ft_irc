@@ -153,7 +153,12 @@ string	Client::GetStrMode() const
 	return (res);
 }
 
-void	Client::SetMode(const string &mode)
+void	Client::SetMode(const char c, bool status)
+{
+	_mode.set(USER_MODE.find(c), status);
+}
+
+void	Client::SetStrMode(const string &mode)
 {
 	bool state = false;
 

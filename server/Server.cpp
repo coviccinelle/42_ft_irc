@@ -1,5 +1,4 @@
 #include "../include/Server.hpp"
-#include "../include/Channel.hpp"
 
 Server::Server(const string &port, const string &pass, const string &operPass) :
 	_portNumber(port),
@@ -311,6 +310,7 @@ void Server::_Oper(const Command &cmd, Client &client)
 		return (AddData(SERVER_NAME, ERR_PASSWDMISMATCH));
 	if (client.GetUinfo()[nickname] != cmd.middle[0])
 		return (AddData(SERVER_NAME, ERR_NOOPERHOST(client.GetUinfo()[nickname])));
+	client.SetMode('o', true);
 	AddData(SERVER_NAME, string("MODE ") + client.GetUinfo()[nickname] + " +o\r\n");
 	AddData(SERVER_NAME, RPL_YOUREOPER(client.GetUinfo()[nickname]));
 }
@@ -326,7 +326,7 @@ void	Server::_Mode(const Command &cmd, Client &client)
 		if (_parser.ParseUserMode(cmd.middle[1]) == false)
 			return (AddData(SERVER_NAME, ERR_UMODEUNKNOWNFLAG(cmd.middle[1])));
 		try {
-			client.SetMode(cmd.middle[1]);
+			client.SetStrMode(cmd.middle[1]);
 		}
 		catch (irc_error &e)
 		{
