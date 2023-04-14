@@ -392,7 +392,7 @@ void	Parser::_ChannelId()
 			throw irc_error("parsing failed: _ChannelId: channelid expected", ERR_CHANNELID);
 		++_it;
 	}
-	_chan->channelid = string(start, _it);
+	_chan->channelid = string(start, _it--);
 }
 
 void	Parser::_ChannelPrefix()
@@ -428,13 +428,13 @@ void Parser::_ChannelString()
 {
 	if (_current == eoi)
 		throw irc_error("parsing failed: _Channel: chanstring expected", ERR_CHANNEL);
-	string::iterator	start = _it;
+	string::iterator	start = _it + 1;
 	while (_current != eoi)
 	{
 		_Wrapper();
 		if (_current == colon)
 		{
-			_chan->chanstring = string(start, _it - 1);
+			_chan->chanstring = string(start, _it);
 			return _ChannelSuffix();
 		}
 	}

@@ -114,9 +114,9 @@ void	Server::_Join(const Command &cmd, Client &client)
 		ChannelParse cp = _parser.GetChan();
 		cp.Debug();
 
-		Channel ch = Channel();
+		_channels.push_back(Channel());
+		Channel &ch = _channels.back();
 		ch.joinChannel(client);
-		_channels.push_back(ch);
 	}
 	catch (irc_error &e)
 	{
@@ -475,15 +475,14 @@ void Server::Logs() const
 			std::cout << "		Realname: " << it->second.GetUinfo()[realname] << std::endl;
 		if (it->second.GetChannels().empty() == false)
 		{
-			std::cout << "		Channels: " << std::endl; 
-			for (std::list< Channel* >::const_iterator chan = it->second.GetChannels().begin(); chan != it->second.GetChannels().end(); ++it)
+			std::cout << "		Channels: ";
+			for (std::list< Channel* >::const_iterator chan = (it->second).GetChannels().begin(); chan != (it->second).GetChannels().end();)
 			{
-				std::cout << (*chan)->GetName();
+				std::cout << (*(*chan)).GetName();
 				if (++chan != it->second.GetChannels().end())
 					std::cout << ",";
-				--chan;
 			}
-
+			std::cout << std::endl;
 		}
 	}
 	std::cout << "=======================" << std::endl;

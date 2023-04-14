@@ -97,7 +97,7 @@ typedef std::list< Client* >::iterator	lst_iterator;
 class Channel
 {
 	private:
-		Client				*_creator; // Should have only one creator (not possible to set it by user)
+		Client					*_creator; // Should have only one creator (not possible to set it by user)
 									  // even if creator itself want to set an another one.
 
 		std::list< Client* >	_chanop; // Privileged users can do stuff that other cant

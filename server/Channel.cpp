@@ -9,7 +9,7 @@ Channel::Channel(void) :
 	_ban(),
 	_exception(),
 	_key(),
-	_chanstring(),
+	_chanstring("toto"),
 	_safe(false),
 	_modeless(false),
 	_mode(0),
