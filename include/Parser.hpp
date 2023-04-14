@@ -67,6 +67,7 @@ class Parser
 		void					_ChannelPrefix();
 		void					_ChannelId();
 		void					_ChannelSuffix();
+		void					_ChannelString();
 
 		string::iterator		_it;
 		Token					_current;

@@ -269,7 +269,9 @@ void	Parser::_Param()
 	if (_current != space)
 		throw irc_error("parsing failed: _Param: space expected", ERR_PARAM);
 	std::string::iterator start = _it + 1;
-	if (_current != eoi)
+	if (_current != eoi &&
+		_cmd->command != "JOIN" &&
+		_cmd->command != "PART")
 		_Target();
 	while (_current != eoi)
 	{
@@ -323,6 +325,7 @@ const std::vector< Token >	&Parser::Tokens() const
 
 void	Parser::Parse(const string &str)
 {
+	std::cout << "str here " << str << std::endl;
 	_InitCmd();
 	_input = str;
 	_it = --_input.begin();
@@ -381,11 +384,11 @@ bool	Parser::ParseUserMode(const string &str)
 
 void	Parser::_ChannelId()
 {
-	string::iterator	start = _input.begin();
+	string::iterator	start = ++_it;
 	for (int i = 0; i < 5; i++)
 	{
-		if (_it == _input.end() ||
-			isdigit(*_it) == false ||
+		if (_it == _input.end() &&
+			isdigit(*_it) == false &&
 			isupper(*_it) == false)
 			throw irc_error("parsing failed: _ChannelId: channelid expected", ERR_CHANNELID);
 		++_it;
@@ -395,21 +398,24 @@ void	Parser::_ChannelId()
 
 void	Parser::_ChannelPrefix()
 {
-	string::iterator	start = _input.begin();
+	string::iterator	start = _it + 1;
 	_Wrapper();
 	if (_current != sha &&
 		_current != plus &&
 		_current != excl_mark &&
 		_current != amp)
 		throw irc_error("parsing failed: _ChannelPrefix: sha or plus or excl_mark or amp expected", ERR_CHANNELPREFIX);
-	_chan->prefix = string(start, _it);
+	_chan->prefix = string(start, _it + 1);
 	if (_current == excl_mark)
 		_ChannelId();
 }
 
 void	Parser::_ChannelSuffix()
 {
-	string::iterator	start = _input.begin();
+	string::iterator	start = _it + 1;
+	_Wrapper();
+	if (_current == eoi)
+		throw irc_error("parsing failed: _ChannelSuffix: chanstring expected", ERR_CHANNELSUFFIX);
 	while (_current != eoi)
 	{
 		_Wrapper();
@@ -419,18 +425,28 @@ void	Parser::_ChannelSuffix()
 	_chan->suffix = string(start, _it);
 }
 
-void	Parser::_Channel()
+void Parser::_ChannelString()
 {
-	string::iterator	start = _input.begin();
-	_ChannelPrefix();
 	if (_current == eoi)
 		throw irc_error("parsing failed: _Channel: chanstring expected", ERR_CHANNEL);
+	string::iterator	start = _it;
 	while (_current != eoi)
 	{
 		_Wrapper();
 		if (_current == colon)
-			_ChannelSuffix();
+		{
+			_chan->chanstring = string(start, _it - 1);
+			return _ChannelSuffix();
+		}
 	}
+	_chan->chanstring = string(start, _it);
+}
+
+void	Parser::_Channel()
+{
+	string::iterator	start = _it + 1;
+	_ChannelPrefix();
+	_ChannelString();
 	_chan->channel = string(start, _it);
 }
 

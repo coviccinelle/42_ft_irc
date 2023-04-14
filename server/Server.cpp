@@ -115,6 +115,7 @@ void	Server::_Join(const Command &cmd, Client &client)
 		cp.Debug();
 
 		Channel ch = Channel();
+		ch.joinChannel(client);
 		_channels.push_back(ch);
 	}
 	catch (irc_error &e)

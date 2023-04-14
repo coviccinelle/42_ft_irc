@@ -48,4 +48,5 @@ void ChannelParse::Debug() const
 	std::cout << "Channelid :[" << channelid << "]" << std::endl;
 	std::cout << "Chanstring :[" << chanstring << "]" << std::endl;
 	std::cout << "Suffix :[" << suffix << "]" << std::endl;
+	std::cout << "===========================" << std::endl;
 }
