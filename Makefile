@@ -8,6 +8,7 @@ SRC		=	server/Server.cpp \
 			server/Client.cpp \
 			server/Parser.cpp \
 			server/Command.cpp \
+			server/TargetParse.cpp \
 			server/ChannelParse.cpp \
 			server/Channel.cpp \
 			utils/utils.cpp \

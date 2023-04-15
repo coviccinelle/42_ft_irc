@@ -4,16 +4,21 @@ Parser::Parser(void) :
 	_it(),
 	_current(error),
 	_tokens(),
-	_cmd(new Command()),
-	_chan(new ChannelParse())
+	_cmd(NULL),
+	_chan(NULL),
+	_target(NULL)
 {
 	return ;
 }
 
 Parser::~Parser(void)
 {
-	delete _cmd;
-	delete _chan;
+	if (_cmd != NULL)
+		delete _cmd;
+	if (_chan != NULL)
+		delete _chan;
+	if (_target != NULL)
+		delete _target;
 	return ;
 }
 
@@ -23,8 +28,15 @@ Parser::Parser(Parser const &src)
 	_current = src._current;
 	_tokens = src._tokens;
 	_input = src._input;
-	_cmd = new Command(*src._cmd);
-	_chan = new ChannelParse(*src._chan);
+	_cmd = NULL;
+	_chan = NULL;
+	_target = NULL;
+	if (_cmd)
+		_cmd = new Command(*src._cmd);
+	if (_chan)
+		_chan = new ChannelParse(*src._chan);
+	if (_target)
+		_target = new TargetParse(*src._target);
 
 	return ;
 }
@@ -37,11 +49,18 @@ Parser &Parser::operator=(Parser const &rhs)
 	_current = rhs._current;
 	_tokens = rhs._tokens;
 	_input = rhs._input;
-
-	delete _cmd;
-	delete _chan;
-	_cmd = new Command(*rhs._cmd);
-	_chan = new ChannelParse(*rhs._chan);
+	if (_cmd)
+		delete _cmd;
+	if (_chan)
+		delete _chan;
+	if (_target)
+		delete _target;	
+	if (rhs._cmd)
+		_cmd = new Command(*rhs._cmd);
+	if (rhs._chan)
+		_chan = new ChannelParse(*rhs._chan);
+	if (rhs._target)
+		_target = new TargetParse(*rhs._target);
 
 	return (*this);
 }
@@ -225,17 +244,15 @@ void	Parser::_Middle()
 	_cmd->middle.push_back(string(start, _it));
 }
 
-void	Parser::_Target()
+void	Parser::_Target(const string &str)
 {
+	_InitTarget();
+	_input = str;
+	_it = --_input.begin();
+
 	std::string::iterator start = _it + 1;
 	std::string::iterator start2 = _it + 1;
 	_Wrapper();
-	if (_current == colon)
-	{
-		_Trailing();
-		_cmd->trailing = string(start + 1, _it);
-		return ;
-	}
 	while (1)
 	{
 		if (_current == colon)
@@ -255,6 +272,11 @@ void	Parser::_Target()
 	}
 }
 
+const TargetParse			&Parser::GetTarget() const
+{
+	return (*target);
+}
+
 void	Parser::_Trailing()
 {
 	while (_current != eoi)
@@ -269,10 +291,6 @@ void	Parser::_Param()
 	if (_current != space)
 		throw irc_error("parsing failed: _Param: space expected", ERR_PARAM);
 	std::string::iterator start = _it + 1;
-	if (_current != eoi &&
-		_cmd->command != "JOIN" &&
-		_cmd->command != "PART")
-		_Target();
 	while (_current != eoi)
 	{
 		if (_current != space)
@@ -308,13 +326,22 @@ void Parser::_Wrapper()
 
 void	Parser::_InitCmd()
 {
-	delete _cmd;
+	if (_cmd)
+		delete _cmd;
 	_cmd = new Command();
+}
+
+void	Parser::_InitTarget()
+{
+	if (_target)
+		delete _target;
+	_target = new Target();
 }
 
 void	Parser::_InitChan()
 {
-	delete _chan;
+	if (_chan)
+		delete _chan;
 	_chan = new ChannelParse();
 }
 
@@ -365,7 +392,7 @@ bool	Parser::isValidNick(const string &str)
 	return (true);
 }
 
-bool	Parser::ParseUserMode(const string &str)
+bool	Parser::isValidUserMode(const string &str)
 {
 	string::const_iterator it = str.begin();
 	if (*it != '+' && *it != '-')
@@ -449,7 +476,7 @@ void	Parser::_Channel()
 	_chan->channel = string(start, _it);
 }
 
-void	Parser::ParseJoin(const string &str)
+void	Parser::ParseChannel(const string &str)
 {
 	_InitChan();
 	_input = str;

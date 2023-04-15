@@ -65,10 +65,6 @@ void Command::Debug() const
 	std::cout << "Middle : " << std::endl;
 	for (std::vector<string>::const_iterator it = middle.begin(); it != middle.end(); ++it)
 		std::cout << " [" << *it << "]" << std::endl;
-
-	std::cout << "Target : " << std::endl;
-	for (std::vector<string>::const_iterator it = target.begin(); it != target.end(); ++it)
-		std::cout << " [" << *it << "]" << std::endl;
 	std::cout << "Trailing : " << trailing << std::endl;
 	std::cout << "===============================" << std::endl;
 }
