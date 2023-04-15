@@ -56,16 +56,16 @@ class Parser
 		bool						isValidNick(const string &str);
 		bool						isValidUserMode(const string &str);
 
+		// Utils
+		cst_vec_str	&GetCinfo() const;
+		cst_vec_str	&GetMiddle() const;
+		cst_vec_str	&GetTargets() const;
+
 	protected:
 		// Tokenizer
 		Token					_GetToken();
 		// Get next Token
 		void					_Wrapper();
-
-		// Utils
-		cst_vec_str	&GetCinfo() const;
-		cst_vec_str	&GetMiddle() const;
-		cst_vec_str	&GetTargets() const;
 
 		void	SetMessage(const string &s);
 		void	SetPrefix(const string &s);

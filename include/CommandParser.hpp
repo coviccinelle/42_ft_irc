@@ -3,8 +3,6 @@
 #include "../utils/utils.hpp"
 #include "../include/Parser.hpp"
 
-class Command;
-
 class CommandParser : public Parser
 {
 	public:

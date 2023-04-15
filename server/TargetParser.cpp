@@ -1,19 +1,19 @@
 #include "../include/TargetParser.hpp"
 
-TargetParser::TargetParser(void) :
-	targets()
+TargetParser::TargetParser() :
+	Parser()
 {
 	return ;
 }
 
-TargetParser::~TargetParser(void)
+TargetParser::~TargetParser()
 {
 	return ;
 }
 
-TargetParser::TargetParser(TargetParser const &src)
+TargetParser::TargetParser(TargetParser const &src) :
+	Parser()
 {
-	targets = src.targets;
 	return ;
 }
 
@@ -22,33 +22,41 @@ TargetParser &TargetParser::operator=(TargetParser const &rhs)
 	if (&rhs == this)
 		return (*this);
 
-	targets = rhs.targets;
 	return (*this);
 }
 
 void TargetParser::Debug() const
 {
 	std::cout << "===========[ DEBUG TargetParser ]===========" << std::endl;
-	for (vec_str::iterator it = targets.begin(); it != targets.end(); ++it)
+	for (vec_str::const_iterator it = GetTargets().begin(); it != GetTargets().end(); ++it)
 	{
 		std::cout << *it;
-		if (it + 1 != targets.end())
+		if (it + 1 != GetTargets().end())
 			std::cout << " ";
 	}
 	std::cout << std::endl;
 	std::cout << "===========================" << std::endl;
 }
 
-void	TargetParser::_Target(const string &str)
+void	TargetParser::Parse(const string &str)
 {
+	_input = str;
+	_it = --_input.begin();
+	_Target();
+}
 
+void	TargetParser::ParseTarget(const string &str)
+{
+	Parse(str);
+}
+
+void	TargetParser::DebugTarget() const
+{
+	Debug();
 }
 
 void	TargetParser::_Target()
 {
-	_input = str;
-	_it = --_input.begin();
-
 	std::string::iterator start = _it + 1;
 	std::string::iterator start2 = _it + 1;
 	_Wrapper();
@@ -58,13 +66,13 @@ void	TargetParser::_Target()
 			throw irc_error("parsing failed: _Target: colon found", ERR_MIDDLE);
 		if (_current == comma)
 		{
-			_cmd->target.push_back(string(start, _it));
+			AddTarget(string(start, _it));
 			start = _it + 1;
 		}
 		else if (_current == space || _current == eoi)
 		{
-			_cmd->target.push_back(string(start, _it));
-			_cmd->middle.push_back(string(start2, _it));
+			AddTarget(string(start, _it));
+			AddMiddle(string(start2, _it));
 			return ;
 		}
 		_Wrapper();

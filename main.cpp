@@ -1,10 +1,12 @@
 #include <iostream>
-#include "include/CommandParser.hpp"
+#include "include/Command.hpp"
 
 int	main(void)
 {
-	CommandParser cp;
-	cp.ParseCommand(":irc PASS toto :coucou");
-	cp.DebugCommand();
+	Command parser;
+	parser.ParseCommand(":irc PASS toto :coucou");
+	parser.DebugCommand();
+	parser.ParseTarget("toto,tata,titi");
+	parser.DebugTarget();
 	return (0);
 }

@@ -1,18 +1,23 @@
-#ifndef TARGETPARSE_HPP
-#define TARGETPARSE_HPP
+#ifndef TARGETPARSER_HPP
+#define TARGETPARSER_HPP
 #include "../utils/utils.hpp"
+#include "../include/Parser.hpp"
 
-class TargetParse
+class TargetParser : public Parser
 {
 	public:
-		TargetParse(void);
-		~TargetParse(void);
-		TargetParse(TargetParse const &src);
-		TargetParse	&operator=(TargetParse const &rhs);
+		TargetParser();
+		virtual ~TargetParser();
+		TargetParser(TargetParser const &src);
+		TargetParser	&operator=(TargetParser const &rhs);
 		
+		void	ParseTarget(const string &str);
+		void	DebugTarget() const;
+	private:
+		void	Parse(const string &str);
 		void	Debug() const;
 
-		vec_str	targets;
+		void	_Target();
 };
 
 #endif
