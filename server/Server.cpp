@@ -267,15 +267,15 @@ vec_pfd::iterator	Server::_GetPfdFromFd(int fd)
 
 void	Server::_ExecCommand(const Command &cmd, Client &client)
 {
-	cmd.Debug();
+	cmd.DebugCommand();
 
-	int	res = _ResolveOption(cmd.command);
+	int	res = _ResolveOption(cmd.GetCinfo()[command]);
 	if (res == UNKNOWN)
 	{
 		std::cout << "Unknow command" << std::endl;
 		return ;
 	}
-	CALL_MEMBER_FN(*this, _funcTable[_ResolveOption(cmd.command)]) (cmd, client);
+	CALL_MEMBER_FN(*this, _funcTable[_ResolveOption(cmd.GetCinfo()[command])]) (cmd, client);
 }
 
 // Mapping between string comands name and enum type ex: "PASS" (string) -> PASS (int)
@@ -336,6 +336,7 @@ void	Server::_CapLs(const Command &cmd, Client &client)
 	if (cmd.size() != 2 || cmd[1] != "LS")
 	{
 		std::cout << "CAP LS invalid" << std::endl;
+		return ;
 	}
 	else
 	{
@@ -347,11 +348,11 @@ void	Server::_CapLs(const Command &cmd, Client &client)
 
 void Server::_Oper(const Command &cmd, Client &client)
 {
-	if (cmd.middle.size() < 1)
+	if (cmd.GetMiddle().size() < 1)
 		return (AddData(SERVER_NAME, ERR_NEEDMOREPARAMS("MODE")));
-	if (cmd.middle.size() < 2 || _operPass != string(cmd.params.begin() + (cmd.middle[0].size() + 1), cmd.params.end()))
+	if (cmd.GetMiddle().size() < 2 || _operPass != string(cmd.GetCinfo()[params].begin() + (cmd.GetMiddle()[0].size() + 1), cmd.GetCinfo()[params].end()))
 		return (AddData(SERVER_NAME, ERR_PASSWDMISMATCH(client.GetPrefix())));
-	if (client.GetUinfo()[nickname] != cmd.middle[0])
+	if (client.GetUinfo()[nickname] != cmd.GetMiddle()[0])
 		return (AddData(SERVER_NAME, ERR_NOOPERHOST(client.GetUinfo()[nickname])));
 	client.SetMode('o', true);
 	AddData(SERVER_NAME, string("MODE ") + client.GetUinfo()[nickname] + " +o\r\n");
@@ -362,17 +363,30 @@ void	Server::_Pass(const Command &cmd, Client &client)
 {
 	vec_str			ui = client.GetUinfo();
 
-	if (cmd.middle.empty() || cmd.middle.size() < 1)
+	if (cmd.GetMiddle().empty() || cmd.GetMiddle().size() < 1)
 		return AddData(SERVER_NAME, ERR_NEEDMOREPARAMS("PASS"));
 	if (client.IsRegistd())
 		return AddData(SERVER_NAME, ERR_ALREADYREGISTERED);
-	ui[password] = cmd.params;
+	ui[password] = cmd.GetCinfo()[params];
 	client.SetUinfo(ui);
 }
 
 void	Server::_Nick(const Command &cmd, Client &client)
 {
 	vec_str			ui = client.GetUinfo();
+	TargetParser	parser;
+	cst_vec_str		*targets;
+
+	try {
+		parser.ParseTarget(cmd.GetMiddle()[0]);
+		parser.DebugTarget();
+		targets = &parser.GetTargets();
+	}
+	catch (irc_error &e)
+	{
+		std::cout << "warning : " << e.what() << std::endl;
+		return ;
+	}
 
 	if (ui[password] != _password)
 	{
@@ -380,16 +394,16 @@ void	Server::_Nick(const Command &cmd, Client &client)
 		SendData(client.GetFd());
 		throw irc_error("error: invalid password", CLOSE_CONNECTION);
 	}
-	if (cmd.target.size() != 1)
+	if (targets->size() != 1)
 		return AddData(SERVER_NAME, ERR_NONICKNAMEGIVEN);
-	if (_parser.isValidNick(cmd.target[0]) == false)
-		return AddData(SERVER_NAME, ERR_ERRONEUSNICKNAME(cmd.target[0]));
-	if (_FindNickname(cmd.target[0], &client) != NULL)
+	if (parser.isValidNick((*targets)[0]) == false)
+		return AddData(SERVER_NAME, ERR_ERRONEUSNICKNAME((*targets)[0]));
+	if (_FindNickname((*targets)[0], &client) != NULL)
 	{
 		string tmp = "*";
 		if (ui[nickname].empty() == false)
 			tmp = ui[nickname];
-		return AddData(SERVER_NAME, ERR_NICKNAMEINUSE(tmp, cmd.target[0]));
+		return AddData(SERVER_NAME, ERR_NICKNAMEINUSE(tmp, (*targets)[0]));
 	}
 
 	string from;
@@ -403,7 +417,7 @@ void	Server::_Nick(const Command &cmd, Client &client)
 	else {
 		from = SERVER_NAME;
 	}
-	ui[nickname] = cmd.target[0];
+	ui[nickname] = (*targets)[0];
 	client.SetUinfo(ui);
 	string data;
 	if (client.IsRegistd() == true)
@@ -425,19 +439,19 @@ void	Server::_User(const Command &cmd, Client &client)
 		SendData(client.GetFd());
 		throw irc_error("error: invalid password", CLOSE_CONNECTION);
 	}
-	if (cmd.middle.size() == 0)
-		return AddData(SERVER_NAME, ERR_NEEDMOREPARAMS(cmd.command));
+	if (cmd.GetMiddle().size() == 0)
+		return AddData(SERVER_NAME, ERR_NEEDMOREPARAMS(cmd.GetCinfo()[command]));
 	//TODO: SendData(ERR_ALREADYREGISTERED);
-	if (cmd.middle.size() < 3 || cmd.trailing.empty() == true)
+	if (cmd.GetMiddle().size() < 3 || cmd.GetCinfo()[trailing].empty() == true)
 	{
 		std::cout << "Invalid param" << std::endl;
 		return ;
 	}
 	else
 	{
-		ui[username] = cmd.middle[0];
-		ui[hostname] = cmd.middle[2];
-		ui[realname] = cmd.trailing;
+		ui[username] = cmd.GetMiddle()[0];
+		ui[hostname] = cmd.GetMiddle()[2];
+		ui[realname] = cmd.GetCinfo()[trailing];
 		client.SetUinfo(ui);
 		if (client.IsRegistd() == false && ui[nickname].empty() == false)
 		{
@@ -449,9 +463,22 @@ void	Server::_User(const Command &cmd, Client &client)
 
 void	Server::_Pong(const Command &cmd, Client &client)
 {
+	TargetParser	parser;
+	cst_vec_str		*targets;
+
+	try {
+		parser.ParseTarget(cmd.GetMiddle()[0]);
+		parser.DebugTarget();
+		targets = &parser.GetTargets();
+	}
+	catch (irc_error &e)
+	{
+		std::cout << "warning : " << e.what() << std::endl;
+		return ;
+	}
 	//409    ERR_NOORIGIN ":No origin specified"
 	//402    ERR_NOSUCHSERVER "<server name> :No such server"
-	AddData(client.GetPrefix(), "PONG " + cmd.target[0] + " irc\r\n");
+	AddData(client.GetPrefix(), "PONG " + (*targets)[0] + " irc\r\n");
 	SendData(client.GetFd());
 }
 
@@ -459,17 +486,30 @@ void	Server::_PrivMsg(const Command &cmd, Client &client)
 {
 	Client			*receiver;
 
-	if (cmd.middle.size() == 0)
-		return AddData(SERVER_NAME, ERR_NORECIPIENT(cmd.message));
-	if (cmd.middle.size() > 1)
-		return AddData(SERVER_NAME, ERR_TOOMANYTARGETS(cmd.middle[1], cmd.message));
-	if (cmd.trailing.empty())
+	TargetParser	parser;
+	cst_vec_str		*targets;
+	try {
+		parser.ParseTarget(cmd.GetMiddle()[0]);
+		parser.DebugTarget();
+		targets = &parser.GetTargets();
+	}
+	catch (irc_error &e)
+	{
+		std::cout << "warning : " << e.what() << std::endl;
+		return ;
+	}
+
+	if (cmd.GetMiddle().size() == 0)
+		return AddData(SERVER_NAME, ERR_NORECIPIENT(cmd.GetCinfo()[message]));
+	if (cmd.GetMiddle().size() > 1)
+		return AddData(SERVER_NAME, ERR_TOOMANYTARGETS(cmd.GetMiddle()[1], cmd.GetCinfo()[message]));
+	if (cmd.GetCinfo()[trailing].empty())
 		return AddData(SERVER_NAME, ERR_NOTEXTTOSEND);
-	if ((receiver = _FindNickname(cmd.target[0])) == NULL)
-		return AddData(SERVER_NAME, ERR_NOSUCHNICK(cmd.target[0]));
+	if ((receiver = _FindNickname((*targets)[0])) == NULL)
+		return AddData(SERVER_NAME, ERR_NOSUCHNICK((*targets)[0]));
 	// TODO: Check also in the list of #channels
 
-	const string msg = "PRIVMSG " + cmd.target[0] + " :" + cmd.trailing + "\r\n";
+	const string msg = "PRIVMSG " + (*targets)[0] + " :" + cmd.GetCinfo()[trailing]+ "\r\n";
 	std::cout << "fd : " << client.GetFd() << std::endl;
 	std::cout << "nickname : " << client.GetUinfo()[nickname] << std::endl;
 	std::cout << "prefix : " << client.GetPrefix() << std::endl;
@@ -479,62 +519,104 @@ void	Server::_PrivMsg(const Command &cmd, Client &client)
 
 void	Server::_Mode(const Command &cmd, Client &client)
 {
-	if (cmd.middle.size() == 0)
-		return (AddData(SERVER_NAME, ERR_NEEDMOREPARAMS("MODE")));
-	if (cmd.target[0] != client.GetUinfo()[nickname])
-		return (AddData(SERVER_NAME, ERR_USERSDONTMATCH(cmd.target[0])));
-	if (cmd.middle.size() > 1)
+	TargetParser	parser;
+	cst_vec_str		*targets;
+	try {
+		parser.ParseTarget(cmd.GetMiddle()[0]);
+		targets = &parser.GetTargets();
+	}
+	catch (irc_error &e)
 	{
-		if (_parser.ParseUserMode(cmd.middle[1]) == false)
-			return (AddData(SERVER_NAME, ERR_UMODEUNKNOWNFLAG(cmd.middle[1])));
+		std::cout << "warning : " << e.what() << std::endl;
+		return ;
+	}
+
+	if (cmd.GetMiddle().size() == 0)
+		return (AddData(SERVER_NAME, ERR_NEEDMOREPARAMS("MODE")));
+	if ((*targets)[0] != client.GetUinfo()[nickname])
+		return (AddData(SERVER_NAME, ERR_USERSDONTMATCH((*targets)[0])));
+	if (cmd.GetMiddle().size() > 1)
+	{
+		if (parser.isValidUserMode(cmd.GetMiddle()[1]) == false)
+			return (AddData(SERVER_NAME, ERR_UMODEUNKNOWNFLAG(cmd.GetMiddle()[1])));
 		try {
-			client.SetStrMode(cmd.middle[1]);
+			client.SetStrMode(cmd.GetMiddle()[1]);
 		}
 		catch (irc_error &e)
 		{
 			return (AddData(SERVER_NAME, e.what()));
 		}
-		return (AddData(SERVER_NAME, string("MODE ") + client.GetUinfo()[nickname] + " " + cmd.middle[1] + "\r\n"));
+		return (AddData(SERVER_NAME, string("MODE ") + client.GetUinfo()[nickname] + " " + cmd.GetMiddle()[1] + "\r\n"));
 	}
 	return (AddData(SERVER_NAME, RPL_UMODEIS(client.GetUinfo()[nickname], client.GetStrMode())));
 }
 
 void	Server::_Notice(const Command &cmd, Client &client)
 {
+	(void)client;
 	Client			*receiver;
-	if (cmd.trailing.empty()) //no text to send
+
+	TargetParser	parser;
+	cst_vec_str		*targets;
+	try {
+		parser.ParseTarget(cmd.GetMiddle()[0]);
+		parser.DebugTarget();
+		targets = &parser.GetTargets();
+	}
+	catch (irc_error &e)
+	{
+		std::cout << "warning : " << e.what() << std::endl;
 		return ;
-	for (std::vector<string>::const_iterator it = cmd.target.begin(); it != cmd.target.end(); ++it)
+	}
+
+	if (cmd.GetCinfo()[trailing].empty()) //no text to send
+		return ;
+	for (std::vector<string>::const_iterator it = targets->begin(); it != targets->end(); ++it)
 	{
 		if (*it == SERVER_NAME)
 		{
-			_NoticeServ(cmd.trailing, client);
+			_NoticeServ(cmd.GetCinfo()[trailing], client);
 			continue ;
 		}
 		else if ((receiver = _FindNickname(*it)) == NULL)
 			continue ;
 		else
 		{
-			string msg = "NOTICE " + *it + " :" + cmd.trailing + "\r\n";
+			string msg = "NOTICE " + *it + " :" + cmd.GetCinfo()[trailing ]+ "\r\n";
 			AddData(SERVER_NAME, msg);
 			SendData(receiver->GetFd());
 		}
 	}
 }
 
+
 void	Server::_Kill(const Command &cmd, Client &client)
 {
 	Client *receiver;
+
+	TargetParser	parser;
+	cst_vec_str		*targets;
+	try {
+		parser.ParseTarget(cmd.GetMiddle()[0]);
+		parser.DebugTarget();
+		targets = &parser.GetTargets();
+	}
+	catch (irc_error &e)
+	{
+		std::cout << "warning : " << e.what() << std::endl;
+		return ;
+	}
+
 	if (client.isOperator() == false)
 		return (AddData(SERVER_NAME, ERR_NOPRIVILEGES));
-	if (cmd.params.empty() == true || cmd.trailing.empty() == true || cmd.target.empty() == true)
+	if (cmd.GetCinfo()[params].empty() == true || cmd.GetCinfo()[trailing].empty() == true || (*targets).empty() == true)
 		return AddData(SERVER_NAME, ERR_NEEDMOREPARAMS("KILL"));
-	if (cmd.target[0] == SERVER_NAME)
+	if ((*targets)[0] == SERVER_NAME)
 		return AddData(SERVER_NAME, ERR_CANTKILLSERVER(client.GetPrefix()));
-	if ((receiver = _FindNickname(cmd.target[0], &client)) == NULL)
-		return AddData(SERVER_NAME, ERR_NOSUCHNICK(cmd.target[0]));
+	if ((receiver = _FindNickname((*targets)[0], &client)) == NULL)
+		return AddData(SERVER_NAME, ERR_NOSUCHNICK((*targets)[0]));
 
-	string msg = "NOTICE " + SERVER_NAME + " 💀 🥷 ☠️  ⚰️ 👋 \033[0;214m " + receiver->GetUinfo()[nickname] + "'s connection has been \033[0;31mkilled\033[0;37m because :" + cmd.trailing + "\r\n";
+	string msg = "NOTICE " + SERVER_NAME + " 💀 🥷 ☠️  ⚰️ 👋 \033[0;214m " + receiver->GetUinfo()[nickname] + "'s connection has been \033[0;31mkilled\033[0;37m because :" + cmd.GetCinfo()[trailing] + "\r\n";
 	AddData(SERVER_NAME, msg);
 	SendData(receiver->GetFd());
 	_CloseConnection(*receiver);
@@ -542,9 +624,9 @@ void	Server::_Kill(const Command &cmd, Client &client)
 
 void	Server::_Quit(const Command &cmd, Client &client)
 {
-	string msg = " 👋 \033[0;214m " + client.GetUinfo()[nickname] + " has \033[0;31mquit\033[0;37m because :" + cmd.trailing + "\r\n";
+	string msg = " 👋 \033[0;214m " + client.GetUinfo()[nickname] + " has \033[0;31mquit\033[0;37m because :" + cmd.GetCinfo()[trailing] + "\r\n";
 	_NoticeServ(msg, client, 1);
-	AddData(client.GetPrefix(), "ERROR :" + cmd.trailing + "\r\n");
+	AddData(client.GetPrefix(), "ERROR :" + cmd.GetCinfo()[trailing] + "\r\n");
 	SendData(client.GetFd());
 //	_CloseConnection(client);
 
@@ -560,22 +642,23 @@ void	Server::_Join(const Command &cmd, Client &client)
 	(void)cmd;
 	(void)client;
 
-	if (cmd.params.empty() == true)
+	if (cmd.GetCinfo()[params].empty() == true)
 		return AddData(SERVER_NAME, ERR_NEEDMOREPARAMS("JOIN"));
 	try
 	{
-		_parser.ParseJoin(cmd.params);
-		ChannelParse cp = _parser.GetChan();
-		cp.Debug();
-
-		_channels.push_back(Channel());
-		Channel &ch = _channels.back();
-		ch.joinChannel(client);
+//		_parser.Parse(cmd.GetCinfo()[params]);
+//		ChannelParse cp = _parser.GetChan();
+//		cp.Debug();
 	}
 	catch (irc_error &e)
 	{
 		std::cout << "⚠️  warning: " << e.what() << std::endl;
+		return ;
 	}
+	_channels.push_back(Channel());
+	Channel &ch = _channels.back();
+	ch.joinChannel(client);
 
 	return ;
 }
+

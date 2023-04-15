@@ -3,7 +3,7 @@
 
 #include "../utils/utils.hpp"
 #include "../include/irc_error.hpp"
-#include "../include/CommandParser.hpp"
+#include "../include/Command.hpp"
 #include "../include/Channel.hpp"
 #include "../include/Errors.hpp"
 
@@ -87,9 +87,6 @@ class Client
 		bool							_registd;
 		vec_str							_uinfo; // nickname, username, hostname ... See InfoClient above for all available field.
 		std::bitset< MODE_SIZE >		_mode;
-
-		/* Utils */
-		CommandParser					_cmdParser;
 };
 
 // Non-Member function

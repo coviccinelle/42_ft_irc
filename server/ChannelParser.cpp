@@ -13,7 +13,7 @@ ChannelParser::~ChannelParser(void)
 }
 
 ChannelParser::ChannelParser(ChannelParser const &src) :
-	Parser(),
+	Parser(src),
 	_channels(src._channels)
 {
 	return ;

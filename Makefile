@@ -7,6 +7,7 @@ RM		=	rm -rf
 SRC		=	server/Server.cpp \
 			server/Client.cpp \
 			server/Parser.cpp \
+			server/Command.cpp \
 			server/CommandParser.cpp \
 			server/TargetParser.cpp \
 			server/ChannelParser.cpp \

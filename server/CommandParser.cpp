@@ -14,9 +14,9 @@ CommandParser::~CommandParser(void)
 }
 
 CommandParser::CommandParser(CommandParser const &src) :
-	Parser(),
-	_cinfo(INF_CMD_SIZE),
-	_middle()
+	Parser(src),
+	_cinfo(src._cinfo),
+	_middle(src._middle)
 {
 	return ;
 }

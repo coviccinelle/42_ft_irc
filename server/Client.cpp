@@ -6,12 +6,11 @@ Client::Client() :
 	_addrSize(sizeof(_addr)),
 	_ip(""),
 	_buf(""),
-	_cmds(0),
+	_cmds(),
 	_channels(),
 	_registd(false),
 	_uinfo(INF_CLI_SIZE),
-	_mode(),
-	_parser()
+	_mode()
 {
 	memset(&_addr, 0, sizeof(_addr));
 }
@@ -36,8 +35,6 @@ Client::Client(Client const &src)
 	_uinfo = src._uinfo;
 	_mode = src._mode;
 
-	_parser = src._parser;
-
 	return ;
 }
 
@@ -57,8 +54,6 @@ Client &Client::operator=(Client const &rhs)
 	_registd = rhs._registd;
 	_uinfo = rhs._uinfo;
 	_mode = rhs._mode;
-
-	_parser = rhs._parser;
 
 	return (*this);
 }
@@ -196,15 +191,16 @@ void	Client::_ParseBuf(const string &buf)
 	_buf = trim(string(_buf.begin() + pos, _buf.end()));
 	for (vec_str::iterator it = raw_cmds.begin(); it != raw_cmds.end(); ++it)
 	{
+		Command	cmd;
 		try
 		{
-			_parser.Parse(trim(*it));
+			cmd.ParseCommand(trim(*it));
 		}
 		catch (irc_error &e)
 		{
 			std::cout << "⚠️  " <<  e.what() << std::endl;
 		}
-		_cmds.push_back(_parser.GetCommand());
+		_cmds.push_back(cmd);
 	}
 }
 

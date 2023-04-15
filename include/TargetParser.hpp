@@ -15,6 +15,7 @@ class TargetParser : public Parser
 		void	DebugTarget() const;
 
 		cst_vec_str	&GetTargets() const;
+
 	private:
 		void	Parse(const string &str);
 		void	Debug() const;

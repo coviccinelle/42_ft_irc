@@ -13,8 +13,8 @@ TargetParser::~TargetParser()
 }
 
 TargetParser::TargetParser(TargetParser const &src) :
-	Parser(),
-	_targets()
+	Parser(src),
+	_targets(src._targets)
 {
 	return ;
 }
@@ -60,7 +60,6 @@ void	TargetParser::DebugTarget() const
 void	TargetParser::_Target()
 {
 	std::string::iterator start = _it + 1;
-	std::string::iterator start2 = _it + 1;
 	_Wrapper();
 	while (1)
 	{
