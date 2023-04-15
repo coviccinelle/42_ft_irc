@@ -335,7 +335,6 @@ void	Server::_CapLs(const Command &cmd, Client &client)
 	if (cmd.size() != 2 || cmd[1] != "LS")
 	{
 		std::cout << "CAP LS invalid" << std::endl;
-		return ;
 	}
 	else
 	{
