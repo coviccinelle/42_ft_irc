@@ -54,14 +54,17 @@ class Server
 	private: 
 		void				_AcceptNewConnection();
 		void				_ReceiveData(struct pollfd &pfd);
-		void				_ParseRecv(const string &buf, Client &client);
 		void				_CloseConnection(struct pollfd &pfd);
 		void				_CloseConnection(Client &client);
 		vec_pfd::iterator	_GetPfdFromFd(int fd);
 
 		void		_ExecCommand(const Command &cmd, Client &client); // Switch case
 		CmdVal		_ResolveOption(const string &input); // Return a enum code for switch case eval
+		Client*		_FindNickname(const string &nick, Client *skip = NULL); //check if there's a nickname like this in the list of client's nicknames
+		Client* 	_FindUsername(const string &name, Client *skip = NULL);
+		void		_NoticeServ(const string str, Client &client, int q = 0);
 
+// *** SERVER COMMANDS *** //
 		void 		_CapLs(const Command &cmd, Client &client);
 		void 		_Oper(const Command &cmd, Client &client);
 		void 		_Pass(const Command &cmd, Client &client);
@@ -71,13 +74,11 @@ class Server
 		void 		_PrivMsg(const Command &cmd, Client &client);
 		void		_Mode(const Command &cmd, Client &client);
 		void		_Notice(const Command &cmd, Client &client);
-		void		_NoticeServ(const string str, Client &client, int q = 0);
-		
-		void		_Join(const Command &cmd, Client &client);
-		void		_Quit(const Command &cmd, Client &client);
 		void		_Kill(const Command &cmd, Client &client);
-		Client*		_FindNickname(const string &nick, Client *skip = NULL); //check if there's a nickname like this in the list of client's nicknames
-		Client* 	_FindUsername(const string &name, Client *skip = NULL);
+		void		_Quit(const Command &cmd, Client &client);
+		
+// *** CHANNEL COMMANDS *** //
+		void		_Join(const Command &cmd, Client &client);
 
 		std::string 					_portNumber;
 		std::string 					_password;
