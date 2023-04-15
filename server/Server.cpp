@@ -267,10 +267,13 @@ Client* Server::_FindNickname(const string &nick, Client *skip)
 
 void	Server::_NoticeServ(const string str, Client &client, int q)
 {
+	//if int q != 0 -> notice a quit from someone
 	if (client.isOperator() == false && q == 0)
 		return (AddData(SERVER_NAME, ERR_NOPRIVILEGES));
 	for (std::map< int, Client >::iterator _it = _clients.begin(); _it != _clients.end(); ++_it)
 	{
+		if (&client == &_it->second)
+			continue ;
 		string msg = "NOTICE " + (_it->second).GetUinfo()[nickname] + " :" + str + "\r\n";
 		AddData(SERVER_NAME, msg);
 		SendData((_it->second).GetFd());
