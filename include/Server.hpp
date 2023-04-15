@@ -52,10 +52,12 @@ class Server
 		void		AddData(const string &from, const string &message, int n = 0);
 
 	private: 
-		void		_AcceptNewConnection();
-		void		_ReceiveData(struct pollfd &pfd);
-		void		_ParseRecv(const string &buf, Client &client);
-		void		_CloseConnection(struct pollfd &pfd);
+		void				_AcceptNewConnection();
+		void				_ReceiveData(struct pollfd &pfd);
+		void				_ParseRecv(const string &buf, Client &client);
+		void				_CloseConnection(struct pollfd &pfd);
+		void				_CloseConnection(Client &client);
+		vec_pfd::iterator	_GetPfdFromFd(int fd);
 
 		void		_ExecCommand(const Command &cmd, Client &client); // Switch case
 		CmdVal		_ResolveOption(const string &input); // Return a enum code for switch case eval

@@ -24,7 +24,7 @@
 # define RPL_TOPICWHOTIME(nick, chan, whoset, user, setat) ("333 " + nick + " " + chan + " " + whoset + "!" + user + "@localhost " + setat + "\r\n")
 # define ERR_ALREADYREGISTERED "462 :You may not reregister\r\n"
 # define ERR_NEEDMOREPARAMS(command) (std::string("461 ") + command + " :Not enough parameters\r\n")
-# define ERR_PASSWDMISMATCH "464 :Password incorrect\r\n"
+# define ERR_PASSWDMISMATCH(from) "464 " + from + " :Password incorrect\r\n"
 # define ERR_NONICKNAMEGIVEN "431 :No nickname given\r\n"
 # define ERR_ERRONEUSNICKNAME(nick) ("432 " + nick + " :Erroneous nickname\r\n")
 # define ERR_NICKNAMEINUSE(to, nick) ("433 " + to + " " + nick + " :Nickname is already in use\r\n")
@@ -55,7 +55,7 @@
 # define RPL_UMODEIS(user, mode) ("221 " + user + " +" + mode + "\r\n")
 # define RPL_CHANNELMODEIS(chan, mode, param) ("324 " + chan + " " + mode + " " + param + "\r\n")
 # define ERR_NOOPERHOST(nick) ("491 " + nick + " :No O-lines for your host\r\n")
-# define ERR_CANTKILLSERVER ("483 :You can't kill a server!\r\n")
+# define ERR_CANTKILLSERVER(from) ("483 " + from + " :You can't kill a server!\r\n")
 //⚠️ 
 # define ERR_NOORIGIN ("409 :No origin specified\r\n")
 # define ERR_NOSUCHSERVER(servername) ("402 " + servername + " :No such server\r\n")

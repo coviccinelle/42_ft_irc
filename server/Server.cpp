@@ -99,6 +99,7 @@ void	Server::_Quit(const Command &cmd, Client &client)
 	(void)cmd;
 	AddData(client.GetPrefix(), "ERROR\r\n");
 	SendData(client.GetFd());
+	std::cout << "Don't forget to send msgs" << std::endl;
 	//:TODO Send msg after !!! 
 	throw irc_error("⚠️  warning: closing connection", CLOSE_CONNECTION);
 }
@@ -111,17 +112,17 @@ void	Server::_Kill(const Command &cmd, Client &client)
 		return (AddData(SERVER_NAME, ERR_NOPRIVILEGES));
 	if (cmd.params.empty() == true || cmd.trailing.empty() == true || cmd.target.empty() == true)
 		return AddData(SERVER_NAME, ERR_NEEDMOREPARAMS("KILL"));
-	if (cmd.target[0] == "irc")
-		return AddData(SERVER_NAME, ERR_CANTKILLSERVER);
+	if (cmd.target[0] == SERVER_NAME)
+		return AddData(SERVER_NAME, ERR_CANTKILLSERVER(client.GetPrefix()));
 	if ((receiver = _FindNickname(cmd.target[0], &client)) == NULL)
 		return AddData(SERVER_NAME, ERR_NOSUCHNICK(cmd.target[0]));
 
 	std::cout << "Now kill 💀 them! Remember to send msg after" << std::endl;
-	//:TODO Send msg after !!! 
-	AddData(receiver->GetPrefix(), "ERROR\r\n");
-	SendData(receiver->GetFd());
-	throw irc_error("⚠️  warning: closing connection", CLOSE_CONNECTION);
 
+	//:TODO Send msg after !!! 
+//	AddData(receiver->GetPrefix(), "ERROR\r\n");
+//	SendData(receiver->GetFd());
+	_CloseConnection(*receiver);
 }
 
 void	Server::_Join(const Command &cmd, Client &client)
@@ -313,7 +314,7 @@ void Server::_Oper(const Command &cmd, Client &client)
 	if (cmd.middle.size() < 1)
 		return (AddData(SERVER_NAME, ERR_NEEDMOREPARAMS("MODE")));
 	if (cmd.middle.size() < 2 || _operPass != string(cmd.params.begin() + (cmd.middle[0].size() + 1), cmd.params.end()))
-		return (AddData(SERVER_NAME, ERR_PASSWDMISMATCH));
+		return (AddData(SERVER_NAME, ERR_PASSWDMISMATCH(client.GetPrefix())));
 	if (client.GetUinfo()[nickname] != cmd.middle[0])
 		return (AddData(SERVER_NAME, ERR_NOOPERHOST(client.GetUinfo()[nickname])));
 	client.SetMode('o', true);
@@ -423,6 +424,24 @@ void Server::_AcceptNewConnection()
 		_clients.insert(std::make_pair(new_fd, client));
 		std::cout << "ℹ️  irc server:\033[0;32m connection etablished\033[0;37m from " << client.GetIp() << " on socket " << client.GetFd() << std::endl;
 	}
+}
+
+vec_pfd::iterator	Server::_GetPfdFromFd(int fd)
+{
+	for (vec_pfd::iterator it = _pollfds.begin(); it != _pollfds.end(); ++it)
+	{
+		if (it->fd == fd)
+			return (it);
+	}
+	return (_pollfds.end());
+}
+
+void	Server::_CloseConnection(Client &client)
+{
+	std::cout << "ℹ️  irc server:\033[0;31m connection close \033[0;37mfor "<< client.GetUinfo()[nickname] << " on socket " << client.GetFd() << std::endl;
+	_clients.erase(client.GetFd());
+	close(client.GetFd());
+	_pollfds.erase(_GetPfdFromFd(client.GetFd()));
 }
 
 void	Server::_CloseConnection(struct pollfd &pfd)
