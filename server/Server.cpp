@@ -542,7 +542,7 @@ void	Server::_Kill(const Command &cmd, Client &client)
 
 void	Server::_Quit(const Command &cmd, Client &client)
 {
-	string msg = " 💀👋 \033[0;214m " + client.GetUinfo()[nickname] + " has \033[0;31mquit\033[0;37m because :" + cmd.trailing + "\r\n";
+	string msg = " 👋 \033[0;214m " + client.GetUinfo()[nickname] + " has \033[0;31mquit\033[0;37m because :" + cmd.trailing + "\r\n";
 	_NoticeServ(msg, client, 1);
 	AddData(client.GetPrefix(), "ERROR :" + cmd.trailing + "\r\n");
 	SendData(client.GetFd());
