@@ -25,6 +25,8 @@ const string	parseArgs(int ac, char **av)
 
 int main(int ac, char **av)
 {
+	int *p = NULL;
+	std::cout << *p << std::endl;
 	//system("clear");
 	std::cout << "------------[ IRC ]------------" << std::endl;
 	try

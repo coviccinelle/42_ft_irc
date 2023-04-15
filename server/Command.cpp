@@ -1,13 +1,8 @@
-#include "../include/Command.hpp"
+#include "Command.hpp"
 
 Command::Command(void) :
-	message(""),
-	prefix(""),
-	params(""),
-	user(""),
-	host(""),
-	nickname(""),
-	command("")
+	cinfo(INF_CMD_SIZE),
+	middle()
 {
 	return ;
 }
@@ -19,52 +14,72 @@ Command::~Command(void)
 
 Command::Command(Command const &src)
 {
-	message = src.message;
-	prefix = src.prefix;
-	params = src.params;
-	user = src.user;
-	host = src.host;
-	nickname = src.nickname;
-	command = src.command;
-	middle = src.middle;
-	target = src.target;
-	trailing = src.trailing;
+	_cinfo = src._cinfo;
+	_middle = src._middle;
 
 	return ;
 }
 
 Command &Command::operator=(Command const &rhs)
 {
-	if (&rhs == this)
+	if (this == &rhs)
 		return (*this);
-
-	message = rhs.message;
-	prefix = rhs.prefix;
-	params = rhs.params;
-	user = rhs.user;
-	host = rhs.host;
-	nickname = rhs.nickname;
-	command = rhs.command;
-	middle = rhs.middle;
-	target = rhs.target;
-	trailing = rhs.trailing;
-
+	_cinfo = rhs._cinfo;
+	_middle = rhs._middle;
 	return (*this);
 }
 
-void Command::Debug() const
+cst_vec_str	&GetCinfo() const
 {
-	std::cout << "===========[ DEBUG ]===========" << std::endl;
-	std::cout << "Message :[" << message << "]" << std::endl;
-	std::cout << "Params :[" << params << "]" << std::endl;
-	std::cout << "Prefix :[" << prefix << "]" << std::endl;
-	std::cout << "User :[" << user << "]" << std::endl;
-	std::cout << "Host :[" << host << "]" << std::endl;
-	std::cout << "Nickname :[" << nickname << "]" << std::endl;
-	std::cout << "Command :[" << command << "]" << std::endl;
-	std::cout << "Middle : " << std::endl;
-	for (std::vector<string>::const_iterator it = middle.begin(); it != middle.end(); ++it)
-		std::cout << " [" << *it << "]" << std::endl;
-	std::cout << "Trailing : " << trailing << std::endl;
-	std::cout << "===============================" << std::endl;
+	return (_cinfo);
+}
+
+cst_vec_str	&GetMiddle() const
+{
+	return (_middle);
+}
+
+void	Command::SetMessage(const string &s)
+{
+	_cmd[message] = s;
+}
+
+void	Command::SetPrefix(const string &s)
+{
+	_cmd[prefix] = s;
+}
+
+void	Command::SetParams(const string &s)
+{
+	_cmd[params] = s;
+}
+
+void	Command::SetUser(const string &s)
+{
+	_cmd[user] = s;
+}
+
+void	Command::SetHost(const string &s)
+{
+	_cmd[host] = s;
+}
+
+void	Command::SetNickname(const string &s)
+{
+	_cmd[nick] = s;
+}
+
+void	Command::SetCommand(const string &s)
+{
+	_cmd[command] = s;
+}
+
+void	Command::SetTrailing(const string &s)
+{
+	_cmd[trailing] = s;
+}
+
+void	Command::AddMiddle(const string &s)
+{
+	_middle.push_back(s);
 }

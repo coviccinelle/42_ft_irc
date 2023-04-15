@@ -1,6 +1,7 @@
 #ifndef CHANNELPARSER_HPP
 #define CHANNELPARSER_HPP
 #include "../utils/utils.hpp"
+#include "../include/ChannelParser.hpp"
 
 class ChannelParser
 {

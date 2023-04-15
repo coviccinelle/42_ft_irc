@@ -3,7 +3,7 @@
 
 #include "../utils/utils.hpp"
 #include "../include/irc_error.hpp"
-#include "../include/Parser.hpp"
+#include "../include/CommandParser.hpp"
 #include "../include/Channel.hpp"
 #include "../include/Errors.hpp"
 
@@ -89,7 +89,7 @@ class Client
 		std::bitset< MODE_SIZE >		_mode;
 
 		/* Utils */
-		Parser							_parser;
+		CommandParser					_cmdParser;
 };
 
 // Non-Member function

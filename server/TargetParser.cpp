@@ -39,15 +39,16 @@ void TargetParser::Debug() const
 	std::cout << "===========================" << std::endl;
 }
 
-void	TargetParser::Parse(const string &str)
+void	TargetParser::_Target(const string &str)
 {
-	_intput = str;
-	_it = --_input.begin();
-	_Target();
+
 }
 
 void	TargetParser::_Target()
 {
+	_input = str;
+	_it = --_input.begin();
+
 	std::string::iterator start = _it + 1;
 	std::string::iterator start2 = _it + 1;
 	_Wrapper();
@@ -57,12 +58,13 @@ void	TargetParser::_Target()
 			throw irc_error("parsing failed: _Target: colon found", ERR_MIDDLE);
 		if (_current == comma)
 		{
-			targets.push_back(string(start, _it));
+			_cmd->target.push_back(string(start, _it));
 			start = _it + 1;
 		}
 		else if (_current == space || _current == eoi)
 		{
-			targets.push_back(string(start, _it));
+			_cmd->target.push_back(string(start, _it));
+			_cmd->middle.push_back(string(start2, _it));
 			return ;
 		}
 		_Wrapper();

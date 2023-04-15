@@ -3,9 +3,6 @@
 
 #include "../utils/utils.hpp"
 #include "../include/irc_error.hpp"
-#include "../include/Command.hpp"
-#include "../include/ChannelParse.hpp"
-#include "../include/TargetParse.hpp"
 
 #define NUL 0x00
 #define SPACE 0x20
@@ -31,67 +28,37 @@ enum Token {
 	error
 };
 
+// Base Parser class
 class Parser
 {
 	public:
 		Parser(void);
-		~Parser(void);
+		virtual ~Parser(void);
 		Parser(Parser const &src);
 		Parser	&operator=(Parser const &rhs);
 
-		// Call Tokenizer
-		const std::vector< Token >	&Tokens() const;
 		// ParseCommand
-		void						Parse(const string &str);
+		virtual void				Parse(const string &str) = 0;
+		virtual void				Debug() const = 0;
 		// Check Nickname
 		bool						isValidNick(const string &str);
 		bool						isValidUserMode(const string &str);
-		void						ParseChannel(const string &str);
 
-		const Command				&GetCommand() const;
-		const ChannelParse 			&GetChan() const;
-		const TargetParse			&GetTarget() const;
+	protected:
+		// Call Tokenizer
+		Token						_GetToken();
+		// Get next token
+		void						_Wrapper();
 
 	private:
-		// Tokenizer
-		Token					_GetToken();
-
-		// General command parser
-		void					_InitCmd();
-		void					_Command();
-
-		void					_Wrapper();
-		void					_Message();
-		void					_Nickname();
-		void					_Prefix();
-		void					_User();
-		void					_Host();
-		void					_Param();
-		void					_Middle();
-		void					_Trailing();
-		void					_MsgTo();
 
 		// Target Parse
-		void					_InitTarget();
 		void					_Target();
 
-		// Channel Parse
-		void					_InitChan();
-		void					_Channel();
-
-		void					_ChannelPrefix();
-		void					_ChannelId();
-		void					_ChannelSuffix();
-		void					_ChannelString();
-
-		// Private Member
 		string::iterator		_it;
 		Token					_current;
 		std::vector< Token >	_tokens;
 		string					_input;
-		Command					*_cmd;
-		ChannelParse			*_chan;
-		TargetParse				*_target;
 };
 
 bool	isspecial(string::const_iterator it);
