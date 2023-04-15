@@ -98,9 +98,11 @@ void	Server::_Quit(const Command &cmd, Client &client)
 {
 	(void)cmd;
 	AddData(client.GetPrefix(), "ERROR\r\n");
-	SendData(client.GetFd());
-	std::cout << "Don't forget to send msgs" << std::endl;
+//	SendData(client.GetFd());
 	//:TODO Send msg after !!! 
+	string msg = "QUIT " + SERVER_NAME + " 💀👋 \033[0;214m " + client.GetUinfo()[nickname] + " has \033[0;31mquit\033[0;37m because of :" + cmd.trailing + "\r\n";
+	AddData(SERVER_NAME, msg);
+	SendData(client.GetFd());
 	throw irc_error("⚠️  warning: closing connection", CLOSE_CONNECTION);
 }
 
@@ -117,11 +119,9 @@ void	Server::_Kill(const Command &cmd, Client &client)
 	if ((receiver = _FindNickname(cmd.target[0], &client)) == NULL)
 		return AddData(SERVER_NAME, ERR_NOSUCHNICK(cmd.target[0]));
 
-	std::cout << "Now kill 💀 them! Remember to send msg after" << std::endl;
-
-	//:TODO Send msg after !!! 
-//	AddData(receiver->GetPrefix(), "ERROR\r\n");
-//	SendData(receiver->GetFd());
+	string msg = "NOTICE " + SERVER_NAME + " 💀 🥷 ☠️  ⚰️ 👋 \033[0;214m " + receiver->GetUinfo()[nickname] + "'s connection has been \033[0;31mkilled\033[0;37m because of :" + cmd.trailing + "\r\n";
+	AddData(SERVER_NAME, msg);
+	SendData(receiver->GetFd());
 	_CloseConnection(*receiver);
 }
 
