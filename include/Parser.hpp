@@ -28,6 +28,18 @@ enum Token {
 	error
 };
 
+#define INF_CMD_SIZE 8
+enum InfoCommand {
+	message = 0,
+	prefix,
+	params,
+	user,
+	host,
+	nick,
+	command,
+	trailing
+};
+
 // Base Parser class
 class Parser
 {
@@ -45,20 +57,37 @@ class Parser
 		bool						isValidUserMode(const string &str);
 
 	protected:
-		// Call Tokenizer
-		Token						_GetToken();
-		// Get next token
-		void						_Wrapper();
+		// Tokenizer
+		Token					_GetToken();
+		// Get next Token
+		void					_Wrapper();
 
-	private:
+		// Utils
+		cst_vec_str	&GetCinfo() const;
+		cst_vec_str	&GetMiddle() const;
+		cst_vec_str	&GetTargets() const;
 
-		// Target Parse
-		void					_Target();
+		void	SetMessage(const string &s);
+		void	SetPrefix(const string &s);
+		void	SetParams(const string &s);
+		void	SetUser(const string &s);
+		void	SetHost(const string &s);
+		void	SetNickname(const string &s);
+		void	SetCommand(const string &s);
+		void	SetTrailing(const string &s);
+		void	AddMiddle(const string &s);
+		void	AddTarget(const string &s);
 
+		// Tokenizer utils
 		string::iterator		_it;
 		Token					_current;
 		std::vector< Token >	_tokens;
 		string					_input;
+
+		// Data for utils
+		vec_str					_cinfo;
+		vec_str					_middle;
+		vec_str					_targets;
 };
 
 bool	isspecial(string::const_iterator it);

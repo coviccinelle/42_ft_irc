@@ -2,20 +2,24 @@
 #define COMMANDPARSER_HPP
 #include "../utils/utils.hpp"
 #include "../include/Parser.hpp"
-#include "../include/Command.hpp"
+
+class Command;
 
 class CommandParser : public Parser
 {
 	public:
-		CommandParser(void);
-		~CommandParser(void);
+		CommandParser();
+		virtual ~CommandParser();
 		CommandParser(CommandParser const &src);
 		CommandParser	&operator=(CommandParser const &rhs);
 		
-		void	Parse(const string &str);
-		void	Debug() const;
+		void					ParseCommand(const string &str);
+		void					DebugCommand() const;
 
 	private:
+		void					Parse(const string &str);
+		void					Debug() const;
+
 		void					_Message();
 		void					_Command();
 		void					_Nickname();
@@ -25,8 +29,6 @@ class CommandParser : public Parser
 		void					_Prefix();
 		void					_Trailing();
 		void					_Param();
-
-		Command					_cmd;
 };
 
 #endif

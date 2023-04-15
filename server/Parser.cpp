@@ -4,39 +4,28 @@ Parser::Parser(void) :
 	_it(),
 	_current(error),
 	_tokens(),
-	_cmd(NULL),
-	_chan(NULL),
-	_target(NULL)
+	_input(""),
+	_cinfo(INF_CMD_SIZE),
+	_middle(),
+	_targets()
 {
 	return ;
 }
 
 Parser::~Parser(void)
 {
-	if (_cmd != NULL)
-		delete _cmd;
-	if (_chan != NULL)
-		delete _chan;
-	if (_target != NULL)
-		delete _target;
 	return ;
 }
 
-Parser::Parser(Parser const &src)
+Parser::Parser(Parser const &src) :
+	_it(src._it),
+	_current(src._current),
+	_tokens(src._tokens),
+	_input(src._input),
+	_cinfo(src._cinfo),
+	_middle(src._middle),
+	_targets(src._targets)
 {
-	_it = src._it;
-	_current = src._current;
-	_tokens = src._tokens;
-	_input = src._input;
-	_cmd = NULL;
-	_chan = NULL;
-	_target = NULL;
-	if (_cmd)
-		_cmd = new Command(*src._cmd);
-	if (_chan)
-		_chan = new ChannelParse(*src._chan);
-	if (_target)
-		_target = new TargetParse(*src._target);
 
 	return ;
 }
@@ -49,18 +38,9 @@ Parser &Parser::operator=(Parser const &rhs)
 	_current = rhs._current;
 	_tokens = rhs._tokens;
 	_input = rhs._input;
-	if (_cmd)
-		delete _cmd;
-	if (_chan)
-		delete _chan;
-	if (_target)
-		delete _target;	
-	if (rhs._cmd)
-		_cmd = new Command(*rhs._cmd);
-	if (rhs._chan)
-		_chan = new ChannelParse(*rhs._chan);
-	if (rhs._target)
-		_target = new TargetParse(*rhs._target);
+	_cinfo = rhs._cinfo;
+	_middle = rhs._middle;
+	_targets = rhs._targets;
 
 	return (*this);
 }
@@ -190,4 +170,70 @@ bool	Parser::isValidUserMode(const string &str)
 		++it;
 	}
 	return (true);
+}
+
+
+cst_vec_str	&Parser::GetCinfo() const
+{
+	return (_cinfo);
+}
+
+cst_vec_str	&Parser::GetMiddle() const
+{
+	return (_middle);
+}
+
+cst_vec_str	&Parser::GetTargets() const
+{
+	return (_targets);
+}
+
+void	Parser::SetMessage(const string &s)
+{
+	_cinfo[message] = s;
+}
+
+void	Parser::SetPrefix(const string &s)
+{
+	_cinfo[prefix] = s;
+}
+
+void	Parser::SetParams(const string &s)
+{
+	_cinfo[params] = s;
+}
+
+void	Parser::SetUser(const string &s)
+{
+	_cinfo[user] = s;
+}
+
+void	Parser::SetHost(const string &s)
+{
+	_cinfo[host] = s;
+}
+
+void	Parser::SetNickname(const string &s)
+{
+	_cinfo[nick] = s;
+}
+
+void	Parser::SetCommand(const string &s)
+{
+	_cinfo[command] = s;
+}
+
+void	Parser::SetTrailing(const string &s)
+{
+	_cinfo[trailing] = s;
+}
+
+void	Parser::AddMiddle(const string &s)
+{
+	_middle.push_back(s);
+}
+
+void	Parser::AddTarget(const string &s)
+{
+	_targets.push_back(s);
 }

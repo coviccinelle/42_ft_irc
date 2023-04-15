@@ -1,7 +1,7 @@
 #include "../include/CommandParser.hpp"
 
-CommandParser::CommandParser(void) :
-	_cmd()
+CommandParser::CommandParser() :
+	Parser()
 {
 	return ;
 }
@@ -11,10 +11,9 @@ CommandParser::~CommandParser(void)
 	return ;
 }
 
-CommandParser::CommandParser(CommandParser const &src)
+CommandParser::CommandParser(CommandParser const &src) :
+	Parser()
 {
-	_cmd = src._cmd;
-
 	return ;
 }
 
@@ -23,36 +22,61 @@ CommandParser &CommandParser::operator=(CommandParser const &rhs)
 	if (&rhs == this)
 		return (*this);
 
-	_cmd = rhs._cmd;
-
 	return (*this);
 }
 
 void CommandParser::Debug() const
 {
 	std::cout << "===========[ DEBUG ]===========" << std::endl;
-	std::cout << "Message :[" << _cmd.GetCinfo()[message] << "]" << std::endl;
-	std::cout << "Params :[" << _cmd.Getinfo()[params] << "]" << std::endl;
-	std::cout << "Prefix :[" << _cmd.Getinfo()[prefix] << "]" << std::endl;
-	std::cout << "User :[" << _cmd.Getinfo()[user] << "]" << std::endl;
-	std::cout << "Host :[" << _cmd.Getinfo()[host] << "]" << std::endl;
-	std::cout << "Nickname :[" << _cmd.Getinfo()[nickname] << "]" << std::endl;
-	std::cout << "Command :[" << _cmd.Getinfo()[command] << "]" << std::endl;
+	std::cout << "Message :[" << GetCinfo()[message] << "]" << std::endl;
+	std::cout << "Params :[" << GetCinfo()[params] << "]" << std::endl;
+	std::cout << "Prefix :[" << GetCinfo()[prefix] << "]" << std::endl;
+	std::cout << "User :[" << GetCinfo()[user] << "]" << std::endl;
+	std::cout << "Host :[" << GetCinfo()[host] << "]" << std::endl;
+	std::cout << "Nickname :[" << GetCinfo()[nick] << "]" << std::endl;
+	std::cout << "Command :[" << GetCinfo()[command] << "]" << std::endl;
 	std::cout << "Middle : " << std::endl;
-	for (std::vector<string>::const_iterator it = _cmd.GetMiddle().begin(); it != _cmd.GetMiddle().end(); ++it)
+	for (std::vector<string>::const_iterator it = GetMiddle().begin(); it != GetMiddle().end(); ++it)
 		std::cout << " [" << *it << "]" << std::endl;
-	std::cout << "Trailing : " << trailing << std::endl;
+	std::cout << "Trailing : " << GetCinfo()[trailing] << std::endl;
 	std::cout << "===============================" << std::endl;
 }
 
 void	CommandParser::Parse(const string &str)
 {
-	_InitCmd();
 	_input = str;
 	_it = --_input.begin();
 	_Message();
 
 	return ;
+}
+
+void	CommandParser::ParseCommand(const string &str)
+{
+	Parse(str);
+}
+
+void	CommandParser::DebugCommand() const
+{
+	Debug();
+}
+
+void CommandParser::_Message()
+{
+	string::iterator	start = _input.begin();
+	_Wrapper();
+	if (_current == colon)
+	{
+		_Prefix();
+		if (_current != space)
+			throw irc_error("parsing failed: _Message: space expected", ERR_MESSAGE);
+		start = _it + 1;
+		_Wrapper();
+	}
+	_Command();
+	SetCommand(string(start, _it + 1));
+	_Param();
+	SetMessage(string(start, _it));
 }
 
 void	CommandParser::_Command()
@@ -70,12 +94,12 @@ void	CommandParser::_Middle()
 	if (_current == colon)
 	{
 		_Trailing();
-		_cmd.SetTrailing(string(start + 1, _it));
+		SetTrailing(string(start + 1, _it));
 		return ;
 	}
 	while (_current != space && _current != eoi)
 		_Wrapper();
-	_cmd.AddMidle(string(start, _it));
+	AddMiddle(string(start, _it));
 }
 
 void	CommandParser::_Nickname()
@@ -86,7 +110,7 @@ void	CommandParser::_Nickname()
 		throw irc_error("parsing failed: _Nickname: letter or special expected", ERR_NICK);
 	while (_current == letter || _current == digit || _current == special || _current == dash)
 		_Wrapper();
-	_cmd.SetNickname(string(start, _it));
+	SetNickname(string(start, _it));
 }
 
 void	CommandParser::_Host()
@@ -100,7 +124,7 @@ void	CommandParser::_Host()
 		_Wrapper();
 		if (_current == space)
 		{
-			_cmd.SetHost(string(start, _it));
+			SetHost(string(start, _it));
 			return ;
 		}
 		if (_current != digit &&
@@ -112,7 +136,7 @@ void	CommandParser::_Host()
 	}
 	if (_current == eoi)
 		throw irc_error("parsing failed: _Host: eoi found", ERR_HOST);
-	_cmd.SetHost(string(start, _it));
+	SetHost(string(start, _it));
 }
 
 void	CommandParser::_User()
@@ -126,13 +150,13 @@ void	CommandParser::_User()
 		_Wrapper();
 		if (_current == space || _current == at)
 		{
-			_cmd.SetUser(string(start, _it));
+			SetUser(string(start, _it));
 			return ;
 		}
 	}
 	if (_current == eoi)
 		throw irc_error("parsing failed: _User: eoi found", ERR_USER);
-	_cmd.SetUser(string(start, _it));
+	SetUser(string(start, _it));
 }
 
 void CommandParser::_Prefix()
@@ -148,35 +172,17 @@ void CommandParser::_Prefix()
 	}
 	else if (_current == at)
 		_Host();
-	_cmd.SetPrefix(string(start, _it));
+	SetPrefix(string(start, _it));
 }
 
 
-void CommandParser::_Message()
-{
-	string::iterator	start = _input.begin();
-	_Wrapper();
-	if (_current == colon)
-	{
-		_Prefix();
-		if (_current != space)
-			throw irc_error("parsing failed: _Message: space expected", ERR_MESSAGE);
-		start = _it + 1;
-		_Wrapper();
-	}
-	_Command();
-	_cmd.SetCommand(string(start, _it + 1));
-	_Param();
-	_cmd.SetMessage(string(start, _it));
-}
-
-void	Parser::_Trailing()
+void	CommandParser::_Trailing()
 {
 	while (_current != eoi)
 		_Wrapper();
 }
 
-void	Parser::_Param()
+void	CommandParser::_Param()
 {
 	_Wrapper();
 	if (_current == eoi)
@@ -190,5 +196,5 @@ void	Parser::_Param()
 			throw irc_error("parsing failed: _Param: space expected", ERR_PARAM);
 		_Middle();
 	}
-	_cmd.SetParams(string(start, _it));
+	SetParams(string(start, _it));
 }
