@@ -51,17 +51,11 @@ class Parser
 		// Wrap GetToken function
 		void					_Wrapper();
 
-		void	AddMiddle(const string &s);
-		void	AddTarget(const string &s);
-
 		// Tokenizer utils
 		string::iterator		_it;
 		Token					_current;
 		std::vector< Token >	_tokens;
 		string					_input;
-
-		// Data for utils
-		vec_str					_targets;
 };
 
 bool	isspecial(string::const_iterator it);

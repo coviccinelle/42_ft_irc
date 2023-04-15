@@ -4,20 +4,18 @@
 #include "../utils/utils.hpp"
 #include "../include/CommandParser.hpp"
 #include "../include/TargetParser.hpp"
-//#include "../include/ChannelParser.hpp"
+#include "../include/ChannelParser.hpp"
 
-class Command : public CommandParser, public TargetParser
+class Command :
+	public CommandParser,
+	public TargetParser,
+	public ChannelParser
 {
 	public:
 		Command(void);
 		~Command(void);
 		Command(Command const &src);
 		Command	&operator=(Command const &rhs);
-
-		// Utils
-		cst_vec_str	&GetCinfo() const;
-		cst_vec_str	&GetMiddle() const;
-		cst_vec_str	&GetTargets() const;
 };
 
 #endif

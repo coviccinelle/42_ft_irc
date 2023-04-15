@@ -4,8 +4,7 @@ Parser::Parser(void) :
 	_it(),
 	_current(error),
 	_tokens(),
-	_input(""),
-	_targets()
+	_input("")
 {
 	return ;
 }
@@ -19,8 +18,7 @@ Parser::Parser(Parser const &src) :
 	_it(src._it),
 	_current(src._current),
 	_tokens(src._tokens),
-	_input(src._input),
-	_targets(src._targets)
+	_input(src._input)
 {
 
 	return ;
@@ -34,7 +32,6 @@ Parser &Parser::operator=(Parser const &rhs)
 	_current = rhs._current;
 	_tokens = rhs._tokens;
 	_input = rhs._input;
-	_targets = rhs._targets;
 
 	return (*this);
 }

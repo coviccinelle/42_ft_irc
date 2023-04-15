@@ -35,7 +35,7 @@ void CommandParser::Debug() const
 	std::cout << "===========[ DEBUG ]===========" << std::endl;
 	std::cout << "Message :[" << GetCinfo()[message] << "]" << std::endl;
 	std::cout << "Params :[" << GetCinfo()[params] << "]" << std::endl;
-	std::cout << "Prefix :[" << GetCinfo()[prefix] << "]" << std::endl;
+	std::cout << "Prefix :[" << GetCinfo()[cmdprefix] << "]" << std::endl;
 	std::cout << "User :[" << GetCinfo()[user] << "]" << std::endl;
 	std::cout << "Host :[" << GetCinfo()[host] << "]" << std::endl;
 	std::cout << "Nickname :[" << GetCinfo()[nick] << "]" << std::endl;
@@ -211,7 +211,7 @@ void	CommandParser::SetMessage(const string &s)
 
 void	CommandParser::SetPrefix(const string &s)
 {
-	_cinfo[prefix] = s;
+	_cinfo[cmdprefix] = s;
 }
 
 void	CommandParser::SetParams(const string &s)

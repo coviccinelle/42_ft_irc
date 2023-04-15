@@ -1,11 +1,8 @@
 #include "../include/ChannelParser.hpp"
 
 ChannelParser::ChannelParser(void) :
-	channel(""),
-	prefix(""),
-	channelid(""),
-	chanstring(""),
-	suffix("")
+	Parser(),
+	_channels(INF_CHAN_SIZE)
 {
 	return ;
 }
@@ -15,14 +12,10 @@ ChannelParser::~ChannelParser(void)
 	return ;
 }
 
-ChannelParser::ChannelParser(ChannelParser const &src)
+ChannelParser::ChannelParser(ChannelParser const &src) :
+	Parser(),
+	_channels(src._channels)
 {
-	channel = src.channel;
-	prefix = src.prefix;
-	channelid = src.channelid;
-	chanstring = src.chanstring;
-	suffix = src.suffix;
-
 	return ;
 }
 
@@ -31,11 +24,7 @@ ChannelParser &ChannelParser::operator=(ChannelParser const &rhs)
 	if (&rhs == this)
 		return (*this);
 
-	channel = rhs.channel;
-	prefix = rhs.prefix;
-	channelid = rhs.channelid;
-	chanstring = rhs.chanstring;
-	suffix = rhs.suffix;
+	_channels = rhs._channels;
 
 	return (*this);
 }
@@ -43,11 +32,11 @@ ChannelParser &ChannelParser::operator=(ChannelParser const &rhs)
 void ChannelParser::Debug() const
 {
 	std::cout << "===========[ DEBUG ChannelParser ]===========" << std::endl;
-	std::cout << "Channel :[" << channel << "]" << std::endl;
-	std::cout << "Prefix :[" << prefix << "]" << std::endl;
-	std::cout << "Channelid :[" << channelid << "]" << std::endl;
-	std::cout << "Chanstring :[" << chanstring << "]" << std::endl;
-	std::cout << "Suffix :[" << suffix << "]" << std::endl;
+	std::cout << "Channel :[" << GetChannels()[chan] << "]" << std::endl;
+	std::cout << "Prefix :[" << GetChannels()[chanprefix] << "]" << std::endl;
+	std::cout << "Channelid :[" << GetChannels()[chanid] << "]" << std::endl;
+	std::cout << "Chanstring :[" << GetChannels()[chanstring] << "]" << std::endl;
+	std::cout << "Suffix :[" << GetChannels()[chansuffix] << "]" << std::endl;
 	std::cout << "===========================" << std::endl;
 }
 
@@ -56,6 +45,16 @@ void	ChannelParser::Parse(const string &str)
 	_input = str;
 	_it = --_input.begin();
 	_Channel();
+}
+
+void	ChannelParser::ParseChannel(const string &str)
+{
+	Parse(str);
+}
+
+void	ChannelParser::DebugChannel() const
+{
+	Debug();
 }
 
 void	ChannelParser::_ChannelId()
@@ -69,7 +68,7 @@ void	ChannelParser::_ChannelId()
 			throw irc_error("parsing failed: _ChannelId: channelid expected", ERR_CHANNELID);
 		++_it;
 	}
-	_chan->channelid = string(start, _it--);
+	SetId(string(start, _it--));
 }
 
 void	ChannelParser::_ChannelPrefix()
@@ -81,7 +80,7 @@ void	ChannelParser::_ChannelPrefix()
 		_current != excl_mark &&
 		_current != amp)
 		throw irc_error("parsing failed: _ChannelPrefix: sha or plus or excl_mark or amp expected", ERR_CHANNELPREFIX);
-	_chan->prefix = string(start, _it + 1);
+	SetPrefix(string(start, _it + 1));
 	if (_current == excl_mark)
 		_ChannelId();
 }
@@ -98,7 +97,7 @@ void	ChannelParser::_ChannelSuffix()
 		if (_current == colon)
 			throw irc_error("parsing failed: _ChannelSuffix: chanstring expected", ERR_CHANNELSUFFIX);
 	}
-	_chan->suffix = string(start, _it);
+	SetSuffix(string(start, _it));
 }
 
 void ChannelParser::_ChannelString()
@@ -111,11 +110,11 @@ void ChannelParser::_ChannelString()
 		_Wrapper();
 		if (_current == colon)
 		{
-			_chan->chanstring = string(start, _it);
+			SetChanstring(string(start, _it));
 			return _ChannelSuffix();
 		}
 	}
-	_chan->chanstring = string(start, _it);
+	SetChanstring(string(start, _it));
 }
 
 void	ChannelParser::_Channel()
@@ -123,5 +122,35 @@ void	ChannelParser::_Channel()
 	string::iterator	start = _it + 1;
 	_ChannelPrefix();
 	_ChannelString();
-	_chan->channel = string(start, _it);
+	SetChannel(string(start, _it));
+}
+
+void	ChannelParser::SetChannel(const string &s)
+{
+	_channels[chan] = s;
+}
+
+void	ChannelParser::SetPrefix(const string &s)
+{
+	_channels[chanprefix] = s;
+}
+
+void	ChannelParser::SetId(const string &s)
+{
+	_channels[chanid] = s;
+}
+
+void	ChannelParser::SetChanstring(const string &s)
+{
+	_channels[chanstring] = s;
+}
+
+void	ChannelParser::SetSuffix(const string &s)
+{
+	_channels[chansuffix] = s;
+}
+
+cst_vec_str	&ChannelParser::GetChannels() const
+{
+	return (_channels);
 }

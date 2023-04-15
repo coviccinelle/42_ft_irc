@@ -6,7 +6,7 @@
 #define INF_CMD_SIZE 8
 enum InfoCommand {
 	message = 0,
-	prefix,
+	cmdprefix,
 	params,
 	user,
 	host,

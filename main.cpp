@@ -3,15 +3,15 @@
 
 int	main(void)
 {
-	Command parser;
+	Command cmd;
 
-	parser.ParseCommand(":irc PASS toto :coucou");
-	parser.DebugCommand();
+	cmd.ParseCommand(":irc PASS toto :coucou");
+	cmd.DebugCommand();
 
-	parser.ParseTarget("toto,tata,titi");
-	parser.DebugTarget();
+	cmd.ParseTarget("toto,tata,titi");
+	cmd.DebugTarget();
 
-//	parser.ParseChannel("#channel");
-//	parser.DebugChannel();
+	cmd.ParseChannel("#channel");
+	cmd.DebugChannel();
 	return (0);
 }
