@@ -96,20 +96,18 @@ void	Server::AddData(const string &from, const string &message, int n)
 
 void	Server::_Quit(const Command &cmd, Client &client)
 {
-	(void)cmd;
-	AddData(client.GetPrefix(), "ERROR\r\n");
-//	SendData(client.GetFd());
-	//:TODO Send msg after !!! 
-	string msg = "QUIT " + SERVER_NAME + " 💀👋 \033[0;214m " + client.GetUinfo()[nickname] + " has \033[0;31mquit\033[0;37m because of :" + cmd.trailing + "\r\n";
-	AddData(SERVER_NAME, msg);
+	string msg = " 💀👋 \033[0;214m " + client.GetUinfo()[nickname] + " has \033[0;31mquit\033[0;37m because :" + cmd.trailing + "\r\n";
+	_NoticeServ(msg, client, 1);
+	AddData(client.GetPrefix(), "ERROR :" + cmd.trailing + "\r\n");
 	SendData(client.GetFd());
+//	_CloseConnection(client);
+
 	throw irc_error("⚠️  warning: closing connection", CLOSE_CONNECTION);
 }
 
 void	Server::_Kill(const Command &cmd, Client &client)
 {
 	Client *receiver;
-	std::cout << "yoooooo It's me small kill" << std::endl;
 	if (client.isOperator() == false)
 		return (AddData(SERVER_NAME, ERR_NOPRIVILEGES));
 	if (cmd.params.empty() == true || cmd.trailing.empty() == true || cmd.target.empty() == true)
@@ -119,7 +117,7 @@ void	Server::_Kill(const Command &cmd, Client &client)
 	if ((receiver = _FindNickname(cmd.target[0], &client)) == NULL)
 		return AddData(SERVER_NAME, ERR_NOSUCHNICK(cmd.target[0]));
 
-	string msg = "NOTICE " + SERVER_NAME + " 💀 🥷 ☠️  ⚰️ 👋 \033[0;214m " + receiver->GetUinfo()[nickname] + "'s connection has been \033[0;31mkilled\033[0;37m because of :" + cmd.trailing + "\r\n";
+	string msg = "NOTICE " + SERVER_NAME + " 💀 🥷 ☠️  ⚰️ 👋 \033[0;214m " + receiver->GetUinfo()[nickname] + "'s connection has been \033[0;31mkilled\033[0;37m because :" + cmd.trailing + "\r\n";
 	AddData(SERVER_NAME, msg);
 	SendData(receiver->GetFd());
 	_CloseConnection(*receiver);
@@ -267,15 +265,31 @@ Client* Server::_FindNickname(const string &nick, Client *skip)
 	return (NULL);
 }
 
+void	Server::_NoticeServ(const string str, Client &client, int q)
+{
+	if (client.isOperator() == false && q == 0)
+		return (AddData(SERVER_NAME, ERR_NOPRIVILEGES));
+	for (std::map< int, Client >::iterator _it = _clients.begin(); _it != _clients.end(); ++_it)
+	{
+		string msg = "NOTICE " + (_it->second).GetUinfo()[nickname] + " :" + str + "\r\n";
+		AddData(SERVER_NAME, msg);
+		SendData((_it->second).GetFd());
+	}
+}
+
 void	Server::_Notice(const Command &cmd, Client &client)
 {
-	(void)client;
 	Client			*receiver;
 	if (cmd.trailing.empty()) //no text to send
 		return ;
 	for (std::vector<string>::const_iterator it = cmd.target.begin(); it != cmd.target.end(); ++it)
 	{
-		if ((receiver = _FindNickname(*it)) == NULL)
+		if (*it == SERVER_NAME)
+		{
+			_NoticeServ(cmd.trailing, client);
+			continue ;
+		}
+		else if ((receiver = _FindNickname(*it)) == NULL)
 			continue ;
 		else
 		{

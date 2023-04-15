@@ -71,6 +71,8 @@ class Server
 		void 		_PrivMsg(const Command &cmd, Client &client);
 		void		_Mode(const Command &cmd, Client &client);
 		void		_Notice(const Command &cmd, Client &client);
+		void		_NoticeServ(const string str, Client &client, int q = 0);
+		
 		void		_Join(const Command &cmd, Client &client);
 		void		_Quit(const Command &cmd, Client &client);
 		void		_Kill(const Command &cmd, Client &client);
