@@ -23,6 +23,12 @@ Server::Server(const string &port, const string &pass, const string &operPass) :
 	_funcTable.push_back(&Server::_Join);
 	_funcTable.push_back(&Server::_Quit);
 	_funcTable.push_back(&Server::_Kill);
+	_funcTable.push_back(&Server::_Part);
+	_funcTable.push_back(&Server::_Topic);
+	_funcTable.push_back(&Server::_Names);
+	_funcTable.push_back(&Server::_List);
+	_funcTable.push_back(&Server::_Invite);
+	_funcTable.push_back(&Server::_Kick);
 	_mapCmd.insert(std::make_pair(string("CAP"), CAP));
 	_mapCmd.insert(std::make_pair(string("PASS"), PASS));
 	_mapCmd.insert(std::make_pair(string("NICK"), NICK));
@@ -35,6 +41,12 @@ Server::Server(const string &port, const string &pass, const string &operPass) :
 	_mapCmd.insert(std::make_pair(string("JOIN"), JOIN));
 	_mapCmd.insert(std::make_pair(string("QUIT"), QUIT));
 	_mapCmd.insert(std::make_pair(string("kill"), KILL));
+	_mapCmd.insert(std::make_pair(string("PART"), PART));
+	_mapCmd.insert(std::make_pair(string("TOPIC"), TOPIC));
+	_mapCmd.insert(std::make_pair(string("NAMES"), NAMES));
+	_mapCmd.insert(std::make_pair(string("LIST"), LIST));
+	_mapCmd.insert(std::make_pair(string("INVITE"), INVITE));
+	_mapCmd.insert(std::make_pair(string("KICK"), KICK));
 }
 
 Server::~Server()
@@ -156,7 +168,6 @@ void Server::ConnectionLoop()
 
 void Server::SendData(int fd)
 {
-	//I want to print what we send
 	std::cout << "Sending data :[" << _data.data() << "]" << std::endl;
 	if (send(fd, _data.data(), _data.size(), 0) == -1)
 		std::cerr << "⚠️ warning : send err" << std::endl;
@@ -616,9 +627,8 @@ void	Server::_Kill(const Command &cmd, Client &client)
 	if ((receiver = _FindNickname((*targets)[0], &client)) == NULL)
 		return AddData(SERVER_NAME, ERR_NOSUCHNICK((*targets)[0]));
 
-	string msg = "NOTICE " + SERVER_NAME + " 💀 🥷 ☠️  ⚰️ 👋 \033[0;214m " + receiver->GetUinfo()[nickname] + "'s connection has been \033[0;31mkilled\033[0;37m because :" + cmd.GetCinfo()[trailing] + "\r\n";
-	AddData(SERVER_NAME, msg);
-	SendData(receiver->GetFd());
+	string msg = " 💀 🥷 ☠️  ⚰️ 👋 \033[0;214m " + receiver->GetUinfo()[nickname] + "'s connection has been \033[0;31mkilled\033[0;37m because :" + cmd.GetCinfo()[trailing] + "\r\n";
+	_NoticeServ(msg, client, 1);
 	_CloseConnection(*receiver);
 }
 
@@ -628,8 +638,6 @@ void	Server::_Quit(const Command &cmd, Client &client)
 	_NoticeServ(msg, client, 1);
 	AddData(client.GetPrefix(), "ERROR :" + cmd.GetCinfo()[trailing] + "\r\n");
 	SendData(client.GetFd());
-//	_CloseConnection(client);
-
 	throw irc_error("⚠️  warning: closing connection", CLOSE_CONNECTION);
 }
 
@@ -662,3 +670,44 @@ void	Server::_Join(const Command &cmd, Client &client)
 	return ;
 }
 
+void	Server::_Part(const Command &cmd, Client &client)
+{
+	std::cout << "Hey I'm command Part ! Nice to meet you" << std::endl;
+	(void)cmd;
+	(void)client;
+}
+
+void	Server::_Topic(const Command &cmd, Client &client)
+{
+	std::cout << "Hey I'm command Topic ! Nice to meet you" << std::endl;
+	(void)cmd;
+	(void)client;
+}
+
+void	Server::_Names(const Command &cmd, Client &client)
+{
+	std::cout << "Hey I'm command Names ! Nice to meet you" << std::endl;
+	(void)cmd;
+	(void)client;
+}
+
+void	Server::_List(const Command &cmd, Client &client)
+{
+	std::cout << "Hey I'm command List ! Nice to meet you" << std::endl;
+	(void)cmd;
+	(void)client;
+}
+
+void	Server::_Invite(const Command &cmd, Client &client)
+{
+	std::cout << "Hey I'm command Invite ! Nice to meet you" << std::endl;
+	(void)cmd;
+	(void)client;
+}
+
+void	Server::_Kick(const Command &cmd, Client &client)
+{
+	std::cout << "Hey I'm command Kick ! Nice to meet you" << std::endl;
+	(void)cmd;
+	(void)client;
+}

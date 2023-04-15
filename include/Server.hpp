@@ -25,6 +25,12 @@ enum CmdVal {
 	JOIN,
 	QUIT,
 	KILL,
+	PART,
+	TOPIC,
+	NAMES,
+	LIST,
+	INVITE,
+	KICK,
 	UNKNOWN
 };
 
@@ -74,6 +80,12 @@ class Server
 		
 // *** CHANNEL COMMANDS *** //
 		void		_Join(const Command &cmd, Client &client);
+		void		_Part(const Command &cmd, Client &client);
+		void		_Topic(const Command &cmd, Client &client);
+		void		_Names(const Command &cmd, Client &client);
+		void		_List(const Command &cmd, Client &client);
+		void		_Invite(const Command &cmd, Client &client);
+		void		_Kick(const Command &cmd, Client &client);
 
 		std::string 					_portNumber;
 		std::string 					_password;
