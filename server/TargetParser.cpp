@@ -1,7 +1,8 @@
 #include "../include/TargetParser.hpp"
 
 TargetParser::TargetParser() :
-	Parser()
+	Parser(),
+	_targets()
 {
 	return ;
 }
@@ -12,7 +13,8 @@ TargetParser::~TargetParser()
 }
 
 TargetParser::TargetParser(TargetParser const &src) :
-	Parser()
+	Parser(),
+	_targets()
 {
 	return ;
 }
@@ -72,9 +74,18 @@ void	TargetParser::_Target()
 		else if (_current == space || _current == eoi)
 		{
 			AddTarget(string(start, _it));
-			AddMiddle(string(start2, _it));
 			return ;
 		}
 		_Wrapper();
 	}
+}
+
+cst_vec_str	&TargetParser::GetTargets() const
+{
+	return (_targets);
+}
+
+void	TargetParser::AddTarget(const string &s)
+{
+	_targets.push_back(s);
 }

@@ -13,6 +13,11 @@ class Command : public CommandParser, public TargetParser
 		~Command(void);
 		Command(Command const &src);
 		Command	&operator=(Command const &rhs);
+
+		// Utils
+		cst_vec_str	&GetCinfo() const;
+		cst_vec_str	&GetMiddle() const;
+		cst_vec_str	&GetTargets() const;
 };
 
 #endif

@@ -13,11 +13,16 @@ class TargetParser : public Parser
 		
 		void	ParseTarget(const string &str);
 		void	DebugTarget() const;
+
+		cst_vec_str	&GetTargets() const;
 	private:
 		void	Parse(const string &str);
 		void	Debug() const;
 
 		void	_Target();
+		void	AddTarget(const string &s);
+
+		vec_str	_targets;
 };
 
 #endif

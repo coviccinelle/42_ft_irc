@@ -26,6 +26,9 @@ class CommandParser : public Parser
 		void		ParseCommand(const string &str);
 		void		DebugCommand() const;
 
+		cst_vec_str	&GetCinfo() const;
+		cst_vec_str	&GetMiddle() const;
+
 	private:
 		void		Parse(const string &str);
 		void		Debug() const;
@@ -38,6 +41,7 @@ class CommandParser : public Parser
 		void		SetNickname(const string &s);
 		void		SetCommand(const string &s);
 		void		SetTrailing(const string &s);
+		void		AddMiddle(const string &s);
 
 		void		_Message();
 		void		_Command();

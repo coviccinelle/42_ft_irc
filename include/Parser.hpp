@@ -44,10 +44,6 @@ class Parser
 		bool						isValidNick(const string &str);
 		bool						isValidUserMode(const string &str);
 
-		// Utils
-		cst_vec_str	&GetCinfo() const;
-		cst_vec_str	&GetMiddle() const;
-		cst_vec_str	&GetTargets() const;
 
 	protected:
 		// Call the next token; Use Wrapper instead

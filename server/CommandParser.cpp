@@ -1,7 +1,9 @@
 #include "../include/CommandParser.hpp"
 
 CommandParser::CommandParser() :
-	Parser()
+	Parser(),
+	_cinfo(INF_CMD_SIZE),
+	_middle()
 {
 	return ;
 }
@@ -12,7 +14,9 @@ CommandParser::~CommandParser(void)
 }
 
 CommandParser::CommandParser(CommandParser const &src) :
-	Parser()
+	Parser(),
+	_cinfo(INF_CMD_SIZE),
+	_middle()
 {
 	return ;
 }
@@ -21,7 +25,8 @@ CommandParser &CommandParser::operator=(CommandParser const &rhs)
 {
 	if (&rhs == this)
 		return (*this);
-
+	_cinfo = rhs._cinfo;
+	_middle = rhs._middle;
 	return (*this);
 }
 
@@ -237,4 +242,20 @@ void	CommandParser::SetCommand(const string &s)
 void	CommandParser::SetTrailing(const string &s)
 {
 	_cinfo[trailing] = s;
+}
+
+
+cst_vec_str	&CommandParser::GetCinfo() const
+{
+	return (_cinfo);
+}
+
+cst_vec_str	&CommandParser::GetMiddle() const
+{
+	return (_middle);
+}
+
+void	CommandParser::AddMiddle(const string &s)
+{
+	_middle.push_back(s);
 }

@@ -5,8 +5,6 @@ Parser::Parser(void) :
 	_current(error),
 	_tokens(),
 	_input(""),
-	_cinfo(INF_CMD_SIZE),
-	_middle(),
 	_targets()
 {
 	return ;
@@ -22,8 +20,6 @@ Parser::Parser(Parser const &src) :
 	_current(src._current),
 	_tokens(src._tokens),
 	_input(src._input),
-	_cinfo(src._cinfo),
-	_middle(src._middle),
 	_targets(src._targets)
 {
 
@@ -38,8 +34,6 @@ Parser &Parser::operator=(Parser const &rhs)
 	_current = rhs._current;
 	_tokens = rhs._tokens;
 	_input = rhs._input;
-	_cinfo = rhs._cinfo;
-	_middle = rhs._middle;
 	_targets = rhs._targets;
 
 	return (*this);
@@ -170,30 +164,4 @@ bool	Parser::isValidUserMode(const string &str)
 		++it;
 	}
 	return (true);
-}
-
-
-cst_vec_str	&Parser::GetCinfo() const
-{
-	return (_cinfo);
-}
-
-cst_vec_str	&Parser::GetMiddle() const
-{
-	return (_middle);
-}
-
-cst_vec_str	&Parser::GetTargets() const
-{
-	return (_targets);
-}
-
-void	Parser::AddMiddle(const string &s)
-{
-	_middle.push_back(s);
-}
-
-void	Parser::AddTarget(const string &s)
-{
-	_targets.push_back(s);
 }
