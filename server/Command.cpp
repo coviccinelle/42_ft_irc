@@ -12,7 +12,6 @@ Command::~Command(void)
 
 Command::Command(Command const &src)
 {
-
 	return ;
 }
 

@@ -198,3 +198,43 @@ void	CommandParser::_Param()
 	}
 	SetParams(string(start, _it));
 }
+
+void	CommandParser::SetMessage(const string &s)
+{
+	_cinfo[message] = s;
+}
+
+void	CommandParser::SetPrefix(const string &s)
+{
+	_cinfo[prefix] = s;
+}
+
+void	CommandParser::SetParams(const string &s)
+{
+	_cinfo[params] = s;
+}
+
+void	CommandParser::SetUser(const string &s)
+{
+	_cinfo[user] = s;
+}
+
+void	CommandParser::SetHost(const string &s)
+{
+	_cinfo[host] = s;
+}
+
+void	CommandParser::SetNickname(const string &s)
+{
+	_cinfo[nick] = s;
+}
+
+void	CommandParser::SetCommand(const string &s)
+{
+	_cinfo[command] = s;
+}
+
+void	CommandParser::SetTrailing(const string &s)
+{
+	_cinfo[trailing] = s;
+}

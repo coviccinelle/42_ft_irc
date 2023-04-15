@@ -6,24 +6,24 @@ class ChannelParser
 {
 	public:
 		ChannelParser(void);
-		~ChannelParser(void);
+		virtual ~ChannelParser(void);
 		ChannelParser(ChannelParser const &src);
 		ChannelParser	&operator=(ChannelParser const &rhs);
 		
-		void	Parse(const string &str);
-		void	Debug() const;
-
 		string	channel;
 		string	prefix;
 		string	channelid;
 		string	chanstring;
 		string	suffix;
 	private:
-		void					_Channel();
-		void					_ChannelPrefix();
-		void					_ChannelId();
-		void					_ChannelSuffix();
-		void					_ChannelString();
+		void	Parse(const string &str);
+		void	Debug() const;
+
+		void	_Channel();
+		void	_ChannelPrefix();
+		void	_ChannelId();
+		void	_ChannelSuffix();
+		void	_ChannelString();
 };
 
 #endif

@@ -28,18 +28,6 @@ enum Token {
 	error
 };
 
-#define INF_CMD_SIZE 8
-enum InfoCommand {
-	message = 0,
-	prefix,
-	params,
-	user,
-	host,
-	nick,
-	command,
-	trailing
-};
-
 // Base Parser class
 class Parser
 {
@@ -62,19 +50,11 @@ class Parser
 		cst_vec_str	&GetTargets() const;
 
 	protected:
-		// Tokenizer
+		// Call the next token; Use Wrapper instead
 		Token					_GetToken();
-		// Get next Token
+		// Wrap GetToken function
 		void					_Wrapper();
 
-		void	SetMessage(const string &s);
-		void	SetPrefix(const string &s);
-		void	SetParams(const string &s);
-		void	SetUser(const string &s);
-		void	SetHost(const string &s);
-		void	SetNickname(const string &s);
-		void	SetCommand(const string &s);
-		void	SetTrailing(const string &s);
 		void	AddMiddle(const string &s);
 		void	AddTarget(const string &s);
 
@@ -85,8 +65,6 @@ class Parser
 		string					_input;
 
 		// Data for utils
-		vec_str					_cinfo;
-		vec_str					_middle;
 		vec_str					_targets;
 };
 

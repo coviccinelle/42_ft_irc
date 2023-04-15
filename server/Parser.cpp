@@ -188,46 +188,6 @@ cst_vec_str	&Parser::GetTargets() const
 	return (_targets);
 }
 
-void	Parser::SetMessage(const string &s)
-{
-	_cinfo[message] = s;
-}
-
-void	Parser::SetPrefix(const string &s)
-{
-	_cinfo[prefix] = s;
-}
-
-void	Parser::SetParams(const string &s)
-{
-	_cinfo[params] = s;
-}
-
-void	Parser::SetUser(const string &s)
-{
-	_cinfo[user] = s;
-}
-
-void	Parser::SetHost(const string &s)
-{
-	_cinfo[host] = s;
-}
-
-void	Parser::SetNickname(const string &s)
-{
-	_cinfo[nick] = s;
-}
-
-void	Parser::SetCommand(const string &s)
-{
-	_cinfo[command] = s;
-}
-
-void	Parser::SetTrailing(const string &s)
-{
-	_cinfo[trailing] = s;
-}
-
 void	Parser::AddMiddle(const string &s)
 {
 	_middle.push_back(s);
