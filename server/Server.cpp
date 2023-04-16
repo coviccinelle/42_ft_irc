@@ -633,17 +633,6 @@ void	Server::_Join(Command &cmd, Client &client)
 
 	if (channels.empty())
 		return AddData(SERVER_NAME, ERR_NEEDMOREPARAMS("JOIN"));
-	try
-	{
-//		_parser.Parse(cmd.GetCinfo()[params]);
-//		ChannelParse cp = _parser.GetChan();
-//		cp.Debug();
-	}
-	catch (irc_error &e)
-	{
-		std::cout << "⚠️  warning: " << e.what() << std::endl;
-		return ;
-	}
 	_channels.push_back(Channel());
 	Channel &ch = _channels.back();
 	ch.joinChannel(client);
