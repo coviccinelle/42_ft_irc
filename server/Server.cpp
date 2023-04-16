@@ -596,14 +596,14 @@ void	Server::_Kill(Command &cmd, Client &client)
 	if ((receiver = _FindNickname(targets[0], &client)) == NULL)
 		return AddData(SERVER_NAME, ERR_NOSUCHNICK(targets[0]));
 
-	string msg = " 💀 🥷 ☠️  ⚰️ 👋 \033[0;214m " + receiver->GetUinfo()[nickname] + "'s connection has been \033[0;31mkilled\033[0;37m because :" + cmd.GetCinfo()[trailing] + "\r\n";
+	string msg = " 💀 🥷 ☠️  ⚰️ 👋 \033[0;214m " + receiver->GetUinfo()[nickname] + "'s connection has been \033[0;31mkilled\033[0;37m because :" + cmd.GetCinfo()[trailing];
 	_NoticeServ(msg, client, 1);
 	_CloseConnection(*receiver);
 }
 
 void	Server::_Quit(Command &cmd, Client &client)
 {
-	string msg = " 👋 \033[0;214m " + client.GetUinfo()[nickname] + " has \033[0;31mquit\033[0;37m because :" + cmd.GetCinfo()[trailing] + "\r\n";
+	string msg = " 👋 \033[0;214m " + client.GetUinfo()[nickname] + " has \033[0;31mquit\033[0;37m because :" + cmd.GetCinfo()[trailing];
 	_NoticeServ(msg, client, 1);
 	AddData(client.GetPrefix(), "ERROR :" + cmd.GetCinfo()[trailing] + "\r\n");
 	SendData(client.GetFd());
