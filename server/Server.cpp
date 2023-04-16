@@ -336,12 +336,12 @@ void	Server::_NoticeServ(const string str, Client &client, int q)
 	}
 }
 
-cst_vec_str	&Server::_WrapTargets(Command &cmd)
+cst_vec_str	&Server::_WrapTargets(Command &cmd, size_t pos)
 {
 	try {
-		if (cmd.GetMiddle().empty())
+		if (cmd.GetMiddle().size() <= pos)
 			throw irc_error("no target", 0);
-		cmd.ParseTarget(cmd.GetMiddle()[0]);
+		cmd.ParseTarget(cmd.GetMiddle()[pos]);
 		cmd.DebugTarget();
 	}
 	catch (irc_error &e)
@@ -401,7 +401,7 @@ void	Server::_Pass(Command &cmd, Client &client)
 void	Server::_Nick(Command &cmd, Client &client)
 {
 	vec_str			ui = client.GetUinfo();
-	cst_vec_str		targets = _WrapTargets(cmd);
+	cst_vec_str		targets = _WrapTargets(cmd, 0);
 
 	if (ui[password] != _password)
 	{
@@ -478,7 +478,7 @@ void	Server::_User(Command &cmd, Client &client)
 
 void	Server::_Pong(Command &cmd, Client &client)
 {
-	cst_vec_str		targets = _WrapTargets(cmd);
+	cst_vec_str		targets = _WrapTargets(cmd, 0);
 
 	if (targets.empty())
 		return ;
@@ -491,7 +491,7 @@ void	Server::_Pong(Command &cmd, Client &client)
 void	Server::_PrivMsg(Command &cmd, Client &client)
 {
 	Client			*receiver;
-	cst_vec_str		targets = _WrapTargets(cmd);
+	cst_vec_str		targets = _WrapTargets(cmd, 0);
 
 	if (targets.empty())
 		return AddData(SERVER_NAME, ERR_NORECIPIENT(cmd.GetCinfo()[message]));
@@ -513,7 +513,7 @@ void	Server::_PrivMsg(Command &cmd, Client &client)
 
 void	Server::_Mode(Command &cmd, Client &client)
 {
-	cst_vec_str		targets = _WrapTargets(cmd);
+	cst_vec_str		targets = _WrapTargets(cmd, 0);
 
 	if (targets.empty())
 		return (AddData(SERVER_NAME, ERR_NEEDMOREPARAMS("MODE")));
@@ -539,7 +539,7 @@ void	Server::_Notice(Command &cmd, Client &client)
 {
 	(void)client;
 	Client			*receiver;
-	cst_vec_str		targets = _WrapTargets(cmd);
+	cst_vec_str		targets = _WrapTargets(cmd, 0);
 
 	if (targets.empty())
 		return ;
@@ -568,7 +568,7 @@ void	Server::_Kill(Command &cmd, Client &client)
 {
 	Client *receiver;
 
-	cst_vec_str		targets = _WrapTargets(cmd);
+	cst_vec_str		targets = _WrapTargets(cmd, 0);
 
 	if (targets.empty())
 		return ;

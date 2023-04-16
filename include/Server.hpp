@@ -65,7 +65,7 @@ class Server
 		Client*							_FindNickname(const string &nick, Client *skip = NULL); //check if there's a nickname like this in the list of client's nicknames
 		Client* 						_FindUsername(const string &name, Client *skip = NULL);
 		void							_NoticeServ(const string str, Client &client, int q = 0);
-		cst_vec_str						&_WrapTargets(Command &cmd);
+		cst_vec_str						&_WrapTargets(Command &cmd, size_t pos);
 
 		// *** SERVER COMMANDS *** //
 		void 							_CapLs(Command &cmd, Client &client);
