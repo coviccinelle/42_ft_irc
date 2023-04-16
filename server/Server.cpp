@@ -339,6 +339,8 @@ void	Server::_NoticeServ(const string str, Client &client, int q)
 cst_vec_str	&Server::_WrapTargets(Command &cmd)
 {
 	try {
+		if (cmd.GetMiddle().empty())
+			throw irc_error("no target", 0);
 		cmd.ParseTarget(cmd.GetMiddle()[0]);
 		cmd.DebugTarget();
 	}
@@ -401,15 +403,13 @@ void	Server::_Nick(Command &cmd, Client &client)
 	vec_str			ui = client.GetUinfo();
 	cst_vec_str		targets = _WrapTargets(cmd);
 
-	if (targets.empty())
-		return ;
 	if (ui[password] != _password)
 	{
 		AddData(SERVER_NAME, ERR_NEEDMOREPARAMS("PASS"));
 		SendData(client.GetFd());
 		throw irc_error("error: invalid password", CLOSE_CONNECTION);
 	}
-	if (targets.size() != 1)
+	if (targets.empty())
 		return AddData(SERVER_NAME, ERR_NONICKNAMEGIVEN);
 	if (cmd.isValidNick(targets[0]) == false)
 		return AddData(SERVER_NAME, ERR_ERRONEUSNICKNAME(targets[0]));
@@ -494,8 +494,6 @@ void	Server::_PrivMsg(Command &cmd, Client &client)
 	cst_vec_str		targets = _WrapTargets(cmd);
 
 	if (targets.empty())
-		return ;
-	if (cmd.GetMiddle().size() == 0)
 		return AddData(SERVER_NAME, ERR_NORECIPIENT(cmd.GetCinfo()[message]));
 	if (cmd.GetMiddle().size() > 1)
 		return AddData(SERVER_NAME, ERR_TOOMANYTARGETS(cmd.GetMiddle()[1], cmd.GetCinfo()[message]));
@@ -518,8 +516,6 @@ void	Server::_Mode(Command &cmd, Client &client)
 	cst_vec_str		targets = _WrapTargets(cmd);
 
 	if (targets.empty())
-		return ;
-	if (cmd.GetMiddle().size() == 0)
 		return (AddData(SERVER_NAME, ERR_NEEDMOREPARAMS("MODE")));
 	if (targets[0] != client.GetUinfo()[nickname])
 		return (AddData(SERVER_NAME, ERR_USERSDONTMATCH(targets[0])));
@@ -543,8 +539,8 @@ void	Server::_Notice(Command &cmd, Client &client)
 {
 	(void)client;
 	Client			*receiver;
-
 	cst_vec_str		targets = _WrapTargets(cmd);
+
 	if (targets.empty())
 		return ;
 	if (cmd.GetCinfo()[trailing].empty()) //no text to send
@@ -576,7 +572,6 @@ void	Server::_Kill(Command &cmd, Client &client)
 
 	if (targets.empty())
 		return ;
-
 	if (client.isOperator() == false)
 		return (AddData(SERVER_NAME, ERR_NOPRIVILEGES));
 	if (cmd.GetCinfo()[params].empty() == true || cmd.GetCinfo()[trailing].empty() == true || targets.empty() == true)
