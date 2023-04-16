@@ -41,9 +41,6 @@ class Parser
 		virtual void				Parse(const string &str) = 0;
 		virtual void				Debug() const = 0;
 
-		bool	isValidNick(const string &str);
-		bool	isValidUserMode(const string &str);
-
 	protected:
 		// Call the next token; Use Wrapper instead
 		Token					_GetToken();

@@ -259,3 +259,42 @@ void	CommandParser::AddMiddle(const string &s)
 {
 	_middle.push_back(s);
 }
+
+
+bool	CommandParser::isValidNick(const string &str)
+{
+	if (str.size() < 1 || str.size() > 9)
+		return (false);
+	_input = str;
+	_it = --_input.begin();
+
+	_Wrapper();
+	if (_current != letter && _current != special)
+		return (false);
+	while (_current != eoi)
+	{
+		if (_current != letter &&
+			_current != digit &&
+			_current != special &&
+			_current != dash)
+			return (false);
+		_Wrapper();
+	}
+	return (true);
+}
+
+bool	CommandParser::isValidUserMode(const string &str)
+{
+	string::const_iterator it = str.begin();
+	if (*it != '+' && *it != '-')
+		return (false);
+	while (it != str.end())
+	{
+		if (*it != '+' &&
+			*it != '-' &&
+			USER_MODE.find(*it) == std::string::npos)
+			return (false);
+		++it;
+	}
+	return (true);
+}

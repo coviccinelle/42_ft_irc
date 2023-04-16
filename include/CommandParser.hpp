@@ -26,6 +26,10 @@ class CommandParser : public Parser
 		void		ParseCommand(const string &str);
 		void		DebugCommand() const;
 
+		bool		isValidNick(const string &str);
+		bool		isValidUserMode(const string &str);
+
+
 		cst_vec_str	&GetCinfo() const;
 		cst_vec_str	&GetMiddle() const;
 

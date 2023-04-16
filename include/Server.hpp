@@ -40,52 +40,54 @@ enum CmdVal {
 class Server
 {
 	public:
-		typedef  void (Server::*Fn)(const Command &cmd, Client &client);
+		typedef  void (Server::*Fn)(Command &cmd, Client &client);
 		/* Coplien */
 		Server(const string &port, const string &pass, const string &operPass = "oper");
 		~Server();
 
-		void		AwaitingConnectionQueue();
-		void		InitConnectionLoop();
-		void 		Logs() const;
-		void 		ConnectionLoop();
-		void 		SendData(int fd);
-		void		AddData(const string &from, const string &message, int n = 0);
+		void							AwaitingConnectionQueue();
+		void							InitConnectionLoop();
+		void 							Logs() const;
+		void 							ConnectionLoop();
+		void 							SendData(int fd);
+		void							AddData(const string &from, const string &message, int n = 0);
 
 	private: 
-		void				_AcceptNewConnection();
-		void				_ReceiveData(struct pollfd &pfd);
-		void				_CloseConnection(struct pollfd &pfd);
-		void				_CloseConnection(Client &client);
-		vec_pfd::iterator	_GetPfdFromFd(int fd);
+		void							_AcceptNewConnection();
+		void							_ReceiveData(struct pollfd &pfd);
+		void							_CloseConnection(struct pollfd &pfd);
+		void							_CloseConnection(Client &client);
+		vec_pfd::iterator				_GetPfdFromFd(int fd);
 
-		void		_ExecCommand(const Command &cmd, Client &client); // Switch case
-		CmdVal		_ResolveOption(const string &input); // Return a enum code for switch case eval
-		Client*		_FindNickname(const string &nick, Client *skip = NULL); //check if there's a nickname like this in the list of client's nicknames
-		Client* 	_FindUsername(const string &name, Client *skip = NULL);
-		void		_NoticeServ(const string str, Client &client, int q = 0);
+		// *** UTILS *** //
+		void							_ExecCommand(Command cmd, Client &client); // Switch case
+		CmdVal							_ResolveOption(const string &input); // Return a enum code for switch case eval
+		Client*							_FindNickname(const string &nick, Client *skip = NULL); //check if there's a nickname like this in the list of client's nicknames
+		Client* 						_FindUsername(const string &name, Client *skip = NULL);
+		void							_NoticeServ(const string str, Client &client, int q = 0);
+		cst_vec_str						&_WrapTargets(Command &cmd);
 
-// *** SERVER COMMANDS *** //
-		void 		_CapLs(const Command &cmd, Client &client);
-		void 		_Oper(const Command &cmd, Client &client);
-		void 		_Pass(const Command &cmd, Client &client);
-		void 		_Nick(const Command &cmd, Client &client);
-		void 		_User(const Command &cmd, Client &client);
-		void 		_Pong(const Command &cmd, Client &client);
-		void 		_PrivMsg(const Command &cmd, Client &client);
-		void		_Mode(const Command &cmd, Client &client);
-		void		_Notice(const Command &cmd, Client &client);
-		void		_Kill(const Command &cmd, Client &client);
-		void		_Quit(const Command &cmd, Client &client);
+		// *** SERVER COMMANDS *** //
+		void 							_CapLs(Command &cmd, Client &client);
+		void 							_Oper(Command &cmd, Client &client);
+		void 							_Pass(Command &cmd, Client &client);
+		void 							_Nick(Command &cmd, Client &client);
+		void 							_User(Command &cmd, Client &client);
+		void 							_Pong(Command &cmd, Client &client);
+		void 							_PrivMsg(Command &cmd, Client &client);
+		void							_Mode(Command &cmd, Client &client);
+		void							_Notice(Command &cmd, Client &client);
+		void							_Kill(Command &cmd, Client &client);
+		void							_Quit(Command &cmd, Client &client);
 		
-// *** CHANNEL COMMANDS *** //
-		void		_Join(const Command &cmd, Client &client);
-		void		_Part(const Command &cmd, Client &client);
-		void		_Topic(const Command &cmd, Client &client);
-		void		_Names(const Command &cmd, Client &client);
-		void		_List(const Command &cmd, Client &client);
-		void		_Invite(const Command &cmd, Client &client);
-		void		_Kick(const Command &cmd, Client &client);
+		// *** CHANNEL COMMANDS *** //
+		void							_Join(Command &cmd, Client &client);
+		void							_Part(Command &cmd, Client &client);
+		void							_Topic(Command &cmd, Client &client);
+		void							_Names(Command &cmd, Client &client);
+		void							_List(Command &cmd, Client &client);
+		void							_Invite(Command &cmd, Client &client);
+		void							_Kick(Command &cmd, Client &client);
 
 		std::string 					_portNumber;
 		std::string 					_password;
