@@ -303,7 +303,7 @@ CmdVal	Server::_ResolveOption(const string &input)
 
 Client* Server::_FindNickname(const string &nick, Client *skip) 
 {
-	for (std::map<int, Client>::iterator it = _clients.begin(); it != _clients.end(); ++it)
+	for (map_int_cli::iterator it = _clients.begin(); it != _clients.end(); ++it)
 	{
 		if (&it->second != skip && it->second.GetUinfo()[nickname] == nick)
 			return (&it->second);
@@ -313,12 +313,22 @@ Client* Server::_FindNickname(const string &nick, Client *skip)
 
 Client* Server::_FindUsername(const string &name, Client *skip) 
 {
-	for (std::map<int, Client>::iterator it = _clients.begin(); it != _clients.end(); ++it)
+	for (map_int_cli::iterator it = _clients.begin(); it != _clients.end(); ++it)
 	{
 		if (&it->second != skip && it->second.GetUinfo()[username] == name)
 			return (&it->second);
 	}
 	return (NULL);
+}
+
+lst_chan::iterator	Server::_FindChanel(const string &name)
+{
+	for (lst_chan::iterator it = _channels.begin(); it != _channels.end(); ++it)
+	{
+		if (it->GetName() == name)
+				return (it);
+	}
+	return (_channels.end());
 }
 
 void	Server::_NoticeServ(const string str, Client &client, int q)
@@ -617,13 +627,37 @@ void	Server::_Quit(Command &cmd, Client &client)
 void	Server::_Join(Command &cmd, Client &client)
 {
 	cst_vec_vec_str	chanparse = _WrapChannels(cmd, 0);
+	lst_chan::iterator	it;
 
 	if (chanparse.empty())
 		return AddData(SERVER_NAME, ERR_NEEDMOREPARAMS("JOIN"));
 	for (size_t i = 0; i < chanparse.size(); ++i)
 	{
-		_channels.push_back(Channel(chanparse[i][chanstring]));
-		_channels.back().joinChannel(client);
+		if ((it = _FindChanel(chanparse[i][chan])) == _channels.end())
+		{
+			_channels.push_back(Channel(chanparse[i][chan]));
+			_channels.back().joinChannel(client);
+			AddData(client.GetPrefix(), "JOIN " + chanparse[i][chan] + "\r\n");
+			if (0)
+				AddData(SERVER_NAME, RPL_NOTOPIC(client.GetUinfo()[nickname], client.GetUinfo()[username], client.GetUinfo()[hostname], _channels.back().GetName()));
+			else
+				AddData(SERVER_NAME, RPL_TOPIC(client.GetUinfo()[nickname], client.GetUinfo()[username], client.GetUinfo()[hostname], _channels.back().GetName(), "todo : call _channels.back().GetTopic()"));
+			AddData(SERVER_NAME, RPL_NAMREPLY(client.GetUinfo()[nickname], chanparse[i][chan]) + "@" + client.GetUinfo()[nickname] + "\r\n");
+			AddData(SERVER_NAME, RPL_ENDOFNAMES(client.GetUinfo()[nickname], chanparse[i][chan]));
+			SendData(client.GetFd());
+		}
+		else
+		{
+			it->joinChannel(client);
+			AddData(client.GetPrefix(), "JOIN " + chanparse[i][chan] + "\r\n");
+			if (0)
+				AddData(SERVER_NAME, RPL_NOTOPIC(client.GetUinfo()[nickname], client.GetUinfo()[username], client.GetUinfo()[hostname], _channels.back().GetName()));
+			else
+				AddData(SERVER_NAME, RPL_TOPIC(client.GetUinfo()[nickname], client.GetUinfo()[username], client.GetUinfo()[hostname], _channels.back().GetName(), "todo : call _channels.back().GetTopic()"));
+			AddData(SERVER_NAME, RPL_NAMREPLY(client.GetUinfo()[nickname], chanparse[i][chan]) + "+" + client.GetUinfo()[nickname] + "\r\n");
+			AddData(SERVER_NAME, RPL_ENDOFNAMES(client.GetUinfo()[nickname], chanparse[i][chan]));
+			SendData(client.GetFd());
+		}
 	}
 
 	return ;
