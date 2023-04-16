@@ -83,6 +83,7 @@ class Server
 		void							_Quit(Command &cmd, Client &client);
 		
 		// *** CHANNEL COMMANDS *** //
+		std::list< Channel >::iterator	_chanExist(const string chanName);
 		void							_Join(Command &cmd, Client &client);
 		void							_Part(Command &cmd, Client &client);
 		void							_Topic(Command &cmd, Client &client);

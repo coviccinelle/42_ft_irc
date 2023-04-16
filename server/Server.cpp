@@ -624,6 +624,19 @@ void	Server::_Quit(Command &cmd, Client &client)
 				//	 *** 	CHANNEL-COMMANDS	***   //
 				//------------------------------------//
 
+std::list < Channel >::iterator Server::_chanExist(const string chanName)
+{
+	for (std::list< Channel >::iterator it = _channels.begin(); it != _channels.end(); ++it)
+	{
+		if (it->GetName() == chanName)
+		{
+			std::cout << "Yahuuuuu I found ittttt !!! => " << it->GetName() << std::endl;
+			return (it);
+		}
+	}
+	return (_channels.end());
+}
+
 void	Server::_Join(Command &cmd, Client &client)
 {
 	cst_vec_vec_str	chanparse = _WrapChannels(cmd, 0);
@@ -668,18 +681,19 @@ void	Server::_Join(Command &cmd, Client &client)
 //ERR_NOTONCHANNEL
 void	Server::_Part(Command &cmd, Client &client)
 {
+	std::list < Channel >::iterator target;
 	std::cout << "Hey I'm command Part ! Nice to meet you" << std::endl;
-	cst_vec_str	channels = _WrapChannels(cmd, 0);
-	int i = 0;
+	cst_vec_vec_str	channels = _WrapChannels(cmd, 0);
 
 	if (channels.empty())
 		return AddData(SERVER_NAME, ERR_NEEDMOREPARAMS("PART"));
-	for (vec_str::const_iterator it = channels.begin(); it != channels.end(); ++it)
+	for (size_t i = 0; i < channels.size(); ++i)
 	{
-		std::cout << "INT i = " << i << std::endl;
-		std::cout << "channels data = " << it->data() << std::endl;
-		i++;
+		std::cout << "channels[i][0] = " << channels[i][chanstring] << std::endl;
 		std::cout << "step 1 : check chan exist -> No such chan" << std::endl;
+		target = _chanExist(channels[i][chanstring]);
+		if (target == _channels.end())
+			return AddData(SERVER_NAME, ERR_NOSUCHCHANNEL(channels[i][chanstring]));
 		std::cout << "step 2 : check client on channel" << std::endl;
 		std::cout << "step 3 : Leave channel" << std::endl;
 //		check_channel_in_server(it);
