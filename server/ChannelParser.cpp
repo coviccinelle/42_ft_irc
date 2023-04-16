@@ -2,7 +2,7 @@
 
 ChannelParser::ChannelParser(void) :
 	Parser(),
-	_channels(INF_CHAN_SIZE)
+	_channels()
 {
 	return ;
 }
@@ -14,7 +14,7 @@ ChannelParser::~ChannelParser(void)
 
 ChannelParser::ChannelParser(ChannelParser const &src) :
 	Parser(src),
-	_channels(src._channels)
+	_channels()
 {
 	return ;
 }
@@ -31,17 +31,18 @@ ChannelParser &ChannelParser::operator=(ChannelParser const &rhs)
 
 void ChannelParser::Debug() const
 {
-	std::cout << "===========[ DEBUG ChannelParser ]===========" << std::endl;
-	std::cout << "Channel :[" << GetChannels()[chan] << "]" << std::endl;
-	std::cout << "Prefix :[" << GetChannels()[chanprefix] << "]" << std::endl;
-	std::cout << "Channelid :[" << GetChannels()[chanid] << "]" << std::endl;
-	std::cout << "Chanstring :[" << GetChannels()[chanstring] << "]" << std::endl;
-	std::cout << "Suffix :[" << GetChannels()[chansuffix] << "]" << std::endl;
-	std::cout << "===========================" << std::endl;
+//	std::cout << "===========[ DEBUG ChannelParser ]===========" << std::endl;
+//	std::cout << "Channel :[" << GetChannels()[chan] << "]" << std::endl;
+//	std::cout << "Prefix :[" << GetChannels()[chanprefix] << "]" << std::endl;
+//	std::cout << "Channelid :[" << GetChannels()[chanid] << "]" << std::endl;
+//	std::cout << "Chanstring :[" << GetChannels()[chanstring] << "]" << std::endl;
+//	std::cout << "Suffix :[" << GetChannels()[chansuffix] << "]" << std::endl;
+//	std::cout << "===========================" << std::endl;
 }
 
 void	ChannelParser::Parse(const string &str)
 {
+	_channels.push_back(vec_str(INF_CHAN_SIZE));
 	_input = str;
 	_it = --_input.begin();
 	_Channel();
@@ -127,30 +128,30 @@ void	ChannelParser::_Channel()
 
 void	ChannelParser::SetChannel(const string &s)
 {
-	_channels[chan] = s;
+	_channels.back()[chan] = s;
 }
 
 void	ChannelParser::SetPrefix(const string &s)
 {
-	_channels[chanprefix] = s;
+	_channels.back()[chanprefix] = s;
 }
 
 void	ChannelParser::SetId(const string &s)
 {
-	_channels[chanid] = s;
+	_channels.back()[chanid] = s;
 }
 
 void	ChannelParser::SetChanstring(const string &s)
 {
-	_channels[chanstring] = s;
+	_channels.back()[chanstring] = s;
 }
 
 void	ChannelParser::SetSuffix(const string &s)
 {
-	_channels[chansuffix] = s;
+	_channels.back()[chansuffix] = s;
 }
 
-cst_vec_str	&ChannelParser::GetChannels() const
+cst_vec_vec_str	&ChannelParser::GetChannels() const
 {
 	return (_channels);
 }
