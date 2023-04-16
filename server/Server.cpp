@@ -336,11 +336,11 @@ void	Server::_NoticeServ(const string str, Client &client, int q)
 	}
 }
 
-cst_vec_str	&Server::_WrapChannels(Command &cmd, size_t pos)
+cst_vec_vec_str	&Server::_WrapChannels(Command &cmd, size_t pos)
 {
 	try {
 		if (cmd.GetMiddle().size() <= pos)
-			throw irc_error("no target", 0);
+			throw irc_error("no channels", 0);
 		cmd.ParseChannel(cmd.GetMiddle()[pos]);
 		cmd.DebugChannel();
 	}
@@ -355,7 +355,7 @@ cst_vec_str	&Server::_WrapTargets(Command &cmd, size_t pos)
 {
 	try {
 		if (cmd.GetMiddle().size() <= pos)
-			throw irc_error("no target", 0);
+			throw irc_error("no targets", 0);
 		cmd.ParseTarget(cmd.GetMiddle()[pos]);
 		cmd.DebugTarget();
 	}
@@ -616,10 +616,9 @@ void	Server::_Quit(Command &cmd, Client &client)
 
 void	Server::_Join(Command &cmd, Client &client)
 {
-	(void)cmd;
-	(void)client;
+	cst_vec_vec_str	channels = _WrapChannels(cmd, 0);
 
-	if (cmd.GetCinfo()[params].empty() == true)
+	if (channels.empty())
 		return AddData(SERVER_NAME, ERR_NEEDMOREPARAMS("JOIN"));
 	try
 	{
