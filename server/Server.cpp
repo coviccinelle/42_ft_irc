@@ -663,13 +663,36 @@ void	Server::_Join(Command &cmd, Client &client)
 	return ;
 }
 
+//Parameters: <channel> *( "," <channel> ) [ <Part Message> ]
+//ERR_NEEDMOREPARAMS              ERR_NOSUCHCHANNEL
+//ERR_NOTONCHANNEL
 void	Server::_Part(Command &cmd, Client &client)
 {
 	std::cout << "Hey I'm command Part ! Nice to meet you" << std::endl;
-	(void)cmd;
+	cst_vec_str	channels = _WrapChannels(cmd, 0);
+	int i = 0;
+
+	if (channels.empty())
+		return AddData(SERVER_NAME, ERR_NEEDMOREPARAMS("PART"));
+	for (vec_str::const_iterator it = channels.begin(); it != channels.end(); ++it)
+	{
+		std::cout << "INT i = " << i << std::endl;
+		std::cout << "channels data = " << it->data() << std::endl;
+		i++;
+		std::cout << "step 1 : check chan exist -> No such chan" << std::endl;
+		std::cout << "step 2 : check client on channel" << std::endl;
+		std::cout << "step 3 : Leave channel" << std::endl;
+//		check_channel_in_server(it);
+//		check_client_in_channel(it);
+//		leave_client_from_channel(it);
+	}
 	(void)client;
 }
 
+// Parameters: <channel> [ <topic> ]
+//            ERR_NEEDMOREPARAMS              ERR_NOTONCHANNEL
+// 	          RPL_NOTOPIC                     RPL_TOPIC
+//            ERR_CHANOPRIVSNEEDED            ERR_NOCHANMODES
 void	Server::_Topic(Command &cmd, Client &client)
 {
 	std::cout << "Hey I'm command Topic ! Nice to meet you" << std::endl;
@@ -677,6 +700,9 @@ void	Server::_Topic(Command &cmd, Client &client)
 	(void)client;
 }
 
+//Parameters: [ <channel> *( "," <channel> ) [ <target> ] ]
+//            ERR_TOOMANYMATCHES              ERR_NOSUCHSERVER
+//            RPL_NAMREPLY                    RPL_ENDOFNAMES
 void	Server::_Names(Command &cmd, Client &client)
 {
 	std::cout << "Hey I'm command Names ! Nice to meet you" << std::endl;
@@ -684,6 +710,9 @@ void	Server::_Names(Command &cmd, Client &client)
 	(void)client;
 }
 
+//Parameters: [ <channel> *( "," <channel> ) [ <target> ] ]
+//           ERR_TOOMANYMATCHES              ERR_NOSUCHSERVED
+//           RPL_LIST                        RPL_LISTEND
 void	Server::_List(Command &cmd, Client &client)
 {
 	std::cout << "Hey I'm command List ! Nice to meet you" << std::endl;
@@ -691,6 +720,11 @@ void	Server::_List(Command &cmd, Client &client)
 	(void)client;
 }
 
+//   Parameters: <nickname> <channel>
+//              ERR_NEEDMOREPARAMS              ERR_NOSUCHNICK
+//	            ERR_NOTONCHANNEL                ERR_USERONCHANNEL
+//	            ERR_CHANOPRIVSNEEDED
+//	            RPL_INVITING                    RPL_AWAY
 void	Server::_Invite(Command &cmd, Client &client)
 {
 	std::cout << "Hey I'm command Invite ! Nice to meet you" << std::endl;
@@ -698,6 +732,12 @@ void	Server::_Invite(Command &cmd, Client &client)
 	(void)client;
 }
 
+//   Parameters: <channel> *( "," <channel> ) <user> *( "," <user> )
+//               [<comment>]
+//
+//           ERR_NEEDMOREPARAMS              ERR_NOSUCHCHANNEL
+//           ERR_BADCHANMASK                 ERR_CHANOPRIVSNEEDED
+//           ERR_USERNOTINCHANNEL            ERR_NOTONCHANNEL
 void	Server::_Kick(Command &cmd, Client &client)
 {
 	std::cout << "Hey I'm command Kick ! Nice to meet you" << std::endl;
