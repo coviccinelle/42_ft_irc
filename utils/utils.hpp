@@ -25,6 +25,9 @@
 #define USER_MODE string("iwos")
 #define MODE_SIZE 4
 
+class Client;
+class Channel;
+
 typedef std::string 						string;
 
 typedef std::vector< string >				vec_str;
@@ -35,6 +38,15 @@ typedef const std::vector< vec_str >		cst_vec_vec_str;
 
 typedef std::vector< struct pollfd >		vec_pfd;
 typedef const std::vector< struct pollfd >	cst_vec_pfd;
+
+typedef std::map< int, Client >				map_int_cli;
+typedef const std::map< int, Client >		cst_map_int_cli;
+
+typedef std::vector< struct pollfd >		vec_pfd;
+typedef const std::vector< struct pollfd >	cst_vec_pfd;
+
+typedef std::list< Channel >				lst_chan;
+typedef const std::list< Channel >			cst_lst_chan;
 
 
 string	ltrim(const string &s);

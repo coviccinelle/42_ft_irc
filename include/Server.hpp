@@ -62,8 +62,9 @@ class Server
 		// *** UTILS *** //
 		void							_ExecCommand(Command cmd, Client &client); // Switch case
 		CmdVal							_ResolveOption(const string &input); // Return a enum code for switch case eval
-		Client*							_FindNickname(const string &nick, Client *skip = NULL); //check if there's a nickname like this in the list of client's nicknames
-		Client* 						_FindUsername(const string &name, Client *skip = NULL);
+		Client							*_FindNickname(const string &nick, Client *skip = NULL); //check if there's a nickname like this in the list of client's nicknames
+		Client							*_FindUsername(const string &name, Client *skip = NULL);
+		lst_chan::iterator				_FindChanel(const string &name);
 		void							_NoticeServ(const string str, Client &client, int q = 0);
 		cst_vec_str						&_WrapTargets(Command &cmd, size_t pos);
 		cst_vec_vec_str					&_WrapChannels(Command &cmd, size_t pos);
@@ -97,13 +98,13 @@ class Server
 
 		int 							_listener;
 
-		std::map< int, Client > 		_clients;
-		std::vector< struct pollfd >	_pollfds;
+		map_int_cli						_clients;
+		vec_pfd							_pollfds;
 		int								_poll_count;
 		std::map< string, CmdVal >		_mapCmd; // mapping between cmd names and integer; used for switch case.
 		std::vector< Fn >				_funcTable;
 		string							_data;
-		std::list< Channel >			_channels;
+		lst_chan						_channels;
 };
 
 #endif
