@@ -66,6 +66,7 @@ class Server
 		Client* 						_FindUsername(const string &name, Client *skip = NULL);
 		void							_NoticeServ(const string str, Client &client, int q = 0);
 		cst_vec_str						&_WrapTargets(Command &cmd, size_t pos);
+		cst_vec_str						&_WrapChannels(Command &cmd, size_t pos);
 
 		// *** SERVER COMMANDS *** //
 		void 							_CapLs(Command &cmd, Client &client);
