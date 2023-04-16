@@ -159,7 +159,7 @@ class Channel
 
 	public:
 		/* Coplien */
-		Channel();
+		Channel(const string &chanstring = "default");
 		Channel(string& chanstring, const Client& client); // Create channel object without channel mask
 		Channel(const Channel& chan);
 		~Channel();

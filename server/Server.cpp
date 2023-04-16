@@ -616,13 +616,15 @@ void	Server::_Quit(Command &cmd, Client &client)
 
 void	Server::_Join(Command &cmd, Client &client)
 {
-	cst_vec_vec_str	channels = _WrapChannels(cmd, 0);
+	cst_vec_vec_str	chanparse = _WrapChannels(cmd, 0);
 
-	if (channels.empty())
+	if (chanparse.empty())
 		return AddData(SERVER_NAME, ERR_NEEDMOREPARAMS("JOIN"));
-	_channels.push_back(Channel());
-	Channel &ch = _channels.back();
-	ch.joinChannel(client);
+	for (size_t i = 0; i < chanparse.size(); ++i)
+	{
+		_channels.push_back(Channel(chanparse[i][chanstring]));
+		_channels.back().joinChannel(client);
+	}
 
 	return ;
 }

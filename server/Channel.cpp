@@ -1,6 +1,6 @@
 #include "../include/Channel.hpp"
 
-Channel::Channel(void) : 
+Channel::Channel(const string &chanstring) : 
 	_creator(NULL),
 	_chanop(),
 	_voice(),
@@ -9,7 +9,7 @@ Channel::Channel(void) :
 	_ban(),
 	_exception(),
 	_key(),
-	_chanstring("toto"),
+	_chanstring(chanstring),
 	_safe(false),
 	_modeless(false),
 	_mode(0),
