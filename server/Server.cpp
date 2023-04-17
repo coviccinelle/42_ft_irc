@@ -664,8 +664,6 @@ void	Server::_Join(Command &cmd, Client &client)
 }
 
 //Parameters: <channel> *( "," <channel> ) [ <Part Message> ]
-//ERR_NEEDMOREPARAMS              ERR_NOSUCHCHANNEL
-//ERR_NOTONCHANNEL
 void	Server::_Part(Command &cmd, Client &client)
 {
 	std::list < Channel >::iterator target;
@@ -677,25 +675,14 @@ void	Server::_Part(Command &cmd, Client &client)
 	for (size_t i = 0; i < channels.size(); ++i)
 	{
 		std::cout << "channels[i][0] = " << channels[i][chanstring] << std::endl;
-		std::cout << "step 1 : check chan exist" << std::endl;
 		target = _FindChannel(channels[i][chan]);
 		if (target == _channels.end())
-		{
-			std::cout << "PAS trouveee " << std::endl;
 			return AddData(SERVER_NAME, ERR_NOSUCHCHANNEL(channels[i][chan]));
-		}
-		std::cout << "step 2 : check client on channel" << std::endl;
 		if (target->_findUserIter(client.GetUinfo()[nickname]) == target->GetUser().end())
-		{
-			std::cout << "Client not on Channel" << std::endl;
 			return (AddData(SERVER_NAME, ERR_NOTONCHANNEL(channels[i][chan])));
-		}
-		std::cout << "step 3 : Leave channel" << std::endl;
-//		check_channel_in_server(it);
-//		check_client_in_channel(it);
+		std::cout << "step 3 :TODO Leave channel" << std::endl;
 //		leave_client_from_channel(it);
 	}
-	(void)client;
 }
 
 // Parameters: <channel> [ <topic> ]
