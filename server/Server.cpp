@@ -513,12 +513,18 @@ void	Server::_Pong(Command &cmd, Client &client)
 	SendData(client.GetFd());
 }
 
+//           ERR_NORECIPIENT                 ERR_NOTEXTTOSEND
+//           ERR_CANNOTSENDTOCHAN            ERR_NOTOPLEVEL
+//           ERR_WILDTOPLEVEL                ERR_TOOMANYTARGETS
+//           ERR_NOSUCHNICK			         RPL_AWAY
+// Parameters: <msgtarget> <text to be sent>
 void	Server::_PrivMsg(Command &cmd, Client &client)
 {
 	Client			*receiver;
 	cst_vec_str		targets = _WrapTargets(cmd, 0);
+//	cst_vec_str		chans = _WrapChannels(cmd, 0);
 
-	if (targets.empty())
+	if (targets.empty() )
 		return AddData(ERR_NORECIPIENT(cmd.GetCinfo()[message]));
 	if (cmd.GetMiddle().size() > 1)
 		return AddData(ERR_TOOMANYTARGETS(cmd.GetMiddle()[1], cmd.GetCinfo()[message]));
