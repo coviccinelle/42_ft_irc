@@ -457,3 +457,18 @@ cst_lst_pcli	&Channel::GetUsers() const
 {
 	return (_user);
 }
+
+string	Channel::GetLstNickname() const
+{
+	string res("");
+	// Please update me :0 Need to set '@' before oper user in the chan
+	for (lst_pcli::const_iterator it = _user.begin(); it != _user.end(); ++it)
+	{
+		res = res + ((*it)->GetUinfo())[nickname];
+		if (*it != _user.back())
+			res += " ";
+		// else if (oper)
+		//	res += " @";
+	}
+	return (res);
+}

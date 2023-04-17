@@ -168,7 +168,7 @@ void Server::ConnectionLoop()
 
 void	Server::SendChannel(const string &chanstr, const string &message, const string &from)
 {
-	cst_lst_pcli &clients = _FindChanel(chanstr)->GetUsers();
+	cst_lst_pcli &clients = _FindChannel(chanstr)->GetUsers();
 
 	for (lst_pcli::const_iterator it = clients.begin(); it != clients.end(); ++it)
 	{
@@ -655,34 +655,16 @@ void	Server::_Join(Command &cmd, Client &client)
 		if ((it = _FindChannel(chanparse[i][chan])) == _channels.end())
 		{
 			_channels.push_back(Channel(chanparse[i][chan]));
-			_channels.back().joinChannel(client);
-			AddData(client.GetPrefix(), "JOIN " + chanparse[i][chan] + "\r\n");
-			if (0)
-				AddData(RPL_NOTOPIC(client.GetUinfo()[nickname], client.GetUinfo()[username], client.GetUinfo()[hostname], _channels.back().GetName()));
-			else
-				AddData(RPL_TOPIC(client.GetUinfo()[nickname], client.GetUinfo()[username], client.GetUinfo()[hostname], _channels.back().GetName(), "todo : call _channels.back().GetTopic()"));
-			AddData(RPL_NAMREPLY(client.GetUinfo()[nickname], chanparse[i][chan]) + "@" + client.GetUinfo()[nickname] + "\r\n");
-			AddData(RPL_ENDOFNAMES(client.GetUinfo()[nickname], chanparse[i][chan]));
-			SendData(client.GetFd());
+			--it;
 		}
+		_channels.back().joinChannel(client);
+		SendChannel(chanparse[i][chan], "JOIN " + chanparse[i][chan] + "\r\n", client.GetPrefix());
+		if (1)
+			AddData(RPL_TOPIC(client.GetUinfo()[nickname], client.GetUinfo()[username], client.GetUinfo()[hostname], _channels.back().GetName(), "todo : topic"));
 		else
-		{
-			it->joinChannel(client);
-
-			SendChannel(chanparse[i][chan], "JOIN " + chanparse[i][chan] + "\r\n", client.GetPrefix());
-			if (0)
-				AddData(RPL_NOTOPIC(client.GetUinfo()[nickname], client.GetUinfo()[username], client.GetUinfo()[hostname], _channels.back().GetName()));
-			else
-				AddData(RPL_TOPIC(client.GetUinfo()[nickname], client.GetUinfo()[username], client.GetUinfo()[hostname], _channels.back().GetName(), "todo : call _channels.back().GetTopic()"));
-
-			string reply = RPL_NAMREPLY(client.GetUinfo()[nickname], chanparse[i][chan]) + "@" + (*it->GetUsers().begin())->GetUinfo()[nickname];
-			for (lst_pcli::const_iterator i = ++it->GetUsers().begin(); i != it->GetUsers().end(); ++i)
-				reply += " " + (*i)->GetUinfo()[nickname];
-			reply += "\r\n";
-			AddData(reply);
-			AddData(RPL_ENDOFNAMES(client.GetUinfo()[nickname], chanparse[i][chan]));
-			SendData(client.GetFd());
-		}
+			AddData(RPL_NOTOPIC(client.GetUinfo()[nickname], client.GetUinfo()[username], client.GetUinfo()[hostname], _channels.back().GetName()));
+		AddData(RPL_NAMREPLY(client.GetUinfo()[nickname], chanparse[i][chan]) + it->GetLstNickname() + "\r\n");
+		AddData(RPL_ENDOFNAMES(client.GetUinfo()[nickname], chanparse[i][chan]));
 	}
 
 	return ;
