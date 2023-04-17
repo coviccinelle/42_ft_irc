@@ -413,12 +413,22 @@ int	Channel::joinChannel(Client& toAccept)
 
 lst_iterator	Channel::_findUserIter(const string& name)
 {
+	std::cout << "looking for USER " << name << " on Channel" << _chanstring << std::endl;
 	for (lst_iterator it = _user.begin(); it != _user.end(); ++it)
 	{
+		std::cout << "list client on chan = " << (*it)->GetUinfo()[nickname] << std::endl;
 		if ((*it)->GetUinfo()[nickname] == name)
+		{
+			std::cout << "Yuhuuu found user " << name << " on channel " << _chanstring << std::endl;
 			return (it);
+		}
 	}
 	return (_user.end());
+}
+
+const std::list< Client* > 	&Channel::GetUser() const
+{
+	return (_user);
 }
 
 //	TO CHANGE:
