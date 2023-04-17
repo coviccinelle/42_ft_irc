@@ -50,7 +50,7 @@ class Server
 		void 							Logs() const;
 		void 							ConnectionLoop();
 		void 							SendData(int fd);
-		void							AddData(const string &from, const string &message, int n = 0);
+		void							AddData(const string &message, const string &from = SERVER_NAME);
 
 	private: 
 		void							_AcceptNewConnection();
