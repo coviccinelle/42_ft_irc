@@ -35,7 +35,7 @@ enum CmdVal {
 };
 
 /*
- * Manage Client connections and Chanels
+ * Manage Client connections and Channels
  */
 class Server
 {
@@ -64,7 +64,7 @@ class Server
 		CmdVal							_ResolveOption(const string &input); // Return a enum code for switch case eval
 		Client							*_FindNickname(const string &nick, Client *skip = NULL); //check if there's a nickname like this in the list of client's nicknames
 		Client							*_FindUsername(const string &name, Client *skip = NULL);
-		lst_chan::iterator				_FindChanel(const string &name);
+		lst_chan::iterator				_FindChannel(const string &name);
 		void							_NoticeServ(const string str, Client &client, int q = 0);
 		cst_vec_str						&_WrapTargets(Command &cmd, size_t pos);
 		cst_vec_vec_str					&_WrapChannels(Command &cmd, size_t pos);

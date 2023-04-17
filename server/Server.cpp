@@ -321,7 +321,7 @@ Client* Server::_FindUsername(const string &name, Client *skip)
 	return (NULL);
 }
 
-lst_chan::iterator	Server::_FindChanel(const string &name)
+lst_chan::iterator	Server::_FindChannel(const string &name)
 {
 	for (lst_chan::iterator it = _channels.begin(); it != _channels.end(); ++it)
 	{
@@ -624,19 +624,6 @@ void	Server::_Quit(Command &cmd, Client &client)
 				//	 *** 	CHANNEL-COMMANDS	***   //
 				//------------------------------------//
 
-std::list < Channel >::iterator Server::_chanExist(const string chanName)
-{
-	for (std::list< Channel >::iterator it = _channels.begin(); it != _channels.end(); ++it)
-	{
-		if (it->GetName() == chanName)
-		{
-			std::cout << "Yahuuuuu I found ittttt !!! => " << it->GetName() << std::endl;
-			return (it);
-		}
-	}
-	return (_channels.end());
-}
-
 void	Server::_Join(Command &cmd, Client &client)
 {
 	cst_vec_vec_str	chanparse = _WrapChannels(cmd, 0);
@@ -646,7 +633,7 @@ void	Server::_Join(Command &cmd, Client &client)
 		return AddData(SERVER_NAME, ERR_NEEDMOREPARAMS("JOIN"));
 	for (size_t i = 0; i < chanparse.size(); ++i)
 	{
-		if ((it = _FindChanel(chanparse[i][chan])) == _channels.end())
+		if ((it = _FindChannel(chanparse[i][chan])) == _channels.end())
 		{
 			_channels.push_back(Channel(chanparse[i][chan]));
 			_channels.back().joinChannel(client);
@@ -691,9 +678,12 @@ void	Server::_Part(Command &cmd, Client &client)
 	{
 		std::cout << "channels[i][0] = " << channels[i][chanstring] << std::endl;
 		std::cout << "step 1 : check chan exist -> No such chan" << std::endl;
-		target = _chanExist(channels[i][chanstring]);
+		target = _FindChannel(channels[i][chan]);
 		if (target == _channels.end())
-			return AddData(SERVER_NAME, ERR_NOSUCHCHANNEL(channels[i][chanstring]));
+		{
+			std::cout << "PAS trouveee " << std::endl;
+			return AddData(SERVER_NAME, ERR_NOSUCHCHANNEL(channels[i][chan]));
+		}
 		std::cout << "step 2 : check client on channel" << std::endl;
 		std::cout << "step 3 : Leave channel" << std::endl;
 //		check_channel_in_server(it);
