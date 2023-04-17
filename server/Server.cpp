@@ -166,12 +166,17 @@ void Server::ConnectionLoop()
 	}
 }
 
-void	Server::SendChannel(const string &chanstr, const string &message, const string &from)
+void	Server::SendChannel(const string &chanstr, const string &message, const string &from, const Client *skip)
 {
-	cst_lst_pcli &clients = _FindChannel(chanstr)->GetUsers();
+	lst_chan::iterator chan = _FindChannel(chanstr);
+	if (chan == _channels.end())
+		throw irc_error(ERR_NOSUCHNICK(chanstr), NO_CHAN);
 
+	cst_lst_pcli &clients = chan->GetUsers();
 	for (lst_pcli::const_iterator it = clients.begin(); it != clients.end(); ++it)
 	{
+		if (*it == skip)
+			continue ;
 		AddData(message, from);
 		SendData((*it)->GetFd());
 	}
@@ -527,10 +532,8 @@ void	Server::_Pong(Command &cmd, Client &client)
 void	Server::_PrivMsg(Command &cmd, Client &client)
 {
 	Client				*receiver = NULL;
-	lst_chan::iterator	recChan;
 	cst_vec_str			targets = _WrapTargets(cmd, 0);
 	cst_vec_vec_str		chans = _WrapChannels(cmd, 0);
-	string msg;
 
 	if (targets.empty() && chans.empty())
 		return AddData(ERR_NORECIPIENT(cmd.GetCinfo()[message]));
@@ -538,34 +541,23 @@ void	Server::_PrivMsg(Command &cmd, Client &client)
 		return AddData(ERR_TOOMANYTARGETS(cmd.GetMiddle()[1], cmd.GetCinfo()[message]));
 	if (cmd.GetCinfo()[trailing].empty())
 		return AddData(ERR_NOTEXTTOSEND);
-	std::cout << "NOT SEGFAULT 4 YET" << std::endl;
-	// TODO: Check also in the list of #channels
-
-	std::cout << "NOT SEGFAULT 5 YET" << std::endl;
 	if (!targets.empty())
 	{
 		if ((receiver = _FindNickname(targets[0])) == NULL)
 			return AddData(ERR_NOSUCHNICK(targets[0]));
-		msg += "PRIVMSG " + targets[0] + " :" + cmd.GetCinfo()[trailing]+ "\r\n";
-		std::cout << "NOT SEGFAULT 6 YET" << std::endl;
-		AddData(msg, client.GetPrefix()); 
+		AddData("PRIVMSG " + targets[0] + " :" + cmd.GetCinfo()[trailing]+ "\r\n", client.GetPrefix()); 
 		SendData(receiver->GetFd());
 	}
 	else if (!chans.empty())
 	{
-		if ((recChan = _FindChannel(cmd.GetCinfo()[chanstring])) == _channels.end())
-			return AddData(ERR_NOSUCHNICK(cmd.GetCinfo()[chanstring]));
-		msg += "PRIVMSG " + cmd.GetCinfo()[chanstring] + " :" + cmd.GetCinfo()[trailing]+ "\r\n";
-//	std::cout << "fd : " << client.GetFd() << std::endl;
-//	std::cout << "nickname : " << client.GetUinfo()[nickname] << std::endl;
-//	std::cout << "prefix : " << client.GetPrefix() << std::endl;
-		std::cout << "NOT SEGFAULT 7 YET" << std::endl;
-		SendChannel(cmd.GetCinfo()[chanstring], msg, client.GetPrefix());
+		try {
+			SendChannel(chans[0][chan], "PRIVMSG " + chans[0][chan] + " :" + cmd.GetCinfo()[trailing]+ "\r\n", client.GetPrefix(), &client);
+		}
+		catch (irc_error &e)
+		{
+			return AddData(e.what());
+		}
 	}
-	std::cout << "NOT SEGFAULT 8 YET" << std::endl;
-	AddData(msg, client.GetPrefix()); 
-	SendData(receiver->GetFd());
-	std::cout << "Function finished, you can't be here => NOT SEGFAULT 9 YET" << std::endl;
 }
 
 void	Server::_Mode(Command &cmd, Client &client)

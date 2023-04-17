@@ -50,7 +50,7 @@ class Server
 		void 							Logs() const;
 		void 							ConnectionLoop();
 		void 							SendData(int fd);
-		void							SendChannel(const string &chanstr, const string &message, const string &from = SERVER_NAME);
+		void							SendChannel(const string &chanstr, const string &message, const string &from = SERVER_NAME, const Client *skip = NULL);
 		void							AddData(const string &message, const string &from = SERVER_NAME);
 
 	private: 
