@@ -135,7 +135,6 @@ class Channel
 		void				_setChanMode(const char& modif, const int& mode, const string& params);
 
 		// Function to find specific user to specific corresponding list
-		lst_iterator		_findUserIter(const string& name);
 		lst_iterator		_findChanopIter(const string& name);
 		lst_iterator		_findVoiceIter(const string& name);
 
@@ -164,6 +163,9 @@ class Channel
 		Channel(const Channel& chan);
 		~Channel();
 		Channel&	operator=(const Channel& rhs);
+
+		lst_pcli::iterator		_findUserIter(const string& name);
+		const std::list< Client* > 	&GetUser() const;
 
 		/* Public Methods */
 		void			sendMessage(const string& msg, const Client& clientSend) const;
