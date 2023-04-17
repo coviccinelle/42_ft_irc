@@ -171,6 +171,7 @@ class Channel
 		int				setChanMode(char modif, int mode, const Client& clientSend, const string& params);
 		int				joinChannel(Client& toAccept);
 		int				leaveChannel(Client& toAccept);
+		cst_lst_pcli		&GetUsers() const;
 		const string	&GetName() const;
 
 		friend std::ostream&	operator<<(std::ostream& lhs, const Channel& rhs);

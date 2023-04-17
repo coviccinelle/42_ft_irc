@@ -648,13 +648,19 @@ void	Server::_Join(Command &cmd, Client &client)
 		}
 		else
 		{
+			std::cout << "Channel" << std::endl;
 			it->joinChannel(client);
 			AddData(client.GetPrefix(), "JOIN " + chanparse[i][chan] + "\r\n");
 			if (0)
 				AddData(SERVER_NAME, RPL_NOTOPIC(client.GetUinfo()[nickname], client.GetUinfo()[username], client.GetUinfo()[hostname], _channels.back().GetName()));
 			else
 				AddData(SERVER_NAME, RPL_TOPIC(client.GetUinfo()[nickname], client.GetUinfo()[username], client.GetUinfo()[hostname], _channels.back().GetName(), "todo : call _channels.back().GetTopic()"));
-			AddData(SERVER_NAME, RPL_NAMREPLY(client.GetUinfo()[nickname], chanparse[i][chan]) + "+" + client.GetUinfo()[nickname] + "\r\n");
+			string reply = RPL_NAMREPLY(client.GetUinfo()[nickname], chanparse[i][chan]) + "@" + (*it->GetUsers().begin())->GetUinfo()[nickname];
+			for (lst_pcli::const_iterator i = ++it->GetUsers().begin(); i != it->GetUsers().end(); ++i)
+				reply += " +" + (*i)->GetUinfo()[nickname];
+			reply += "\r\n";
+			std::cout << "REPLY" << reply << std::endl;
+			AddData(SERVER_NAME, reply);
 			AddData(SERVER_NAME, RPL_ENDOFNAMES(client.GetUinfo()[nickname], chanparse[i][chan]));
 			SendData(client.GetFd());
 		}

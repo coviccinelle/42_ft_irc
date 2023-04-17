@@ -442,3 +442,8 @@ const string	&Channel::GetName() const
 {
 	return (_chanstring);
 }
+
+cst_lst_pcli	&Channel::GetUsers() const
+{
+	return (_user);
+}
