@@ -37,7 +37,7 @@
 # define ERR_CHANNELISFULL(nick, channel) ("471 " + nick + " " + channel + " :Cannot join channel (+l)\r\n")
 # define ERR_TOOMANYCHANNELS(nick, channel) ("405 " + nick + " " + channel + " :You have joined too many channels\r\n")
 
-# define RPL_NAMREPLY(nick, channel) ("353 " + nick + " =" + channel + " :")
+# define RPL_NAMREPLY(nick, channel) ("353 " + nick + " = " + channel + " :")
 # define RPL_ENDOFNAMES(nick, channel) ("366 " + nick + " " + channel + " :End of NAMES list\r\n")
 
 # define RPL_INVITING(nick, user, host, invitenick, channel) ("341 " + nick + "!" + user + "@" + host + " " + invitenick + " " + channel + "\r\n")
@@ -46,7 +46,7 @@
 # define ERR_CHANOPRIVSNEEDED(chan) ("482 " + chan + " :You're not channel operator\r\n")
 # define ERR_INVITEONLYCHAN(nick, chan) ("473 " + nick + " " + chan + " :Cannot join channel (+i)\r\n")
 # define ERR_CANNOTSENDTOCHAN(nick, chan) ("404 " + nick + " " + chan + " :Cannot send to channel\r\n")
-# define ERR_USERSDONTMATCH(nick) ("502 " + nick + " :Cannot change change mode for other users\r\n")
+# define ERR_USERSDONTMATCH(nick) ("502 " + nick + " :Cannot change mode for other users\r\n")
 # define ERR_USERONCHANNEL(nick, invitenick, chan) ("443 " + nick + " " + invitenick + " " + chan + ":is already on channel\r\n")
 # define ERR_NORECIPIENT(command) ("411 :No recipient given " + command + "\r\n") 
 # define ERR_NOTEXTTOSEND "412 :No text to send\r\n"
@@ -54,7 +54,7 @@
 # define ERR_TOOMANYTARGETS(target, msg) (target + ":407 recipients. " + msg + " ⚠️ \r\n") 
 # define ERR_UMODEUNKNOWNFLAG(flag)("501 " + flag + " :Unknown MODE flag\r\n")
 # define RPL_UMODEIS(user, mode) ("221 " + user + " +" + mode + "\r\n")
-# define RPL_CHANNELMODEIS(chan, mode, param) ("324 " + chan + " " + mode + " " + param + "\r\n")
+# define RPL_CHANNELMODEIS(mode) ("324 " + mode + "\r\n")
 # define ERR_NOOPERHOST(nick) ("491 " + nick + " :No O-lines for your host\r\n")
 # define ERR_CANTKILLSERVER(from) ("483 " + from + " :You can't kill a server!\r\n")
 //⚠️ 
