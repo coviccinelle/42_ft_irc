@@ -61,10 +61,12 @@ void	TargetParser::_Target()
 {
 	std::string::iterator start = _it + 1;
 	_Wrapper();
+	if (_current != special && _current != letter)
+		throw irc_error("warning parsing failed: _Target: special or letter expected", ERR_MIDDLE);
 	while (1)
 	{
 		if (_current == colon)
-			throw irc_error("parsing failed: _Target: colon found", ERR_MIDDLE);
+			throw irc_error("warning parsing failed: _Target: colon found", ERR_MIDDLE);
 		if (_current == comma)
 		{
 			AddTarget(string(start, _it));
