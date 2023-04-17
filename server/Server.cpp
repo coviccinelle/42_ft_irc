@@ -659,6 +659,7 @@ void	Server::_Join(Command &cmd, Client &client)
 		}
 		else
 		{
+			std::cout << "Channel" << std::endl;
 			it->joinChannel(client);
 
 			for (lst_pcli::const_iterator iter = it->GetUsers().begin(); iter != it->GetUsers().end(); ++iter)
