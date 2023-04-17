@@ -524,7 +524,7 @@ void	Server::_PrivMsg(Command &cmd, Client &client)
 	cst_vec_str		targets = _WrapTargets(cmd, 0);
 //	cst_vec_str		chans = _WrapChannels(cmd, 0);
 
-	if (targets.empty() )
+	if (targets.empty())
 		return AddData(ERR_NORECIPIENT(cmd.GetCinfo()[message]));
 	if (cmd.GetMiddle().size() > 1)
 		return AddData(ERR_TOOMANYTARGETS(cmd.GetMiddle()[1], cmd.GetCinfo()[message]));
@@ -659,7 +659,6 @@ void	Server::_Join(Command &cmd, Client &client)
 		}
 		else
 		{
-			std::cout << "Channel" << std::endl;
 			it->joinChannel(client);
 
 			for (lst_pcli::const_iterator iter = it->GetUsers().begin(); iter != it->GetUsers().end(); ++iter)
