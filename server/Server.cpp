@@ -526,9 +526,11 @@ void	Server::_Pong(Command &cmd, Client &client)
 // Parameters: <msgtarget> <text to be sent>
 void	Server::_PrivMsg(Command &cmd, Client &client)
 {
-	Client			*receiver;
-	cst_vec_str		targets = _WrapTargets(cmd, 0);
+	Client				*receiver = NULL;
+	lst_chan::iterator	recChan;
+	cst_vec_str			targets = _WrapTargets(cmd, 0);
 	cst_vec_vec_str		chans = _WrapChannels(cmd, 0);
+	string msg;
 
 	if (targets.empty() && chans.empty())
 		return AddData(ERR_NORECIPIENT(cmd.GetCinfo()[message]));
@@ -536,16 +538,34 @@ void	Server::_PrivMsg(Command &cmd, Client &client)
 		return AddData(ERR_TOOMANYTARGETS(cmd.GetMiddle()[1], cmd.GetCinfo()[message]));
 	if (cmd.GetCinfo()[trailing].empty())
 		return AddData(ERR_NOTEXTTOSEND);
-	if ((receiver = _FindNickname(targets[0])) == NULL)
-		return AddData(ERR_NOSUCHNICK(targets[0]));
+	std::cout << "NOT SEGFAULT 4 YET" << std::endl;
 	// TODO: Check also in the list of #channels
 
-	const string msg = "PRIVMSG " + targets[0] + " :" + cmd.GetCinfo()[trailing]+ "\r\n";
-	std::cout << "fd : " << client.GetFd() << std::endl;
-	std::cout << "nickname : " << client.GetUinfo()[nickname] << std::endl;
-	std::cout << "prefix : " << client.GetPrefix() << std::endl;
+	std::cout << "NOT SEGFAULT 5 YET" << std::endl;
+	if (!targets.empty())
+	{
+		if ((receiver = _FindNickname(targets[0])) == NULL)
+			return AddData(ERR_NOSUCHNICK(targets[0]));
+		msg += "PRIVMSG " + targets[0] + " :" + cmd.GetCinfo()[trailing]+ "\r\n";
+		std::cout << "NOT SEGFAULT 6 YET" << std::endl;
+		AddData(msg, client.GetPrefix()); 
+		SendData(receiver->GetFd());
+	}
+	else if (!chans.empty())
+	{
+		if ((recChan = _FindChannel(cmd.GetCinfo()[chanstring])) == _channels.end())
+			return AddData(ERR_NOSUCHNICK(cmd.GetCinfo()[chanstring]));
+		msg += "PRIVMSG " + cmd.GetCinfo()[chanstring] + " :" + cmd.GetCinfo()[trailing]+ "\r\n";
+//	std::cout << "fd : " << client.GetFd() << std::endl;
+//	std::cout << "nickname : " << client.GetUinfo()[nickname] << std::endl;
+//	std::cout << "prefix : " << client.GetPrefix() << std::endl;
+		std::cout << "NOT SEGFAULT 7 YET" << std::endl;
+		SendChannel(cmd.GetCinfo()[chanstring], msg, client.GetPrefix());
+	}
+	std::cout << "NOT SEGFAULT 8 YET" << std::endl;
 	AddData(msg, client.GetPrefix()); 
 	SendData(receiver->GetFd());
+	std::cout << "Function finished, you can't be here => NOT SEGFAULT 9 YET" << std::endl;
 }
 
 void	Server::_Mode(Command &cmd, Client &client)
