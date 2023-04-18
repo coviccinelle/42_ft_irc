@@ -751,6 +751,7 @@ void	Server::_Topic(Command &cmd, Client &client)
 			AddData(RPL_NOTOPIC(client.GetUinfo()[nickname], client.GetUinfo()[username], client.GetUinfo()[hostname], channel->GetName()));
 		else
 			AddData(RPL_TOPIC(client.GetUinfo()[nickname], client.GetUinfo()[username], client.GetUinfo()[hostname], channel->GetName(), channel->GetTopic()));
+		SendData(client.GetFd());
 	}
 	else
 	{
