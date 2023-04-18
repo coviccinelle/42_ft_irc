@@ -411,17 +411,12 @@ int	Channel::joinChannel(Client& toAccept)
 	return (0);
 }
 
-lst_iterator	Channel::_findUserIter(const string& name)
+lst_iterator	Channel::findUserIter(const string& name)
 {
-	std::cout << "looking for USER " << name << " on Channel" << _chanstring << std::endl;
 	for (lst_iterator it = _user.begin(); it != _user.end(); ++it)
 	{
-		std::cout << "list client on chan = " << (*it)->GetUinfo()[nickname] << std::endl;
 		if ((*it)->GetUinfo()[nickname] == name)
-		{
-			std::cout << "Yuhuuu found user " << name << " on channel " << _chanstring << std::endl;
 			return (it);
-		}
 	}
 	return (_user.end());
 }
@@ -436,15 +431,15 @@ const std::list< Client* > 	&Channel::GetUser() const
 //
 //	@params:
 //	- toAccept: Client that want to leave the channel
-int	Channel::leaveChannel(Client& toAccept)
+void	Channel::leaveChannel(Client& toAccept)
 {
-	lst_iterator it = _findUserIter(toAccept.GetUinfo()[nickname]);
+	lst_iterator it = findUserIter(toAccept.GetUinfo()[nickname]);
 	if (it == _user.end())
-		return (-1);
+		return ;
 
 	toAccept.DeregisterChannel(*this);
 	_user.remove(*it);
-	return (RPL_SOMETHING);
+	return ;
 }
 
 

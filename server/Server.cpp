@@ -670,25 +670,22 @@ void	Server::_Join(Command &cmd, Client &client)
 	return ;
 }
 
-//Parameters: <channel> *( "," <channel> ) [ <Part Message> ]
 void	Server::_Part(Command &cmd, Client &client)
 {
-	std::list < Channel >::iterator target;
-	std::cout << "Hey I'm command Part ! Nice to meet you" << std::endl;
-	cst_vec_vec_str	channels = _WrapChannels(cmd, 0);
+	std::list < Channel >::iterator it;
+	cst_vec_vec_str	chanparse = _WrapChannels(cmd, 0);
 
-	if (channels.empty())
-		return AddData(SERVER_NAME, ERR_NEEDMOREPARAMS("PART"));
-	for (size_t i = 0; i < channels.size(); ++i)
+	if (chanparse.empty())
+		return AddData(ERR_NEEDMOREPARAMS("PART"));
+	for (size_t i = 0; i < chanparse.size(); ++i)
 	{
-		std::cout << "channels[i][0] = " << channels[i][chanstring] << std::endl;
-		target = _FindChannel(channels[i][chan]);
-		if (target == _channels.end())
-			return AddData(SERVER_NAME, ERR_NOSUCHCHANNEL(channels[i][chan]));
-		if (target->_findUserIter(client.GetUinfo()[nickname]) == target->GetUser().end())
-			return (AddData(SERVER_NAME, ERR_NOTONCHANNEL(channels[i][chan])));
-		std::cout << "step 3 :TODO Leave channel" << std::endl;
-//		leave_client_from_channel(it);
+		if ((it = _FindChannel(chanparse[i][chan])) == _channels.end())
+			return AddData(ERR_NOSUCHCHANNEL(chanparse[i][chan]));
+		if (it->findUserIter(client.GetUinfo()[nickname]) == it->GetUser().end())
+			return AddData(ERR_NOTONCHANNEL(chanparse[i][chan]));
+		it->leaveChannel(client);
+		SendChannel(it->GetName(), string("PART ") + it->GetName() + (cmd.GetCinfo()[trailing].empty() ? string("") : string(" :") + cmd.GetCinfo()[trailing]) + "\r\n", client.GetPrefix());
+		AddData(string("PART ") + it->GetName() + (cmd.GetCinfo()[trailing].empty() ? string("") : string(" :") + cmd.GetCinfo()[trailing]) + "\r\n", client.GetPrefix());
 	}
 }
 
