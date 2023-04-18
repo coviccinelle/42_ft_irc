@@ -762,39 +762,39 @@ void	Server::_Topic(Command &cmd, Client &client)
 	}
 }
 
-//-----------------
-void	Server::_PrivMsg(Command &cmd, Client &client)
-{
-	Client				*receiver = NULL;
-	cst_vec_str			targets = _WrapTargets(cmd, 0);
-	cst_vec_vec_str		chans = _WrapChannels(cmd, 0);
-
-	if (targets.empty() && chans.empty())
-		return AddData(ERR_NORECIPIENT(cmd.GetCinfo()[message]));
-	if (cmd.GetMiddle().size() > 1)
-		return AddData(ERR_TOOMANYTARGETS(cmd.GetMiddle()[1], cmd.GetCinfo()[message]));
-	if (cmd.GetCinfo()[trailing].empty())
-		return AddData(ERR_NOTEXTTOSEND);
-	if (!targets.empty())
-	{
-		if ((receiver = _FindNickname(targets[0])) == NULL)
-			return AddData(ERR_NOSUCHNICK(targets[0]));
-		AddData("PRIVMSG " + targets[0] + " :" + cmd.GetCinfo()[trailing]+ "\r\n", client.GetPrefix()); 
-		SendData(receiver->GetFd());
-	}
-	else if (!chans.empty())
-	{
-		try {
-			SendChannel(chans[0][chan], "PRIVMSG " + chans[0][chan] + " :" + cmd.GetCinfo()[trailing]+ "\r\n", client.GetPrefix(), &client);
-		}
-		catch (irc_error &e)
-		{
-			return AddData(e.what());
-		}
-	}
-}
-//-----------------
-
+////-----------------
+//void	Server::_PrivMsg(Command &cmd, Client &client)
+//{
+//	Client				*receiver = NULL;
+//	cst_vec_str			targets = _WrapTargets(cmd, 0);
+//	cst_vec_vec_str		chans = _WrapChannels(cmd, 0);
+//
+//	if (targets.empty() && chans.empty())
+//		return AddData(ERR_NORECIPIENT(cmd.GetCinfo()[message]));
+//	if (cmd.GetMiddle().size() > 1)
+//		return AddData(ERR_TOOMANYTARGETS(cmd.GetMiddle()[1], cmd.GetCinfo()[message]));
+//	if (cmd.GetCinfo()[trailing].empty())
+//		return AddData(ERR_NOTEXTTOSEND);
+//	if (!targets.empty())
+//	{
+//		if ((receiver = _FindNickname(targets[0])) == NULL)
+//			return AddData(ERR_NOSUCHNICK(targets[0]));
+//		AddData("PRIVMSG " + targets[0] + " :" + cmd.GetCinfo()[trailing]+ "\r\n", client.GetPrefix()); 
+//		SendData(receiver->GetFd());
+//	}
+//	else if (!chans.empty())
+//	{
+//		try {
+//			SendChannel(chans[0][chan], "PRIVMSG " + chans[0][chan] + " :" + cmd.GetCinfo()[trailing]+ "\r\n", client.GetPrefix(), &client);
+//		}
+//		catch (irc_error &e)
+//		{
+//			return AddData(e.what());
+//		}
+//	}
+//}
+////-----------------
+//
 
 //Parameters: [ <channel> *( "," <channel> ) [ <target> ] ]
 //            ERR_TOOMANYMATCHES              ERR_NOSUCHSERVER
