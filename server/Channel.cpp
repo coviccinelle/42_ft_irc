@@ -193,6 +193,24 @@ void	Channel::_setChanMode(const char& modif, const int& mode, const string& par
 
 }
 
+void	Channel::SetTopic(const string& Str)
+{
+	_topic = Str;
+}
+
+bool	Channel::IsOperator(const Client& client) const
+{
+	(void)client;
+	//return (_mode[USER_MODE.find('o')]);
+	std::cout << "under construction" << std::endl;
+	return (false);
+}
+
+const string &Channel::GetTopic() const
+{
+	return (_topic);
+}
+
 // TO CHANGE:
 // 	I need to change the way message are send,
 // 	use of right format is needed (nickname!username@hostname)

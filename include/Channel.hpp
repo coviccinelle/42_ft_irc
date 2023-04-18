@@ -109,6 +109,7 @@ class Channel
  
 		string				_key; // Key used to access to channel
 		string				_chanstring; // Channel name
+		string				_topic; // Channel's topic
 
 		bool				_safe; // Safe channel (created with prefix '!')
 		bool				_modeless; // Modeless channel (created with prefix '+') also no chanop
@@ -166,6 +167,10 @@ class Channel
 
 		lst_pcli::iterator			_findUserIter(const string& name);
 		const std::list< Client* > 	&GetUser() const;
+		const string 				&GetTopic() const;
+
+		void						SetTopic(const string& params);
+		bool						IsOperator(const Client& client) const;
 
 		/* Public Methods */
 		void			sendMessage(const string& msg, const Client& clientSend) const;
