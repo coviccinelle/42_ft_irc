@@ -164,7 +164,7 @@ class Channel
 		~Channel();
 		Channel&	operator=(const Channel& rhs);
 
-		lst_pcli::iterator		_findUserIter(const string& name);
+		lst_pcli::iterator			_findUserIter(const string& name);
 		const std::list< Client* > 	&GetUser() const;
 
 		/* Public Methods */

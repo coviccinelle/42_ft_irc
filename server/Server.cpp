@@ -708,15 +708,15 @@ void	Server::_Part(Command &cmd, Client &client)
 	cst_vec_vec_str	channels = _WrapChannels(cmd, 0);
 
 	if (channels.empty())
-		return AddData(SERVER_NAME, ERR_NEEDMOREPARAMS("PART"));
+		return AddData(ERR_NEEDMOREPARAMS("PART"));
 	for (size_t i = 0; i < channels.size(); ++i)
 	{
 		std::cout << "channels[i][0] = " << channels[i][chanstring] << std::endl;
 		target = _FindChannel(channels[i][chan]);
 		if (target == _channels.end())
-			return AddData(SERVER_NAME, ERR_NOSUCHCHANNEL(channels[i][chan]));
+			return AddData(ERR_NOSUCHCHANNEL(channels[i][chan]));
 		if (target->_findUserIter(client.GetUinfo()[nickname]) == target->GetUser().end())
-			return (AddData(SERVER_NAME, ERR_NOTONCHANNEL(channels[i][chan])));
+			return (AddData(ERR_NOTONCHANNEL(channels[i][chan])));
 		std::cout << "step 3 :TODO Leave channel" << std::endl;
 //		leave_client_from_channel(it);
 	}
@@ -728,10 +728,73 @@ void	Server::_Part(Command &cmd, Client &client)
 //            ERR_CHANOPRIVSNEEDED            ERR_NOCHANMODES
 void	Server::_Topic(Command &cmd, Client &client)
 {
-	std::cout << "Hey I'm command Topic ! Nice to meet you" << std::endl;
-	(void)cmd;
-	(void)client;
+	std::list < Channel >::iterator channel;
+	cst_vec_vec_str		chans = _WrapChannels(cmd, 0);
+	cst_vec_str			targets = _WrapTargets(cmd, 0);
+
+	std::cout << "Hey I'm command Topic: to change or view topic of chan" << std::endl;
+	if (chans.empty())
+		return AddData(ERR_NEEDMOREPARAMS("TOPIC"));
+	if ((channel = _FindChannel(chans[0][chan])) == _channels.end())
+			continue ;
+		if (channel->_findUserIter(client.GetUinfo()[nickname]) == channel->GetUser().end())
+			return (AddData(ERR_NOTONCHANNEL(chans[0][chan])));
+	if (cmd.GetMiddle().size() == 1)
+	{
+		//Send topic of the channel back to the client
+		if (channel->GetTopic().empty())
+			AddData(RPL_NOTOPIC(client.GetUinfo()[nickname], client.GetUinfo()[username], client.GetUinfo()[hostname], channel->GetName()));
+		else
+			AddData(RPL_TOPIC(client.GetUinfo()[nickname], client.GetUinfo()[username], client.GetUinfo()[hostname], channel->GetName(), channel->GetTopic()));
+	}
+	else
+	{
+		//check if the client is an operator of the channel
+		if (channel->_findUserIter(client.GetUinfo()[nickname])->GetMode() != '@')
+			return AddData(ERR_CHANOPRIVSNEEDED(chans[0][chan]));
+		//change the topic of the channel
+		if (cmd.GetCinfo()[trailing].empty())
+			channel->SetTopic("");
+		else
+			channel->SetTopic(cmd.GetCinfo()[trailing]);
+		//send the new topic to all the users of the channel
+		SendChannel(channel->GetName(), "TOPIC " + channel->GetName() + " :" + channel->GetTopic() + "\r\n");
+	}
 }
+
+//-----------------
+void	Server::_PrivMsg(Command &cmd, Client &client)
+{
+	Client				*receiver = NULL;
+	cst_vec_str			targets = _WrapTargets(cmd, 0);
+	cst_vec_vec_str		chans = _WrapChannels(cmd, 0);
+
+	if (targets.empty() && chans.empty())
+		return AddData(ERR_NORECIPIENT(cmd.GetCinfo()[message]));
+	if (cmd.GetMiddle().size() > 1)
+		return AddData(ERR_TOOMANYTARGETS(cmd.GetMiddle()[1], cmd.GetCinfo()[message]));
+	if (cmd.GetCinfo()[trailing].empty())
+		return AddData(ERR_NOTEXTTOSEND);
+	if (!targets.empty())
+	{
+		if ((receiver = _FindNickname(targets[0])) == NULL)
+			return AddData(ERR_NOSUCHNICK(targets[0]));
+		AddData("PRIVMSG " + targets[0] + " :" + cmd.GetCinfo()[trailing]+ "\r\n", client.GetPrefix()); 
+		SendData(receiver->GetFd());
+	}
+	else if (!chans.empty())
+	{
+		try {
+			SendChannel(chans[0][chan], "PRIVMSG " + chans[0][chan] + " :" + cmd.GetCinfo()[trailing]+ "\r\n", client.GetPrefix(), &client);
+		}
+		catch (irc_error &e)
+		{
+			return AddData(e.what());
+		}
+	}
+}
+//-----------------
+
 
 //Parameters: [ <channel> *( "," <channel> ) [ <target> ] ]
 //            ERR_TOOMANYMATCHES              ERR_NOSUCHSERVER
