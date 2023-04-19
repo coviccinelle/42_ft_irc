@@ -677,9 +677,9 @@ void	Server::_Join(Command &cmd, Client &client)
 		_channels.back().joinChannel(client);
 		SendChannel(chanIt, string("JOIN " + chanparse[i][chan] + "\r\n"), client.GetPrefix());
 		if (1)
-			AddData(RPL_TOPIC(client.GetUinfo()[nickname], client.GetUinfo()[username], client.GetUinfo()[hostname], _channels.back().GetName(), "todo : topic"));
+			AddData(RPL_TOPIC(client.GetPrefix(), _channels.back().GetName(), "todo : topic"));
 		else
-			AddData(RPL_NOTOPIC(client.GetUinfo()[nickname], client.GetUinfo()[username], client.GetUinfo()[hostname], _channels.back().GetName()));
+			AddData(RPL_NOTOPIC(client.GetPrefix(), _channels.back().GetName()));
 		AddData(RPL_NAMREPLY(client.GetUinfo()[nickname], chanparse[i][chan]) + chanIt->GetLstNickname() + "\r\n");
 		AddData(RPL_ENDOFNAMES(client.GetUinfo()[nickname], chanparse[i][chan]));
 	}
@@ -728,11 +728,12 @@ void	Server::_Topic(Command &cmd, Client &client)
 		return (AddData(ERR_NOTONCHANNEL(chans[0][chan])));
 	if (cmd.GetCinfo()[trailing].empty())
 	{
+//		topic = user->getPrefix() + " TOPIC " + channel->getName() + " " + channel->getTopic() + END;
 		//Send topic of the channel back to the client
 		if (channel->GetTopic().empty())
-			AddData(RPL_NOTOPIC(client.GetUinfo()[nickname], client.GetUinfo()[username], client.GetUinfo()[hostname], channel->GetName()));
+			AddData(RPL_NOTOPIC(client.GetPrefix(), channel->GetName()));
 		else
-			AddData(RPL_TOPIC(client.GetUinfo()[nickname], client.GetUinfo()[username], client.GetUinfo()[hostname], channel->GetName(), channel->GetTopic()));
+			AddData(RPL_TOPIC(client.GetPrefix(), channel->GetName(), channel->GetTopic()));
 		SendData(client.GetFd());
 	}
 	else
@@ -748,7 +749,8 @@ void	Server::_Topic(Command &cmd, Client &client)
 		else
 			channel->SetTopic(cmd.GetCinfo()[trailing]);
 		//send the new topic to all the users of the channel
-		SendChannel(channel, channel->GetName(), "TOPIC " + channel->GetName() + " :" + channel->GetTopic() + "\r\n");
+//		AddData(RPL_TOPIC(client.GetPrefix(), _channels.back().GetName(), channel->GetTopic() + "\r\n"));
+		SendChannel(channel, "TOPIC " + channel->GetName() + " :" + channel->GetTopic() + "\r\n", client.GetPrefix());
 	}
 }
 

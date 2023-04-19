@@ -18,9 +18,9 @@
 # define BANNED(nick, user, host, channel, target) (":" + nick + "!" + user + "@" + host + " MODE " + channel + " +b " + target + "\r\n")
 # define KICK(nick, user, host, chan, kicked, reason) (":" + nick + "!" + user + "@" + host + " KICK " + chan + " " + kicked + " :" + reason + "\r\n")
 # define INVITE(nick, user, host, nickinvite, channel)  (":" + nick + "!" + user + "@" + host + " INVITE " + nickinvite + " " + channel + "\r\n")
-# define RPL_NOTOPIC(nick, user, host, chan) ("331 " + nick + "!" + user + "@" + host + " " + chan + " :No topic is set\r\n")
-# define TOPIC(nick, user, host, chan, topic) (":" + nick + "!" + user + "@" + host + " TOPIC " + chan + " :" + topic + "\n\r")
-# define RPL_TOPIC(nick, user, host, chan, topic) ("332 " + nick + "!" + user + "@" + host + " " + chan + " :" + topic + "\r\n")
+# define RPL_NOTOPIC(prefix, chan) ("331 " + prefix + " " + chan + " :No topic is set\r\n")
+# define TOPIC(prefix, chan, topic) (":" + prefix + " TOPIC " + chan + " :" + topic + "\n\r")
+# define RPL_TOPIC(prefix, chan, topic) ("332 " + prefix+ " " + chan + " :" + topic + "\r\n")
 # define RPL_TOPICWHOTIME(nick, chan, whoset, user, setat) ("333 " + nick + " " + chan + " " + whoset + "!" + user + "@localhost " + setat + "\r\n")
 # define ERR_ALREADYREGISTERED "462 :You may not reregister\r\n"
 # define ERR_NEEDMOREPARAMS(command) (std::string("461 ") + command + " :Not enough parameters\r\n")
