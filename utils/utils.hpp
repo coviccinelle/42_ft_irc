@@ -23,6 +23,7 @@
 
 #define SERVER_NAME string("irc")
 #define USER_MODE string("iwos")
+#define MEMBER_MODE string("oO")
 #define MODE_SIZE 4
 
 class Client;
@@ -47,9 +48,6 @@ typedef const std::vector< struct pollfd >	cst_vec_pfd;
 
 typedef std::list< Channel >				lst_chan;
 typedef const std::list< Channel >			cst_lst_chan;
-
-typedef std::list< Client * >				lst_pcli;
-typedef const std::list< Client * >			cst_lst_pcli;
 
 string	ltrim(const string &s);
 string	rtrim(const string &s);

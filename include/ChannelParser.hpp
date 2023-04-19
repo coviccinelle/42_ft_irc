@@ -23,6 +23,7 @@ class ChannelParser : public Parser
 		void			ParseChannel(const string &str);
 		void			DebugChannel() const;
 
+		void			ClearChannels();
 		cst_vec_vec_str	&GetChannels() const;
 
 	private:

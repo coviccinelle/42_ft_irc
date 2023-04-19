@@ -86,6 +86,11 @@ cst_vec_str	&TargetParser::GetTargets() const
 	return (_targets);
 }
 
+void	TargetParser::ClearTargets()
+{
+	_targets.clear();
+}
+
 void	TargetParser::AddTarget(const string &s)
 {
 	_targets.push_back(s);

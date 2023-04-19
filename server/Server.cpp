@@ -166,19 +166,18 @@ void Server::ConnectionLoop()
 	}
 }
 
-void	Server::SendChannel(const string &chanstr, const string &message, const string &from, const Client *skip)
+void	Server::SendChannel(lst_chan::iterator chan, const string &message, const string &from, const Client *skip)
 {
-	lst_chan::iterator chan = _FindChannel(chanstr);
 	if (chan == _channels.end())
-		throw irc_error(ERR_NOSUCHNICK(chanstr), NO_CHAN);
+		return ;
 
-	cst_lst_pcli &clients = chan->GetUsers();
-	for (lst_pcli::const_iterator it = clients.begin(); it != clients.end(); ++it)
+	cst_map_pcli &clients = chan->GetUsers();
+	for (map_pcli::const_iterator it = clients.begin(); it != clients.end(); ++it)
 	{
-		if (*it == skip)
+		if (it->first == skip)
 			continue ;
 		AddData(message, from);
-		SendData((*it)->GetFd());
+		SendData(it->first->GetFd());
 	}
 }
 
@@ -367,6 +366,7 @@ cst_vec_vec_str	&Server::_WrapChannels(Command &cmd, size_t pos)
 	}
 	catch (irc_error &e)
 	{
+		cmd.ClearChannels();
 		std::cout << "warning : " << e.what() << std::endl;
 	}
 	return (cmd.GetChannels());
@@ -382,6 +382,7 @@ cst_vec_str	&Server::_WrapTargets(Command &cmd, size_t pos)
 	}
 	catch (irc_error &e)
 	{
+		cmd.ClearTargets();
 		std::cout << "warning : " << e.what() << std::endl;
 	}
 	return (cmd.GetTargets());
@@ -533,9 +534,9 @@ void	Server::_PrivMsg(Command &cmd, Client &client)
 {
 	Client				*receiver = NULL;
 	cst_vec_str			targets = _WrapTargets(cmd, 0);
-	cst_vec_vec_str		chans = _WrapChannels(cmd, 0);
+	cst_vec_vec_str		chanparse = _WrapChannels(cmd, 0);
 
-	if (targets.empty() && chans.empty())
+	if (targets.empty() && chanparse.empty())
 		return AddData(ERR_NORECIPIENT(cmd.GetCinfo()[message]));
 	if (cmd.GetMiddle().size() > 1)
 		return AddData(ERR_TOOMANYTARGETS(cmd.GetMiddle()[1], cmd.GetCinfo()[message]));
@@ -548,16 +549,37 @@ void	Server::_PrivMsg(Command &cmd, Client &client)
 		AddData("PRIVMSG " + targets[0] + " :" + cmd.GetCinfo()[trailing]+ "\r\n", client.GetPrefix()); 
 		SendData(receiver->GetFd());
 	}
-	else if (!chans.empty())
+	else if (!chanparse.empty())
 	{
+		lst_chan::iterator	chanIt;
+
+		if ((chanIt = _FindChannel(chanparse[0][chan])) == _channels.end())
+			AddData(ERR_NOSUCHCHANNEL(chanparse[0][chan]));
+		else if (chanIt->GetUsers().count(&client) == 0) 
+			AddData(ERR_NOTONCHANNEL(chanIt->GetName()));
+		else
+			SendChannel(chanIt, "PRIVMSG " + chanparse[0][chan] + " :" + cmd.GetCinfo()[trailing]+ "\r\n", client.GetPrefix(), &client);
+	}
+}
+
+void	Server::_ModeClient(Command &cmd, Client &client, const string &target)
+{
+	if (target != client.GetUinfo()[nickname])
+		return (AddData(ERR_USERSDONTMATCH(target)));
+	if (cmd.GetMiddle().size() > 1)
+	{
+		if (cmd.isValidUserMode(cmd.GetMiddle()[1]) == false)
+			return (AddData(ERR_UMODEUNKNOWNFLAG(cmd.GetMiddle()[1])));
 		try {
-			SendChannel(chans[0][chan], "PRIVMSG " + chans[0][chan] + " :" + cmd.GetCinfo()[trailing]+ "\r\n", client.GetPrefix(), &client);
+			client.SetStrMode(cmd.GetMiddle()[1]);
 		}
 		catch (irc_error &e)
 		{
-			return AddData(e.what());
+			return (AddData(e.what()));
 		}
+		return (AddData(string("MODE ") + client.GetUinfo()[nickname] + " " + cmd.GetMiddle()[1] + "\r\n"));
 	}
+	return (AddData(RPL_UMODEIS(client.GetUinfo()[nickname], client.GetStrMode())));
 }
 
 void	Server::_Mode(Command &cmd, Client &client)
@@ -565,29 +587,12 @@ void	Server::_Mode(Command &cmd, Client &client)
 	cst_vec_str		targets = _WrapTargets(cmd, 0);
 	cst_vec_vec_str	chanparse = _WrapChannels(cmd, 0);
 
-	if (targets.empty() && chanparse.empty())
-		return (AddData(ERR_NEEDMOREPARAMS("MODE")));
-
-	if (targets.empty() == false)
+	if (chanparse.empty())
 	{
-		if (targets[0] != client.GetUinfo()[nickname])
-			return (AddData(ERR_USERSDONTMATCH(targets[0])));
-		if (cmd.GetMiddle().size() > 1)
-		{
-			if (cmd.isValidUserMode(cmd.GetMiddle()[1]) == false)
-				return (AddData(ERR_UMODEUNKNOWNFLAG(cmd.GetMiddle()[1])));
-			try {
-				client.SetStrMode(cmd.GetMiddle()[1]);
-			}
-			catch (irc_error &e)
-			{
-				return (AddData(e.what()));
-			}
-			return (AddData(string("MODE ") + client.GetUinfo()[nickname] + " " + cmd.GetMiddle()[1] + "\r\n"));
-		}
-		return (AddData(RPL_UMODEIS(client.GetUinfo()[nickname], client.GetStrMode())));
+		if (targets.empty())
+			return (AddData(ERR_NEEDMOREPARAMS("MODE")));
+		return _ModeClient(cmd, client, targets[0]);
 	}
-
 	return (AddData(RPL_CHANNELMODEIS(chanparse[0][chan]) /*+mode here*/ ));
 }
 
@@ -658,24 +663,24 @@ void	Server::_Quit(Command &cmd, Client &client)
 void	Server::_Join(Command &cmd, Client &client)
 {
 	cst_vec_vec_str	chanparse = _WrapChannels(cmd, 0);
-	lst_chan::iterator	it;
+	lst_chan::iterator	chanIt;
 
 	if (chanparse.empty())
 		return AddData(ERR_NEEDMOREPARAMS("JOIN"));
 	for (size_t i = 0; i < chanparse.size(); ++i)
 	{
-		if ((it = _FindChannel(chanparse[i][chan])) == _channels.end())
+		if ((chanIt = _FindChannel(chanparse[i][chan])) == _channels.end())
 		{
 			_channels.push_back(Channel(chanparse[i][chan]));
-			--it;
+			--chanIt;
 		}
 		_channels.back().joinChannel(client);
-		SendChannel(chanparse[i][chan], "JOIN " + chanparse[i][chan] + "\r\n", client.GetPrefix());
+		SendChannel(chanIt, string("JOIN " + chanparse[i][chan] + "\r\n"), client.GetPrefix());
 		if (1)
 			AddData(RPL_TOPIC(client.GetUinfo()[nickname], client.GetUinfo()[username], client.GetUinfo()[hostname], _channels.back().GetName(), "todo : topic"));
 		else
 			AddData(RPL_NOTOPIC(client.GetUinfo()[nickname], client.GetUinfo()[username], client.GetUinfo()[hostname], _channels.back().GetName()));
-		AddData(RPL_NAMREPLY(client.GetUinfo()[nickname], chanparse[i][chan]) + it->GetLstNickname() + "\r\n");
+		AddData(RPL_NAMREPLY(client.GetUinfo()[nickname], chanparse[i][chan]) + chanIt->GetLstNickname() + "\r\n");
 		AddData(RPL_ENDOFNAMES(client.GetUinfo()[nickname], chanparse[i][chan]));
 	}
 
@@ -684,22 +689,22 @@ void	Server::_Join(Command &cmd, Client &client)
 
 void	Server::_Part(Command &cmd, Client &client)
 {
-	std::list < Channel >::iterator it;
 	cst_vec_vec_str	chanparse = _WrapChannels(cmd, 0);
+	lst_chan::iterator	chanIt;
 
 	if (chanparse.empty())
 		return AddData(ERR_NEEDMOREPARAMS("PART"));
 	for (size_t i = 0; i < chanparse.size(); ++i)
 	{
-		if ((it = _FindChannel(chanparse[i][chan])) == _channels.end())
+		if ((chanIt = _FindChannel(chanparse[i][chan])) == _channels.end())
 			AddData(ERR_NOSUCHCHANNEL(chanparse[i][chan]));
-		else if (it->findUserIter(client.GetUinfo()[nickname]) == it->GetUser().end())
-			AddData(ERR_NOTONCHANNEL(chanparse[i][chan]));
+		else if (chanIt->GetUsers().count(&client) == 0)
+			AddData(ERR_NOTONCHANNEL(chanIt->GetName()));
 		else
 		{
-			it->leaveChannel(client);
-			SendChannel(it->GetName(), string("PART ") + it->GetName() + (cmd.GetCinfo()[trailing].empty() ? string("") : string(" :") + cmd.GetCinfo()[trailing]) + "\r\n", client.GetPrefix());
-			AddData(string("PART ") + it->GetName() + (cmd.GetCinfo()[trailing].empty() ? string("") : string(" :") + cmd.GetCinfo()[trailing]) + "\r\n", client.GetPrefix());
+			chanIt->leaveChannel(client);
+			SendChannel(chanIt, string("PART ") + chanIt->GetName() + (cmd.GetCinfo()[trailing].empty() ? string("") : string(" :") + cmd.GetCinfo()[trailing]) + "\r\n", client.GetPrefix());
+			AddData(string("PART ") + chanIt->GetName() + (cmd.GetCinfo()[trailing].empty() ? string("") : string(" :") + cmd.GetCinfo()[trailing]) + "\r\n", client.GetPrefix());
 		}
 	}
 }
@@ -747,46 +752,11 @@ void	Server::_Topic(Command &cmd, Client &client)
 	}
 }
 
-////-----------------
-//void	Server::_PrivMsg(Command &cmd, Client &client)
-//{
-//	Client				*receiver = NULL;
-//	cst_vec_str			targets = _WrapTargets(cmd, 0);
-//	cst_vec_vec_str		chans = _WrapChannels(cmd, 0);
-//
-//	if (targets.empty() && chans.empty())
-//		return AddData(ERR_NORECIPIENT(cmd.GetCinfo()[message]));
-//	if (cmd.GetMiddle().size() > 1)
-//		return AddData(ERR_TOOMANYTARGETS(cmd.GetMiddle()[1], cmd.GetCinfo()[message]));
-//	if (cmd.GetCinfo()[trailing].empty())
-//		return AddData(ERR_NOTEXTTOSEND);
-//	if (!targets.empty())
-//	{
-//		if ((receiver = _FindNickname(targets[0])) == NULL)
-//			return AddData(ERR_NOSUCHNICK(targets[0]));
-//		AddData("PRIVMSG " + targets[0] + " :" + cmd.GetCinfo()[trailing]+ "\r\n", client.GetPrefix()); 
-//		SendData(receiver->GetFd());
-//	}
-//	else if (!chans.empty())
-//	{
-//		try {
-//			SendChannel(chans[0][chan], "PRIVMSG " + chans[0][chan] + " :" + cmd.GetCinfo()[trailing]+ "\r\n", client.GetPrefix(), &client);
-//		}
-//		catch (irc_error &e)
-//		{
-//			return AddData(e.what());
-//		}
-//	}
-//}
-////-----------------
-//
-
 //Parameters: [ <channel> *( "," <channel> ) [ <target> ] ]
 //            ERR_TOOMANYMATCHES              ERR_NOSUCHSERVER
 //            RPL_NAMREPLY                    RPL_ENDOFNAMES
 void	Server::_Names(Command &cmd, Client &client)
 {
-	std::cout << "Hey I'm command Names ! Nice to meet you" << std::endl;
 	(void)cmd;
 	(void)client;
 }
@@ -821,7 +791,21 @@ void	Server::_Invite(Command &cmd, Client &client)
 //           ERR_USERNOTINCHANNEL            ERR_NOTONCHANNEL
 void	Server::_Kick(Command &cmd, Client &client)
 {
-	std::cout << "Hey I'm command Kick ! Nice to meet you" << std::endl;
-	(void)cmd;
-	(void)client;
+	cst_vec_vec_str	chanparse = _WrapChannels(cmd, 0);
+	lst_chan::iterator			chanIt;
+	map_pcli::const_iterator	toKick;	
+
+	if (chanparse.empty())
+		return AddData(ERR_NEEDMOREPARAMS("JOIN"));
+	if ((chanIt = _FindChannel(chanparse[0][chan])) == _channels.end())
+		AddData(ERR_NOSUCHCHANNEL(chanparse[0][chan]));
+	else if (chanIt->GetUsers().count(&client) == 0)
+		AddData(ERR_NOTONCHANNEL(chanparse[0][chan]));
+	else if ((toKick = chanIt->findUserIter(cmd.GetMiddle()[1])) == chanIt->GetUsers().end())
+		AddData(ERR_USERNOTINCHANNEL(cmd.GetMiddle()[1], chanparse[0][chan]));
+	else
+	{
+		SendChannel(chanIt, string("KICK ") + chanIt->GetName() + " " + toKick->first->GetUinfo()[nickname] + " :" + cmd.GetCinfo()[trailing] + "\r\n", client.GetPrefix());
+		chanIt->leaveChannel(*(toKick->first));
+	}
 }
