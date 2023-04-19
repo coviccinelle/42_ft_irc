@@ -171,3 +171,8 @@ cst_vec_vec_str	&ChannelParser::GetChannels() const
 {
 	return (_channels);
 }
+
+void	ChannelParser::ClearChannels()
+{
+	_channels.clear();
+}

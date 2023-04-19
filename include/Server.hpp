@@ -78,13 +78,14 @@ class Server
 		void 							_User(Command &cmd, Client &client);
 		void 							_Pong(Command &cmd, Client &client);
 		void 							_PrivMsg(Command &cmd, Client &client);
+		void							_ModeClient(Command &cmd, Client &client, const string &target);
 		void							_Mode(Command &cmd, Client &client);
 		void							_Notice(Command &cmd, Client &client);
 		void							_Kill(Command &cmd, Client &client);
 		void							_Quit(Command &cmd, Client &client);
 		
 		// *** CHANNEL COMMANDS *** //
-		std::list< Channel >::iterator	_chanExist(const string chanName);
+		lst_chan::iterator				_chanExist(const string chanName);
 		void							_Join(Command &cmd, Client &client);
 		void							_Part(Command &cmd, Client &client);
 		void							_Topic(Command &cmd, Client &client);
