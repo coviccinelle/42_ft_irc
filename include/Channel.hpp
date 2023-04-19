@@ -165,7 +165,7 @@ class Channel
 		~Channel();
 		Channel&	operator=(const Channel& rhs);
 
-		lst_pcli::iterator			_findUserIter(const string& name);
+		lst_pcli::iterator		findUserIter(const string& name);
 		const std::list< Client* > 	&GetUser() const;
 		const string 				&GetTopic() const;
 
@@ -177,9 +177,11 @@ class Channel
 		int				setMemberStatus(char modif, int mode, const Client& clientSend, const string& params);
 		int				setChanMode(char modif, int mode, const Client& clientSend, const string& params);
 		int				joinChannel(Client& toAccept);
-		int				leaveChannel(Client& toAccept);
+		void			leaveChannel(Client& toAccept);
+
 		cst_lst_pcli	&GetUsers() const;
 		const string	&GetName() const;
+		string			GetLstNickname() const;
 
 		friend std::ostream&	operator<<(std::ostream& lhs, const Channel& rhs);
 };

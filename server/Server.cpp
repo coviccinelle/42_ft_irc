@@ -667,58 +667,40 @@ void	Server::_Join(Command &cmd, Client &client)
 		if ((it = _FindChannel(chanparse[i][chan])) == _channels.end())
 		{
 			_channels.push_back(Channel(chanparse[i][chan]));
-			_channels.back().joinChannel(client);
-			AddData(client.GetPrefix(), "JOIN " + chanparse[i][chan] + "\r\n");
-			if (0)
-				AddData(RPL_NOTOPIC(client.GetUinfo()[nickname], client.GetUinfo()[username], client.GetUinfo()[hostname], _channels.back().GetName()));
-			else
-				AddData(RPL_TOPIC(client.GetUinfo()[nickname], client.GetUinfo()[username], client.GetUinfo()[hostname], _channels.back().GetName(), "todo : call _channels.back()._getTopic()"));
-			AddData(RPL_NAMREPLY(client.GetUinfo()[nickname], chanparse[i][chan]) + "@" + client.GetUinfo()[nickname] + "\r\n");
-			AddData(RPL_ENDOFNAMES(client.GetUinfo()[nickname], chanparse[i][chan]));
-			SendData(client.GetFd());
+			--it;
 		}
+		_channels.back().joinChannel(client);
+		SendChannel(chanparse[i][chan], "JOIN " + chanparse[i][chan] + "\r\n", client.GetPrefix());
+		if (1)
+			AddData(RPL_TOPIC(client.GetUinfo()[nickname], client.GetUinfo()[username], client.GetUinfo()[hostname], _channels.back().GetName(), "todo : topic"));
 		else
-		{
-			it->joinChannel(client);
-
-			SendChannel(chanparse[i][chan], "JOIN " + chanparse[i][chan] + "\r\n", client.GetPrefix());
-			if (0)
-				AddData(RPL_NOTOPIC(client.GetUinfo()[nickname], client.GetUinfo()[username], client.GetUinfo()[hostname], _channels.back().GetName()));
-			else
-				AddData(RPL_TOPIC(client.GetUinfo()[nickname], client.GetUinfo()[username], client.GetUinfo()[hostname], _channels.back().GetName(), "todo : call _channels.back()._getTopic()"));
-
-			string reply = RPL_NAMREPLY(client.GetUinfo()[nickname], chanparse[i][chan]) + "@" + (*it->GetUsers().begin())->GetUinfo()[nickname];
-			for (lst_pcli::const_iterator i = ++it->GetUsers().begin(); i != it->GetUsers().end(); ++i)
-				reply += " " + (*i)->GetUinfo()[nickname];
-			reply += "\r\n";
-			AddData(reply);
-			AddData(RPL_ENDOFNAMES(client.GetUinfo()[nickname], chanparse[i][chan]));
-			SendData(client.GetFd());
-		}
+			AddData(RPL_NOTOPIC(client.GetUinfo()[nickname], client.GetUinfo()[username], client.GetUinfo()[hostname], _channels.back().GetName()));
+		AddData(RPL_NAMREPLY(client.GetUinfo()[nickname], chanparse[i][chan]) + it->GetLstNickname() + "\r\n");
+		AddData(RPL_ENDOFNAMES(client.GetUinfo()[nickname], chanparse[i][chan]));
 	}
 
 	return ;
 }
 
-//Parameters: <channel> *( "," <channel> ) [ <Part Message> ]
 void	Server::_Part(Command &cmd, Client &client)
 {
-	std::list < Channel >::iterator target;
-	std::cout << "Hey I'm command Part ! Nice to meet you" << std::endl;
-	cst_vec_vec_str	channels = _WrapChannels(cmd, 0);
+	std::list < Channel >::iterator it;
+	cst_vec_vec_str	chanparse = _WrapChannels(cmd, 0);
 
-	if (channels.empty())
+	if (chanparse.empty())
 		return AddData(ERR_NEEDMOREPARAMS("PART"));
-	for (size_t i = 0; i < channels.size(); ++i)
+	for (size_t i = 0; i < chanparse.size(); ++i)
 	{
-		std::cout << "channels[i][0] = " << channels[i][chanstring] << std::endl;
-		target = _FindChannel(channels[i][chan]);
-		if (target == _channels.end())
-			return AddData(ERR_NOSUCHCHANNEL(channels[i][chan]));
-		if (target->_findUserIter(client.GetUinfo()[nickname]) == target->GetUser().end())
-			return (AddData(ERR_NOTONCHANNEL(channels[i][chan])));
-		std::cout << "step 3 :TODO Leave channel" << std::endl;
-//		leave_client_from_channel(it);
+		if ((it = _FindChannel(chanparse[i][chan])) == _channels.end())
+			AddData(ERR_NOSUCHCHANNEL(chanparse[i][chan]));
+		else if (it->findUserIter(client.GetUinfo()[nickname]) == it->GetUser().end())
+			AddData(ERR_NOTONCHANNEL(chanparse[i][chan]));
+		else
+		{
+			it->leaveChannel(client);
+			SendChannel(it->GetName(), string("PART ") + it->GetName() + (cmd.GetCinfo()[trailing].empty() ? string("") : string(" :") + cmd.GetCinfo()[trailing]) + "\r\n", client.GetPrefix());
+			AddData(string("PART ") + it->GetName() + (cmd.GetCinfo()[trailing].empty() ? string("") : string(" :") + cmd.GetCinfo()[trailing]) + "\r\n", client.GetPrefix());
+		}
 	}
 }
 
@@ -742,7 +724,7 @@ void	Server::_Topic(Command &cmd, Client &client)
 		return AddData(ERR_NEEDMOREPARAMS("TOPIC"));
 	if ((channel = _FindChannel(chans[0][chan])) == _channels.end())
 		return ;
-	if (channel->_findUserIter(client.GetUinfo()[nickname]) == channel->GetUser().end())
+	if (channel->findUserIter(client.GetUinfo()[nickname]) == channel->GetUser().end())
 		return (AddData(ERR_NOTONCHANNEL(chans[0][chan])));
 	if (cmd.GetCinfo()[trailing].empty())
 	{
