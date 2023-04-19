@@ -12,6 +12,9 @@
 
 class Channel;
 
+#define USER_MODE string("iwos")
+#define MODE_SIZE 4
+
 // List of infos on a client
 enum InfoClient {
 	password = 0,
@@ -60,6 +63,7 @@ class Client
 
 		void							RegisterChannel(Channel &chan);
 		void							DeregisterChannel(Channel &chan);
+		void							LeaveAllChans();
 		const std::list< Channel* >		&GetChannels() const;
 
 		// User Mode info

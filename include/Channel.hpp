@@ -1,9 +1,13 @@
 #ifndef CHANNEL_HPP
 # define CHANNEL_HPP
+#include <ctime>
+#include <iostream>
+#include <string>
+#include <sstream>
 #include "../utils/utils.hpp"
 #include "../include/Client.hpp"
 
-#define MEMBER_MODE string("oO")
+#define MEMBER_MODE string("o")
 #define CHAN_MODE string("b")
 
 class Client;
@@ -13,10 +17,9 @@ enum chanmode {
 	CHAN_BAN = 0, // b
 };
 
-#define MEMBER_MODE_SIZE 2
+#define MEMBER_MODE_SIZE 1
 enum memberMode {
 	MEM_CHANOP = 0, // o
-	MEM_CHANCREATOR = 1 // O
 };
 
 typedef std::map< Client*, std::bitset< MEMBER_MODE_SIZE > >		map_pcli;	
@@ -44,11 +47,18 @@ class Channel
 		cst_map_pcli				&GetUsers() const;
 		const string				&GetName() const;
 		string						GetLstNickname() const;
+		string						GetStrChanMode() const;
+		string						GetStrUserMode(const Client &client) const;
+		const string				&GetCtime() const;
+		const string				&GetTopicStat() const;
 	private:
+		string						_GetTime() const;
 		Client						*_creator;
 		map_pcli					_user;
 		string						_chanstring;
 		chan_mode					_mode;
+		string						_ctime;
+		string						_topicStat;
 };
 
 #endif

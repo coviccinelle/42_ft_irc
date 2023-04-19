@@ -9,6 +9,8 @@
 
 #define MAX_LISTEN	5
 #define SERVER_NAME string("irc")
+#define SERVER_VERSION string("0.0.1")
+#define SERVER_DATE string("Mon Mar 2023 at 15:11:00 UTC")
 
 #define CALL_MEMBER_FN(object,ptrToMember)  ((object).*(ptrToMember))
 
@@ -78,6 +80,7 @@ class Server
 		void 							_User(Command &cmd, Client &client);
 		void 							_Pong(Command &cmd, Client &client);
 		void 							_PrivMsg(Command &cmd, Client &client);
+		void							_ModeServer(Command &cmd, Client &client, const string &target);
 		void							_ModeClient(Command &cmd, Client &client, const string &target);
 		void							_Mode(Command &cmd, Client &client);
 		void							_Notice(Command &cmd, Client &client);

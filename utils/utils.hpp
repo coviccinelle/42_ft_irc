@@ -23,7 +23,6 @@
 
 #define SERVER_NAME string("irc")
 #define USER_MODE string("iwos")
-#define MEMBER_MODE string("oO")
 #define MODE_SIZE 4
 
 class Client;

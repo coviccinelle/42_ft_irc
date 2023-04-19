@@ -262,6 +262,7 @@ void	Server::_ReceiveData(struct pollfd &pfd)
 void	Server::_CloseConnection(struct pollfd &pfd)
 {
 	std::cout << "ℹ️  irc server:\033[0;31m connection close \033[0;37mfrom " << _clients[pfd.fd].GetIp() << " on socket " << pfd.fd << std::endl;
+	_clients[pfd.fd].LeaveAllChans();
 	_clients.erase(pfd.fd);
 	close(pfd.fd);
 	_pollfds.erase(vec_pfd::iterator(&pfd));
@@ -270,6 +271,7 @@ void	Server::_CloseConnection(struct pollfd &pfd)
 void	Server::_CloseConnection(Client &client)
 {
 	std::cout << "ℹ️  irc server:\033[0;31m connection close \033[0;37mfor "<< client.GetUinfo()[nickname] << " on socket " << client.GetFd() << std::endl;
+	client.LeaveAllChans();
 	_clients.erase(client.GetFd());
 	close(client.GetFd());
 	_pollfds.erase(_GetPfdFromFd(client.GetFd()));
@@ -478,6 +480,9 @@ void	Server::_Nick(Command &cmd, Client &client)
 	{
 		client.SetRegistd();
 		AddData(RPL_WELCOME(ui[nickname], ui[username], ui[hostname]));
+		AddData(RPL_YOURHOST(ui[nickname], SERVER_NAME, SERVER_VERSION));
+		AddData(RPL_CREATED(ui[nickname], SERVER_DATE));
+		AddData(RPL_MYINFO(ui[nickname], SERVER_NAME, SERVER_VERSION, USER_MODE, MEMBER_MODE, CHAN_MODE));
 	}
 }
 
@@ -509,6 +514,9 @@ void	Server::_User(Command &cmd, Client &client)
 		{
 			client.SetRegistd();
 			AddData(RPL_WELCOME(ui[nickname], ui[username], ui[hostname]));
+			AddData(RPL_YOURHOST(ui[nickname], SERVER_NAME, SERVER_VERSION));
+			AddData(RPL_CREATED(ui[nickname], SERVER_DATE));
+			AddData(RPL_MYINFO(ui[nickname], SERVER_NAME, SERVER_VERSION, USER_MODE, MEMBER_MODE, CHAN_MODE));
 		}
 	}
 }
@@ -582,18 +590,29 @@ void	Server::_ModeClient(Command &cmd, Client &client, const string &target)
 	return (AddData(RPL_UMODEIS(client.GetUinfo()[nickname], client.GetStrMode())));
 }
 
+void	Server::_ModeServer(Command &cmd, Client &client, const string &channel)
+{
+	(void)cmd;
+	lst_chan::iterator	chan = _FindChannel(channel);
+	AddData(RPL_CHANNELMODEIS(client.GetUinfo()[nickname], channel, string("+") + chan->GetStrUserMode(client)));
+	AddData(RPL_CREATIONTIME(client.GetUinfo()[nickname], channel, chan->GetCtime()));
+
+	return ;
+}
+
 void	Server::_Mode(Command &cmd, Client &client)
 {
 	cst_vec_str		targets = _WrapTargets(cmd, 0);
 	cst_vec_vec_str	chanparse = _WrapChannels(cmd, 0);
 
-	if (chanparse.empty())
-	{
-		if (targets.empty())
-			return (AddData(ERR_NEEDMOREPARAMS("MODE")));
-		return _ModeClient(cmd, client, targets[0]);
-	}
-	return (AddData(RPL_CHANNELMODEIS(chanparse[0][chan]) /*+mode here*/ ));
+	if (chanparse.empty() && targets.empty())
+		AddData(ERR_NEEDMOREPARAMS("MODE"));
+	else if (chanparse.empty())
+		_ModeClient(cmd, client, targets[0]);
+	else
+		_ModeServer(cmd, client, chanparse[0][chan]);
+
+	return ;
 }
 
 void	Server::_Notice(Command &cmd, Client &client)
@@ -674,12 +693,15 @@ void	Server::_Join(Command &cmd, Client &client)
 			_channels.push_back(Channel(chanparse[i][chan]));
 			--chanIt;
 		}
-		_channels.back().joinChannel(client);
+		chanIt->joinChannel(client);
 		SendChannel(chanIt, string("JOIN " + chanparse[i][chan] + "\r\n"), client.GetPrefix());
 		if (1)
-			AddData(RPL_TOPIC(client.GetUinfo()[nickname], client.GetUinfo()[username], client.GetUinfo()[hostname], _channels.back().GetName(), "todo : topic"));
+		{
+			AddData(RPL_TOPIC(client.GetUinfo()[nickname], client.GetUinfo()[username], client.GetUinfo()[hostname], chanIt->GetName(), "todo : topic"));
+			AddData(RPL_TOPICWHOTIME(client.GetUinfo()[nickname], chanIt->GetName(), chanIt->GetTopicStat()));
+		}
 		else
-			AddData(RPL_NOTOPIC(client.GetUinfo()[nickname], client.GetUinfo()[username], client.GetUinfo()[hostname], _channels.back().GetName()));
+			AddData(RPL_NOTOPIC(client.GetUinfo()[nickname], client.GetUinfo()[username], client.GetUinfo()[hostname], chanIt->GetName()));
 		AddData(RPL_NAMREPLY(client.GetUinfo()[nickname], chanparse[i][chan]) + chanIt->GetLstNickname() + "\r\n");
 		AddData(RPL_ENDOFNAMES(client.GetUinfo()[nickname], chanparse[i][chan]));
 	}

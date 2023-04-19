@@ -277,3 +277,8 @@ vec_str	Split(const string &str, const string delimiter)
 	return (res);
 }
 
+void	Client::LeaveAllChans()
+{
+	while (_channels.empty() == false)
+		(*_channels.begin())->leaveChannel(*this);
+}

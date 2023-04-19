@@ -3,8 +3,12 @@
 Channel::Channel(const string &chanstring) : 
 	_creator(NULL),
 	_user(),
-	_chanstring(chanstring)
+	_chanstring(chanstring),
+	_ctime(""),
+	_topicStat("")
 {
+	_ctime = _GetTime();
+	std::cout << "New channel created on " << _ctime << std::endl;
 }
 
 Channel::~Channel()
@@ -14,7 +18,9 @@ Channel::~Channel()
 Channel::Channel(const Channel &src) :
 	_creator(src._creator),
 	_user(src._user),
-	_chanstring(src._chanstring)
+	_chanstring(src._chanstring),
+	_ctime(src._ctime),
+	_topicStat(src._topicStat)
 {
 }
 
@@ -26,6 +32,8 @@ Channel&	Channel::operator=(const Channel& rhs)
 	_creator = rhs._creator;
 	_user = rhs._user;
 	_chanstring = rhs._chanstring;
+	_ctime = rhs._ctime;
+	_topicStat = rhs._topicStat;
 
 	return (*this);
 }
@@ -43,8 +51,8 @@ int	Channel::joinChannel(Client& toAccept)
 {
 	if (_creator == NULL)
 	{
+		_topicStat = toAccept.GetPrefix() + " " + _GetTime();
 		_creator = &toAccept;
-		SetMemberMode(toAccept, 'O', true);
 		SetMemberMode(toAccept, 'o', true);
 		SetChanMode('b', true);
 	}
@@ -61,7 +69,6 @@ void	Channel::leaveChannel(Client& toRemove)
 
 	return ;
 }
-
 
 const string	&Channel::GetName() const
 {
@@ -95,4 +102,46 @@ map_pcli::const_iterator	Channel::findUserIter(const string &toFind) const
 			return (it);
 	}
 	return (_user.end());
+}
+
+string	Channel::GetStrChanMode() const
+{
+	string res;
+
+	for (int i = 0; i < CHAN_MODE_SIZE; ++i)
+	{
+		if (_mode[i])
+			res += CHAN_MODE[i];
+	}
+	return (res);
+}
+
+string	Channel::GetStrUserMode(const Client &client) const 
+{
+	string res;
+
+	for (int i = 0; i < MEMBER_MODE_SIZE; ++i)
+	{
+		if (_user.find(const_cast< Client * >(&client))->second[i])
+			res += MEMBER_MODE[i];
+	}
+	return (res);
+}
+
+const string	&Channel::GetCtime() const
+{
+	return (_ctime);
+}
+
+const string	&Channel::GetTopicStat() const
+{
+	return (_topicStat);
+}
+
+string Channel::_GetTime() const
+{
+	time_t secs = std::time(0);
+	std::stringstream ss;
+	ss << secs;
+	return (ss.str());
 }

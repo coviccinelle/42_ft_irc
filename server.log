@@ -1,0 +1,184 @@
+<< CAP LS
+<< NICK julien
+<< USER julien julien irc.libera.chat :Julien FRANCAIS
+>> :tantalum.libera.chat NOTICE * :*** Checking Ident
+>> :tantalum.libera.chat NOTICE * :*** Looking up your hostname...
+>> :tantalum.libera.chat NOTICE * :*** Found your hostname: 231.12.23.93.rev.sfr.net
+>> :tantalum.libera.chat NOTICE * :*** No Ident response
+>> :tantalum.libera.chat CAP * LS :account-notify away-notify chghost extended-join multi-prefix sasl tls account-tag cap-notify echo-message server-time solanum.chat/identify-msg solanum.chat/oper solanum.chat/realhost
+<< CAP REQ :multi-prefix
+>> :tantalum.libera.chat 433 * julien :Nickname is already in use.
+<< NICK julien_
+>> :tantalum.libera.chat CAP * ACK :multi-prefix
+<< CAP END
+>> :tantalum.libera.chat 001 julien_ :Welcome to the Libera.Chat Internet Relay Chat Network julien_
+<< MODE julien_ +i
+<< WHOIS julien
+>> :tantalum.libera.chat 002 julien_ :Your host is tantalum.libera.chat[93.158.237.2/6697], running version solanum-1.0-dev
+>> :tantalum.libera.chat 003 julien_ :This server was created Mon Feb 13 2023 at 12:05:04 UTC
+>> :tantalum.libera.chat 004 julien_ tantalum.libera.chat solanum-1.0-dev DGMQRSZaghilopsuwz CFILMPQRSTbcefgijklmnopqrstuvz bkloveqjfI
+>> :tantalum.libera.chat 005 julien_ WHOX MONITOR=100 SAFELIST ELIST=CMNTU ETRACE FNC CALLERID=g KNOCK CHANTYPES=# EXCEPTS INVEX CHANMODES=eIbq,k,flj,CFLMPQRSTcgimnprstuz :are supported by this server
+>> :tantalum.libera.chat 005 julien_ CHANLIMIT=#:250 PREFIX=(ov)@+ MAXLIST=bqeI:100 MODES=4 NETWORK=Libera.Chat STATUSMSG=@+ CASEMAPPING=rfc1459 NICKLEN=16 MAXNICKLEN=16 CHANNELLEN=50 TOPICLEN=390 DEAF=D :are supported by this server
+>> :tantalum.libera.chat 005 julien_ TARGMAX=NAMES:1,LIST:1,KICK:1,WHOIS:1,PRIVMSG:4,NOTICE:4,ACCEPT:,MONITOR: EXTBAN=$,ajrxz :are supported by this server
+>> :tantalum.libera.chat 251 julien_ :There are 71 users and 43973 invisible on 28 servers
+>> :tantalum.libera.chat 252 julien_ 39 :IRC Operators online
+>> :tantalum.libera.chat 253 julien_ 67 :unknown connection(s)
+>> :tantalum.libera.chat 254 julien_ 23263 :channels formed
+>> :tantalum.libera.chat 255 julien_ :I have 2536 clients and 1 servers
+>> :tantalum.libera.chat 265 julien_ 2536 3232 :Current local users 2536, max 3232
+>> :tantalum.libera.chat 266 julien_ 44044 51777 :Current global users 44044, max 51777
+>> :tantalum.libera.chat 250 julien_ :Highest connection count: 3233 (3232 clients) (336849 connections received)
+>> :tantalum.libera.chat 375 julien_ :- tantalum.libera.chat Message of the Day - 
+>> :tantalum.libera.chat 372 julien_ :- This server provided by Hyperfilter (https://hyperfilter.com)
+>> :tantalum.libera.chat 372 julien_ :-  
+>> :tantalum.libera.chat 372 julien_ :-  
+>> :tantalum.libera.chat 372 julien_ :- Welcome to Libera Chat, the IRC network for
+>> :tantalum.libera.chat 372 julien_ :- free & open-source software and peer directed projects.
+>> :tantalum.libera.chat 372 julien_ :-  
+>> :tantalum.libera.chat 372 julien_ :- Use of Libera Chat is governed by our network policies.
+>> :tantalum.libera.chat 372 julien_ :-  
+>> :tantalum.libera.chat 372 julien_ :- To reduce network abuses we perform open proxy checks
+>> :tantalum.libera.chat 372 julien_ :- on hosts at connection time.
+>> :tantalum.libera.chat 372 julien_ :-  
+>> :tantalum.libera.chat 372 julien_ :- Please visit us in #libera for questions and support.
+>> :tantalum.libera.chat 372 julien_ :-  
+>> :tantalum.libera.chat 372 julien_ :- Website and documentation:  https://libera.chat
+>> :tantalum.libera.chat 372 julien_ :- Webchat:                    https://web.libera.chat
+>> :tantalum.libera.chat 372 julien_ :- Network policies:           https://libera.chat/policies
+>> :tantalum.libera.chat 372 julien_ :- Email:                      support@libera.chat
+>> :tantalum.libera.chat 376 julien_ :End of /MOTD command.
+>> :julien_ MODE julien_ :+Ziw
+<< PING tantalum.libera.chat
+<< JOIN #libera
+>> :tantalum.libera.chat 311 julien_ JULIEN ~Thunderbi 81.194.25.93.rev.sfr.net * :JULIEN
+--> nickfind event whois
+>> :tantalum.libera.chat 312 julien_ JULIEN lithium.libera.chat :London, UK
+--> event empty
+>> :tantalum.libera.chat 301 julien_ JULIEN :Je suis absent pour le moment.
+--> event empty
+>> :tantalum.libera.chat 671 julien_ JULIEN :is using a secure connection
+--> event empty
+>> :tantalum.libera.chat 338 julien_ JULIEN 93.25.194.81 :actually using host
+--> event empty
+>> :tantalum.libera.chat 318 julien_ julien :End of /WHOIS list.
+--> event empty
+>> :tantalum.libera.chat PONG tantalum.libera.chat :tantalum.libera.chat
+--> lag pong
+>> :julien_!~julien@231.12.23.93.rev.sfr.net JOIN #libera
+>> :tantalum.libera.chat 332 julien_ #libera :Welcome to Libera Chat support (no: politics, covid, IRC drama, cryptocurrency) | Cloak → #libera-cloak | FAQ & guides https://libera.chat/guides/faq | Find staff with /stats p or /who libera/staff/* | Advice for helpers: https://libera.chat/guides/helpers | Channel Search: /msg alis help list
+>> :tantalum.libera.chat 333 julien_ #libera kline!freedom0@libera/staff/kline 1675560017
+>> :tantalum.libera.chat 353 julien_ = #libera :julien_ Haxxa hwpplayer1 jacobk DilloTX terrorjack SetHost0 krg DodoGTA theo E7th Myst53 biberu Noisytoot mech_pilot r3m Sazhen86 anloh krn dodecahedron heraldo Xenguy kayronn MiloTilo gspbirel56 Umbire agvantibo @A_Dragon louipc rsjw OverCoder Nav burger dsrt^ draq MichaelLong toshywoshy b50d ZeroMaster sunborn Jeremy_Rand Wouter010067044 Jivko Ng Sankalp pharonix71 calcul0n dutch uNmowed yloves ahoka Guyver2 HuggableSquare |3ean deathstar gog nina vim_fans
+>> :tantalum.libera.chat 353 julien_ = #libera :Linux_Kerio Pixi` coruja terminalpusher svm_invictvs letto Ramuel PantelicGR geoffo NEYi aombk2 seumas xorscp Auron956 Valeria22 motheki devc arimane bri stw kusanagi_ trillion_exabyte craigevil Inline dreamreal progandy defec7ed powermail ttoland1 wonderer xx signofzeta djhankb santiago ArtBlob weko link2xt hggdh herme5 freanux Tempesta FluffyMask bwitt teepee wpa glasscapt_ divx118 WantToHelp oatmealraisin decimuscorvinus @el snowhawk JustSomeGoon Sgeo
+>> :tantalum.libera.chat 353 julien_ = #libera :voltage_ cinderblock cristiioan Eggsters kee ornx darsie wlemuel feriman vysn DesertDweller6 cth _predator_ zness wereii [itchyjunk] snek83 areguera vdamewood dviola White_Flame Reception123 s1gyn Namarrgon milkt tutu fluter monr0e_ scain Wstfgl0 bloody xoddf2 oats Sonar_Guy jagannatharjun andr01d Hydrogen_ Noxturnix chEwBaCca blaklistd zvi1 TheEnbyperor Taco- mouses beaver kurahaupo moldorcoder7 willyg_cos rvalue noahajac montpyr0 Cyp nyah xypista106462
+>> :tantalum.libera.chat 353 julien_ = #libera :Gaboradon abs3nt LuKaRo nr0q_radio gr33n7007h ar3itrary janneke doc DiffieHellman cisme akossh firechicken lsrtl jinsun Pie-jacker875 mayableepa Masklin trisk B[] michel_c12 fury999io tejr Lantizia|Work mncheck stellacy alhBrit chesty Ajax1469 sam113101 ch3ckd0wn undefined_bob F0ma PipStuart brendo platypus_laser techandcoffee niallist bildramer bgs GadgeteerZA zer0bitz_ happymeal mehdix meireikei ryzenda flyback takimbal nyov revolt112 FinnElija BearFortress
+>> :tantalum.libera.chat 353 julien_ = #libera :lsd|2 Scotteh Russell Miblo Chanakan orhun jmdaemon Kelsar Slevin Napsterbater pyook guf_trup[m] ch38in Cahaan oerheks waltman caveman Lord_of_Life TheSilentLink NetSysFire MRDPZK_ zabe sasha mahler GrantN05 nonchip Eickmeyer agd spacecase GodEater \dev\null dalan0382 JerryXiao Lizard_ Lucanis0 Foxboron sebonirc nb polymorphic Furna_away Fleet fcser puck arooni death916 Arrowmaster duri xandris BOWnbERTHA86 jarthur mitrokov eroc1990 sean instantp10neer lorimer
+>> :tantalum.libera.chat 353 julien_ = #libera :Hypfer foton x13 chiselfuse fsflp23 lemuria comradeCrow diogenese richie Viscometer Novi justmatt mrmango176 Mutsumi unixsec Brewster bodiccea Vercas694 TMedina relipse agrue maknho RonaldR34g4m sauce elkalamar__ Alexandro enyc qxs circuit troyt Langoor loworderbit llh Freeyorp Tonux Ckat y2kboy23 Helenah GerbilSoft x8092 luva dodo munkis Ranhir qsx MetaNova vulpine D3M0N stefanc_diff Smeef deathonater grinja hambaga azdle7 Exa nyany yuna jtgd duoi Dougie[m]
+>> :tantalum.libera.chat 353 julien_ = #libera :dungodung yu jf duude__ iovoid anginapectoris ximet4 Liver_K Radon- @jess drathir_tor joe7057 Pea89284 Throgkt DJ-ArcAngel IamKing lowcrash meg rsheftel5 terjan Metroid mornfall mspe kcrk @Stx SnoFox Reiner_Unsinn_ APic thanas linuxgemini general_j[m] z0mbie janLuna WhizzWr quantumcupcake Tabmow Praise leftyfb fe[nl]ix dman1 BDIkaros relms JohnComputation loafer a42wk7nl xoferif Angelz AMG zaz\ nepeat kron Adbray cryptic1 Archange- de-facto CEP tomgus1 nephyrin
+>> :tantalum.libera.chat 353 julien_ = #libera :puke DaTa HexDecimal Kilroy Nokaji BrUt4LM45t3R rqsd fling advil alexxy Zombiebaron matttest nekobit Trashlord dixi dbee Leopold kongeon alicejustplaying vancz lilmonkey ErrantEgo satanist jer Phase cisco87 graves vgtw hussein1 Seeder99 Yonle dani-g5x[m]1 ILoveCandy mzajc idar Houndor b0b armin hopolapopola mrdata cim lh hannibal_ad_port Marc dfriehs Ankhers ajhalili2006 seanh shreyasminocha jopes fnstudio riksteri hsv KindOne Ferus nwf cooldude \\ ced117
+>> :tantalum.libera.chat 353 julien_ = #libera :tristan957_ fcresende signaryk insistent tpjg brocellous srp cfebs hwrd psw ntdll yuiyukihira ashpool immutable dooba blakesmith LjL v9fk CovertDuck Sakura`Kinomoto Mathisen yanmaani1 strugee_ darkAffinity8 LinusCDE noobsorz ueberall _ReVoLt_ greypw25460021 superheroes AryaSenna[m] blkshp hentai intrac chalcedony lunario siniSter Guest7768 yuta telgareith loredin Forza svetlemodry Voeid voice aqsd clueminati shayne wagwan mohit geko86 BSaboia jrivett NeoThermic
+>> :tantalum.libera.chat 353 julien_ = #libera :EGH kaipee goone helmi77 ThinkT510 Marquel gnu3ra morgan bookworm RichSmith Stryyker akin wodencafe inahd[m] TC01 BinarySavior bfortified deflated8837 buZz manawyrm Asdfghjkl dab21 kimiamania Woundheir Netboy3 quackgyver EdFletcher AJ_Z0 chris64 dreamer guardian rorx PantelicGR2 madage Legomannetje marens102 fatal peterz gildarts monsterdhal[m] Tanvir Echoz Jeremail sintax Doffi ikwyl6 gloomy_desktop AEonFyr Randy_ wb9688 mjh4386 PublicWiFi berong91 em mbaxter
+>> :tantalum.libera.chat 353 julien_ = #libera :crabbedhaloablut JanC srk alexmac22347 andi- esselfe fChanX alf[m] tmow1 boubou sprock Epsilon wmute tripleslash Wojciech_K tonyt hudo__ tanimislamTanimI ricardoamaro M1dontknow2dontc phonekait LePhilousophe frumious sjs ben_zen vogelfrei Joel cynthia DynamiteDan alexia saasja[m] Moreno35[m] sudo[m] Schwarze[m] dervist imprevisto[m] h[m] sam[m] eldiablo1984[m] sgfa22[m] mplscorwin[m] josayko[m] Toni[m] jayaxe Zetta1Reid0[M] hsiktas[m] Trodden[m] foghorn
+>> :tantalum.libera.chat 353 julien_ = #libera :chaos[m] aggressivebehavi ChrisReilly[m] EchoCoder1729[m] knaese[m] SunClonus[m] M0xdead8ead[m] p01ar[m] charmitro[m] jmcantrell ormaaj rhoxthebeast[m] hussam thebiggestLOSer dani-g5x[m] ShaneonConduitrs niall[m] b00rad73y[m] val[m] antholop[m] rsclub22[m] azizLIGHT elf roadkill bpye ripdog pounce EdePopede somlis kodcode ElPresidente cottongin Thedarkb ^_sEm_^ AlexC tec gossie cyraxjoe luckman212 mpan Pingue jb3 danbee4 edcragg Leonarbro fiet BashedByBash itu
+>> :tantalum.libera.chat 353 julien_ = #libera :nuala noex swinnenb CompanionCube Stary stac novns beest wei5 archigos ninjabuffet thecliguy utsuhorocks nkukard gry eskimo perplexa k-man Shentino_ ovo herald ponies Peng bw1 Remco evenfall TINYLILY mock thomas1 d10n @amdj kgz nicoo k6ka He-Man boxmein @Fuchs fauxpride turlando MrLuca berkay duds` hirion edenist xzatovic0 firewalldt mirppc michaelll tsr Arie bytearray64 orkim SleePy Bossi JamCow ml| copypaste gbmor robertfoss oisota stephan48 Ragnor mrkirby153
+>> :tantalum.libera.chat 353 julien_ = #libera :crummel micro Error0x99 blast007 Sherpard2_ shiver32 @nicole gnoirzox1 metalcated Dumbfoundde4d Schrapnel pedrocr Guest1675 Ade^ gusto Codemastr bifi @spb Sput_ letztesendung thumbs tofran aklsh xgpt kodah DOGEMEMEGOD_D deafboy koolazer SysGhost cjphaunr slim Bram_ bea tk tkimball_ sky- nurtle slowjo daikojun placebo nwe finfa morpheuz Raekye Red tmbg yourfate sunyour blabber tscott weyhmueller_ frantathefranta leah2 duckfullstop potash madprops perrierjouet
+>> :tantalum.libera.chat 353 julien_ = #libera :pkapp VonToutCourt joast redj CoJaBo technically xaltsc sakurambo oldlaptop taavi trebmuh Tintle CodeGeek kraucrow hirish gtkgtkgtk Tamwyn runrin thoatt zmc Surfer DarkG shonudo hoobop ghost64 pupskuchen radiofree NaviTheFairy shailangsa l4yer slikislik Hackerpcs kvn_ kayla brettgilio tabakhase @Unit193 Agent HappyMan swordsmanz snep mcint launchd gmodena pizza eldritch M144_ Crakila Pokey weeb cln_ benji bindu Guest7693 Henry_The_Longsh tomreyn Netshroud kaz
+>> :tantalum.libera.chat 353 julien_ = #libera :signalhunter ralothar Jaran Birosso bebna Visne alex jmjl bsdbandit justaguy trvv javi404 Takios lxdr robink hololeap liriel vectr0n abff ugjka Sarah wCPO busti nukke itsonlybinary fbegyn PowerUser64 kontio KokaKiwi MaddieKalan jaskal GrezZeR rcf tsp krytarik TkTech Atlas guntbert rob0 ben_at_harrison jeffrom Dotz0cat sud0 moony emilyd charls_a therock247uk trillian_ balrog avane baakeydow zkanda nisstyre Administrator flotwig_ mogad0n alyx @jose Znevna
+>> :tantalum.libera.chat 353 julien_ = #libera :Cheaterman TetoM haggertk mon nazlyba jamn SlimeDiamond GreenSh1eld Madatnek lambda systwi mondino tomhek Togra Tori_Ooka_ wildeboskat qwestion yar jabster28 Solitary heartburn Romster Anth0mk bmr luspi Mikro Arsen Nei syxi duckgoose @tomaw night nickodd falcon zcat raj_ Oldiesmann ketas murr4y @She vhns zenguy greenracer pyre Frogging101 very_sneaky ski kenwoodfox trygveaa SchneeSchwarz XerShadowTail tiger_ halikular sm2n srhm Sousapro axsuul FastLizard4
+>> :tantalum.libera.chat 353 julien_ = #libera :gwillen newton MJ94 kevr KDDLB MuonNeutrino Andrew SophieL JamesShen endre brethil ehctiR vague Singh compuguy1 Valware decay brabo Liz3 eoli3n andreas303 MaxForce Kandarihu phebus Techman matt0x6f dracorex MrElendig CAT_S militantorc Ferien kumquat feto_bastardo \mSg jlc johnnyreb deicer mvchtz twice6 Caeli overholts tjr redquasar prplecake seds tacocats batman DirkS TeodOR Maulwurf luna-is-here Norkle @Kuraokami phy1729 Arrow ave windragon +Sario Mesalon
+>> :tantalum.libera.chat 353 julien_ = #libera :ghavil jelly Lizard fr33domlover Tronic Guest7394 Teacup sofar Aero diskdance cloux snoopy Mombius tomkap inversed asarandi tayl Xe voidcat XdaddyZX_ Numline1 wraeth DragoonAethis hexnewbie The_Tablet eyeoh iczero jajabro1 hikikomori PANDEMONS SMRT Foxy Skunky Tristam neemos shan shinjipf hjckr mlaga97 doublej472 Mony doyleish kantlivelong ikiryo dirmaster0 dvzrv rewby kashike keigel2001 tinwhiskers wsor rhansen [_________] Eryn_FL sirufer gjn DarthGandalf
+>> :tantalum.libera.chat 353 julien_ = #libera :aphelion702 flx-- lonjil Comnenus Purrl farn__ jm18 Vermont Faely tjr-- ptgb torresjrjr ActionHOSchT baloona ashkitten-irc paladox stux finsternis JTL zauberfisch zutt APLU manwithl- moo finnekit bfft caverton p2plife_ gandalf FieryM29 dextro9 crypt0kr1 kofuyu dvdmuckle se6astian ikonia_ RaptorJesus tortillasandwich beneth ivaat et samuelkadolph Meroje cybermind MrBurns fo0bar Selavi omnigoat adam12 c Hackintech microfracture ReimuHakurei artart78 Menzador
+>> :tantalum.libera.chat 353 julien_ = #libera :tuxifan retrofunpl dostoyevsky2 ByronJohnson TimWolla cc0 carlos22 Wessie Edgy2 cheapie swifteh FireFly Brutus WhitePhosphorus kushal Bsides fructose jsto noidea_ canton7 flamingspinach brandon niv hays Whippersnapper The_Blode cnsvc xelxebar wikky eb jakzale muuo psnszsn amada95 cofob mapperr idmyn karthin tmpod rash_pro poyu jsanz ztrawhcse mulliken natkin halvdan sus skeels jonesv bdn hm0880 avshar mrzv jsvcycling arctic nicohman akarle antiquis chlvr
+>> :tantalum.libera.chat 353 julien_ = #libera :trinity luana bagels chiraag djelic patrick otherdudedidit Reggie_ wtfiscrq kindablue kfoley hanna sar efftoyz nedia troels akelly monadgauge cmahns mistiry exz Johann fs2 layline-away hamster ubergeek momcorp jleightcap merl sooc txtsd jrootabega skippy judah les dub_a KDN_Observer ariel lynndotpy cris10an alexlehm hexa- mattx jdek TheAppleFox eeerik8 sbp MillerBOSS ponycat genii instructor bacalao @moonmoon spithash kiska3 micke CasInvictus Ratler astlep5504
+>> :tantalum.libera.chat 353 julien_ = #libera :b3owulf alice neoandroid Mangy_Lobster tparenti lum sivoais lexik @Swant jpb moxie marens101 r00t sahilister tbrowder__ caf Arachnophine emergence Max-P jfred-linode doge roselandgoose thiccdaddy Zegnat Gokturk enkrypt myhre cacheyourdreams ricab Tobbi abcX V3n3RiX jessicant @Allie allejo tries Ne02ptzero Koeniz summerisle oztunan Ellenor litharge @ozone Aristide nullsh JamesGamble Matthew_ KnownSyntax lawt kkd hook54321 itok Tips|Cloud mz` wkalt mefistofeles
+>> :tantalum.libera.chat 353 julien_ = #libera :CalimeroTeknik ecks Yamakaja berndj jb1277976 aloo skill Sevalecan _99lb arbo pavelow carbolymer c014 FrozenHost bleb DLange Hobby_ Dude mst `ryban_ Saphir duckscarf milky jeff Casper Affliction _nikko birkoff @ChanServ jesse welterde hyperfekt Khaytsus @mquin _________ Kaare zecege vega val jrtc27 auri jcallen hata stefan-_ steven Cienisty Mc lacop1 rbraun larjona kisser sus0 x0rzavi grim Notgnoshi friedrich AndyCap rhe janis depeche lumidify NotNite l0de Juhu
+>> :tantalum.libera.chat 353 julien_ = #libera :ecaille picooz Kabouik Lenny_ computerquip giesen kif enderst _0ne wbewl pdx LambdaComplex another| rb gx Peng_ sheep dago SurfBlueCrab rfx esum XgF ilmostro NetHogr poorboy neil mrhands_ sebastorama BrandonArnold linuxdaemon nsh Ekho dp anthonyg daemon opcode bigfoot547 rud0lf FLHerne milkii emma Xen energizer gunnar jrb0001 xerox |san| Alan BuckarooBanzai tharkun croc SoF wyre jeanbtrd @ben sybariten ikonia naos argonel gradator supay mukti kos_tom kiedtl
+>> :tantalum.libera.chat 353 julien_ = #libera :Tiger` ePirat comrad Gaelan Hobbyboy dilfridge marahin- Tamara ihabunek ia mgubyt_ raindryp pekster ExEric3 acidsys xMopx Maff scifi_cli Quokka CheckYourSix etj forero reddit89 Evolver Hex srw dreamgirl_ PocketKiller mtrovilho InvalidUserName jason- noob kd ullbeking Elizabeth jmcnaught @JonathanD zagura daddy u^A|mobile robla ComputerTech davef SQ9KQS Grinnz x10 wof d1 ljharb cwaydt Naleksuh reborn GTAXL hexology dupondje TheBigK g0tmi1k johnlage ethereal avu
+>> :tantalum.libera.chat 353 julien_ = #libera :eloy yamchah2 asa dmonschein @kline pj mooo yano Przemek92 Exterminador Koragg astra afarrag leonardus rubin55 Druid juwain justache roniez the4oo4 V theloudspeaker_ Daniel Chex EpicNeo woo thies RichiH feuerrot leonardo erry tisiphone phj @bastelfreak kldint eggy Zppix MPenguin kawaii rabbitear Irydacea themill ilmais1n olasd hayden TadeusTaD LimeOn pjoter cruxeternus Disconsented AlexZ Sciuro makx Outlawz melmothX Operator873 corwin madduck PeGaSuS qwerty
+>> :tantalum.libera.chat 353 julien_ = #libera :NoahvdAa Adran @bakerst nitrix Solbu thib-o barlas brprice NatsumiH Guest4947 fxrh CeBe urbanecm Venhal darkblue ic310rd hype skydoge DrinkyBird karstensrage yin darkphoenix richrd NeddySeagoon elliot inf ornitorrincos Soliton Pricey Azonic apb misha DCTWD style luz1 tris @Lausefuchs rappet calcmandan_ knolle dTal voker57 ThiefMaster nckx ncf KitsuWhooa Titore gothicserpent ebb njt NiKaN Spydar007 kristjansson_ loopy s1b1 circuitbone sa @Bahhumbug nurupo
+>> :tantalum.libera.chat 353 julien_ = #libera :MrBonkers vegetux zoraj mpmc @niko ozymandias dionisis cluelessperson_ catties
+>> :tantalum.libera.chat 366 julien_ #libera :End of /NAMES list.
+<< MODE #libera
+>> :tantalum.libera.chat 324 julien_ #libera +CPTntf #libera-overflow
+--> chanquery mode
+<< MODE #libera b
+>> :tantalum.libera.chat 329 julien_ #libera 1619211933
+--> event 329
+>> :tantalum.libera.chat 367 julien_ #libera *!*@S01069050ca4e3573.cg.shawcable.net moonmoon!awoo@libera/staff/wofl/moonmoon 1679628218
+--> chanquery ban
+>> :tantalum.libera.chat 367 julien_ #libera $a:jiggawatt moonmoon!awoo@libera/staff/wofl/moonmoon 1679596832
+--> chanquery ban
+>> :tantalum.libera.chat 367 julien_ #libera *!*@98.50.16.116 She!haveident@libera/staff/she/her 1674354845
+--> chanquery ban
+>> :tantalum.libera.chat 367 julien_ #libera *!ratbox@triton.blinkenshell.org She!haveident@libera/staff/she/her 1672361915
+--> chanquery ban
+>> :tantalum.libera.chat 367 julien_ #libera upasana!*@* sandy-claws!meow@libera/staff/cat/jess 1670854839
+--> chanquery ban
+>> :tantalum.libera.chat 367 julien_ #libera *!*@user/loggingbot She!haveident@libera/staff/she/her 1667350093
+--> chanquery ban
+>> :tantalum.libera.chat 367 julien_ #libera *!*@pa49-181-193-242.pa.nsw.optusnet.com.au helium.libera.chat 1662267401
+--> chanquery ban
+>> :tantalum.libera.chat 367 julien_ #libera MatrixBot*!*@* helium.libera.chat 1662267401
+--> chanquery ban
+>> :tantalum.libera.chat 367 julien_ #libera *!*@2001:470:69fc:105::2:391c helium.libera.chat 1662267401
+--> chanquery ban
+>> :tantalum.libera.chat 367 julien_ #libera $a:Kalio helium.libera.chat 1662267401
+--> chanquery ban
+>> :tantalum.libera.chat 367 julien_ #libera *!*@user/truthr helium.libera.chat 1662267401
+--> chanquery ban
+>> :tantalum.libera.chat 367 julien_ #libera *!*@user/filystyn helium.libera.chat 1662267401
+--> chanquery ban
+>> :tantalum.libera.chat 367 julien_ #libera $a:matrixbot_bartab helium.libera.chat 1662267401
+--> chanquery ban
+>> :tantalum.libera.chat 367 julien_ #libera *!*@119246041048.ctinets.com helium.libera.chat 1662267401
+--> chanquery ban
+>> :tantalum.libera.chat 367 julien_ #libera *!*@user/panopticon helium.libera.chat 1662267401
+--> chanquery ban
+>> :tantalum.libera.chat 367 julien_ #libera *!*limnoria@2400:8904::f03c:92ff:fe9b:* helium.libera.chat 1662267401
+--> chanquery ban
+>> :tantalum.libera.chat 367 julien_ #libera *!?id507024@id-507024.ilkley.irccloud.com helium.libera.chat 1662267401
+--> chanquery ban
+>> :tantalum.libera.chat 367 julien_ #libera $a:h4x0r helium.libera.chat 1662267401
+--> chanquery ban
+>> :tantalum.libera.chat 367 julien_ #libera $a:RingtailedFox helium.libera.chat 1662267401
+--> chanquery ban
+>> :tantalum.libera.chat 367 julien_ #libera $a:alexdelarge helium.libera.chat 1662267401
+--> chanquery ban
+>> :tantalum.libera.chat 368 julien_ #libera :End of Channel Ban List
+--> chanquery ban end
+>> :bernard__!~bernard@user/bernard JOIN #libera
+>> :droptone!~droptone@2600:1700:3370:78ff:d059:773:98ae:4a07 JOIN #libera
+>> :bernard__!~bernard@user/bernard PRIVMSG #libera :`but this weekend we are going to stop sending login failure notices by default.`
+>> :bernard__!~bernard@user/bernard PRIVMSG #libera :thankgod
+<< PING tantalum.libera.chat
+>> :tantalum.libera.chat PONG tantalum.libera.chat :tantalum.libera.chat
+--> lag pong
+>> :bernard__!~bernard@user/bernard PART #libera
+>> :MiloTilo!~MiloTilo@user/MiloTilo PRIVMSG #libera :honestly i don't mind the notices
+<< PING tantalum.libera.chat
+>> :tantalum.libera.chat PONG tantalum.libera.chat :tantalum.libera.chat
+--> lag pong
+>> :MiloTilo!~MiloTilo@user/MiloTilo PRIVMSG #libera :it's not like they are being spammed or anything
+>> :pekster!~rewt@user/pekster PRIVMSG #libera :Users with more common nicks get them more frequently; that becomes useless noise since there's nothing to do (with a strong password already.)
+>> :pekster!~rewt@user/pekster PRIVMSG #libera :Accounts with bad passwords (weak or re-used or known-exposed) should change them, not wait for such a notice to do so :P
+<< PING tantalum.libera.chat
+>> :tantalum.libera.chat PONG tantalum.libera.chat :tantalum.libera.chat
+--> lag pong
+<< PING tantalum.libera.chat
+>> :tantalum.libera.chat PONG tantalum.libera.chat :tantalum.libera.chat
+--> lag pong
+<< PING tantalum.libera.chat
+>> :tantalum.libera.chat PONG tantalum.libera.chat :tantalum.libera.chat
+--> lag pong
+>> :CTFF!~mruser@user/CTFF JOIN #libera
+<< PING tantalum.libera.chat
+>> :tantalum.libera.chat PONG tantalum.libera.chat :tantalum.libera.chat
+--> lag pong
+<< PING tantalum.libera.chat
+>> :tantalum.libera.chat PONG tantalum.libera.chat :tantalum.libera.chat
+--> lag pong
+>> :SetHost0!~SetHost0@2a11:2b07:f003:aa:e6b3:18ff:fecc:4e80 QUIT :Ping timeout: 265 seconds
+>> :SetHost0!~SetHost0@subs-37-44-228-5.lightspeed.today JOIN #libera
+>> :wodencafe!wodencafe@woden.cafe PRIVMSG #libera :I get a fair amount of them, probably because I have `who` grouped.
+<< PING tantalum.libera.chat
+>> :tantalum.libera.chat PONG tantalum.libera.chat :tantalum.libera.chat
+--> lag pong

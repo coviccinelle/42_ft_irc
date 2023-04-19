@@ -2,6 +2,10 @@
 # define ERRORS_HPP
 
 # define RPL_WELCOME(nick, user, host) ("001 " + nick + " :Welcome to the Internet Relay Network " + nick + "!" + user + "@" + host + "\r\n")
+# define RPL_YOURHOST(nick, servername, version) ("002 " + nick + " :Your host is " + servername + ", running version " + version + "\r\n")
+# define RPL_CREATED(nick, date) ("003 " + nick + " :This server was created " + date + "\r\n")
+# define RPL_MYINFO(nick, servername, version, umode, cmode, pmode) ("004 " + nick + " " + servername + " " + version + " " + umode + " " + cmode + " " + pmode + "\r\n")
+
 # define PING(localhost) ("PING " + localhost + "\r\n")
 # define PONG(localhost) ("PONG " + localhost + "\r\n")
 # define QUIT_REASON(nick, user, host, msg) (nick + "!" + user + "@" + host  + " QUIT :" + msg + "\r\n")
@@ -18,10 +22,11 @@
 # define BANNED(nick, user, host, channel, target) (":" + nick + "!" + user + "@" + host + " MODE " + channel + " +b " + target + "\r\n")
 # define KICK(nick, user, host, chan, kicked, reason) (":" + nick + "!" + user + "@" + host + " KICK " + chan + " " + kicked + " :" + reason + "\r\n")
 # define INVITE(nick, user, host, nickinvite, channel)  (":" + nick + "!" + user + "@" + host + " INVITE " + nickinvite + " " + channel + "\r\n")
+# define RPL_CREATIONTIME(nick, chan, ctime)("329 " + nick + " " + chan + " " + ctime + "\r\n")
 # define RPL_NOTOPIC(nick, user, host, chan) ("331 " + nick + "!" + user + "@" + host + " " + chan + " :No topic is set\r\n")
 # define TOPIC(nick, user, host, chan, topic) (":" + nick + "!" + user + "@" + host + " TOPIC " + chan + " :" + topic + "\n\r")
 # define RPL_TOPIC(nick, user, host, chan, topic) ("332 " + nick + "!" + user + "@" + host + " " + chan + " :" + topic + "\r\n")
-# define RPL_TOPICWHOTIME(nick, chan, whoset, user, setat) ("333 " + nick + " " + chan + " " + whoset + "!" + user + "@localhost " + setat + "\r\n")
+# define RPL_TOPICWHOTIME(nick, chan, whoset) ("333 " + nick + " " + chan + " " + whoset +  "\r\n")
 # define ERR_ALREADYREGISTERED "462 :You may not reregister\r\n"
 # define ERR_NEEDMOREPARAMS(command) (std::string("461 ") + command + " :Not enough parameters\r\n")
 # define ERR_PASSWDMISMATCH(from) "464 " + from + " :Password incorrect\r\n"
@@ -52,7 +57,7 @@
 # define ERR_TOOMANYTARGETS(target, msg) (target + ":407 recipients. " + msg + " ⚠️ \r\n") 
 # define ERR_UMODEUNKNOWNFLAG(flag)("501 " + flag + " :Unknown MODE flag\r\n")
 # define RPL_UMODEIS(user, mode) ("221 " + user + " +" + mode + "\r\n")
-# define RPL_CHANNELMODEIS(mode) ("324 " + mode + "\r\n")
+# define RPL_CHANNELMODEIS(nick, chan, mode) ("324 " + nick + " " + chan + " " + mode + "\r\n")
 # define ERR_NOOPERHOST(nick) ("491 " + nick + " :No O-lines for your host\r\n")
 # define ERR_CANTKILLSERVER(from) ("483 " + from + " :You can't kill a server!\r\n")
 //⚠️ 
