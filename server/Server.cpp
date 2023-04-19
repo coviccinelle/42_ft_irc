@@ -728,7 +728,6 @@ void	Server::_Topic(Command &cmd, Client &client)
 		return (AddData(ERR_NOTONCHANNEL(chans[0][chan])));
 	if (cmd.GetCinfo()[trailing].empty())
 	{
-//		topic = user->getPrefix() + " TOPIC " + channel->getName() + " " + channel->getTopic() + END;
 		//Send topic of the channel back to the client
 		if (channel->GetTopic().empty())
 			AddData(RPL_NOTOPIC(client.GetPrefix(), channel->GetName()));
@@ -749,7 +748,7 @@ void	Server::_Topic(Command &cmd, Client &client)
 		else
 			channel->SetTopic(cmd.GetCinfo()[trailing]);
 		//send the new topic to all the users of the channel
-//		AddData(RPL_TOPIC(client.GetPrefix(), _channels.back().GetName(), channel->GetTopic() + "\r\n"));
+//		AddData(TOPIC(client.GetPrefix(), channel->GetName(), channel->GetTopic() + "\r\n"));
 		SendChannel(channel, "TOPIC " + channel->GetName() + " :" + channel->GetTopic() + "\r\n", client.GetPrefix());
 	}
 }
