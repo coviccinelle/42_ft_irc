@@ -33,7 +33,6 @@ class Channel
 		Channel(const Channel& chan);
 		Channel	&operator=(const Channel& rhs);
 
-		map_pcli::const_iterator	findUserIter(const string& name);
 		const std::list< Client* > 	&GetUser() const;
 		const string 				&GetTopic() const;
 
