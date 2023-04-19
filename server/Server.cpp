@@ -714,11 +714,6 @@ void	Server::_Topic(Command &cmd, Client &client)
 	cst_vec_vec_str		chans = _WrapChannels(cmd, 0);
 	cst_vec_str			targets = _WrapTargets(cmd, 0);
 
-//	(void)cmd;
-//	(void)client;
-//	(void)channel;
-//	(void)chans;
-//	(void)targets;
 	std::cout << "Hey I'm command Topic: to change or view topic of chan" << std::endl;
 	if (chans.empty())
 		return AddData(ERR_NEEDMOREPARAMS("TOPIC"));
