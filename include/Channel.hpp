@@ -28,11 +28,12 @@ class Channel
 {
 	public:
 		/* Coplien */
+		Channel(const string &chanstring = "default");
+		~Channel();
 		Channel(const Channel& chan);
 		Channel	&operator=(const Channel& rhs);
-		~Channel();
 
-		cst_map_pcli::iterator		findUserIter(const string& name);
+		map_pcli::const_iterator	findUserIter(const string& name);
 		const std::list< Client* > 	&GetUser() const;
 		const string 				&GetTopic() const;
 

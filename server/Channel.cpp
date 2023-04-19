@@ -40,6 +40,11 @@ void	Channel::SetChanMode(const char c, bool status)
 	_mode.set(CHAN_MODE.find(c), status);
 }
 
+void	Channel::SetTopic(const string& name)
+{
+	_topic = name;
+}
+
 bool	Channel::IsOperator(const Client& client) const
 {
 	(void)client;
