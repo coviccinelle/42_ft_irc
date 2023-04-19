@@ -671,7 +671,7 @@ void	Server::_Join(Command &cmd, Client &client)
 	{
 		if ((chanIt = _FindChannel(chanparse[i][chan])) == _channels.end())
 		{
-			_channels.push_back(Channel(chanparse[i][chan]));
+			_channels.push_back(chanIt);
 			--chanIt;
 		}
 		_channels.back().joinChannel(client);
@@ -748,7 +748,7 @@ void	Server::_Topic(Command &cmd, Client &client)
 		else
 			channel->SetTopic(cmd.GetCinfo()[trailing]);
 		//send the new topic to all the users of the channel
-		SendChannel(channel->GetName(), "TOPIC " + channel->GetName() + " :" + channel->GetTopic() + "\r\n");
+		SendChannel(channel, channel->GetName(), "TOPIC " + channel->GetName() + " :" + channel->GetTopic() + "\r\n");
 	}
 }
 
