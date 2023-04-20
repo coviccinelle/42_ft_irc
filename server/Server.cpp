@@ -711,11 +711,15 @@ void	Server::_Join(Command &cmd, Client &client)
 		SendChannel(chanIt, string("JOIN " + chanparse[i][chan] + "\r\n"), client.GetPrefix());
 		if (1)
 		{
-			AddData(RPL_TOPIC(client.GetPrefix(), chanIt->GetName(), "todo : topic"));
+			AddData(RPL_TOPIC(client.GetPrefix(), chanIt->GetName(), chanIt->GetTopic()));
 			AddData(RPL_TOPICWHOTIME(client.GetUinfo()[nickname], chanIt->GetName(), chanIt->GetTopicStat()));
 		}
 		else
+		{
+
+//			AddData(RPL_TOPIC(client.GetPrefix(), chanIt->GetName(), chanIt->GetTopic()));
 			AddData(RPL_NOTOPIC(client.GetPrefix(), chanIt->GetName()));
+		}
 		AddData(RPL_NAMREPLY(client.GetUinfo()[nickname], chanparse[i][chan]) + chanIt->GetLstNickname() + "\r\n");
 		AddData(RPL_ENDOFNAMES(client.GetUinfo()[nickname], chanparse[i][chan]));
 	}
