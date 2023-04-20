@@ -6,6 +6,7 @@
 #include <sstream>
 #include "../utils/utils.hpp"
 #include "../include/Client.hpp"
+#include "../include/Ban.hpp"
 
 #define MEMBER_MODE string("ob")
 #define CHAN_MODE string("t")
@@ -25,8 +26,12 @@ enum memberMode {
 
 typedef std::map< Client*, std::bitset< MEMBER_MODE_SIZE > >		map_pcli;	
 typedef const std::map< Client*, std::bitset< MEMBER_MODE_SIZE > >	cst_map_pcli;
+
 typedef std::bitset< CHAN_MODE_SIZE >								chan_mode;
 typedef const std::bitset< CHAN_MODE_SIZE >							cst_chan_mode;
+
+typedef std::list< Ban >											lst_ban;
+typedef const std::list< Ban >										cst_lst_ban;
 
 class Channel
 {
@@ -37,10 +42,11 @@ class Channel
 		Channel(const Channel& chan);
 		Channel	&operator=(const Channel& rhs);
 
-		const std::list< Client* > 	&GetUser() const;
 		const string 				&GetTopic() const;
 
 		void						SetTopic(const string& params);
+
+		bool						IsBanned(Client& client);
 		bool						IsOperator(Client& client);
 		bool						IsOpTopicOnly() const;
 
@@ -59,6 +65,8 @@ class Channel
 		string						GetStrUserMode(const Client &client) const;
 		const string				&GetCtime() const;
 		const string				&GetTopicStat() const;
+		void						AddToBanList(const string &from, const string &toBan);
+		cst_lst_ban					GetBanList() const;
 	private:
 		string						_GetTime() const;
 		Client						*_creator;
@@ -68,6 +76,7 @@ class Channel
 		chan_mode					_mode;
 		string						_ctime;
 		string						_topicStat;
+		lst_ban						_banList;
 };
 
 #endif

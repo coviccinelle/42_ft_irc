@@ -607,13 +607,28 @@ void	Server::_ModeClient(Command &cmd, Client &client, const string &target)
 void	Server::_ModeServer(Command &cmd, Client &client, const string &channel)
 {
 	(void)cmd;
-	lst_chan::iterator	chan = _FindChannel(channel);
+	lst_chan::iterator	chanIt = _FindChannel(channel);
 	if (cmd.GetMiddle().size() == 1)
-		AddData(RPL_CHANNELMODEIS(client.GetUinfo()[nickname], channel, string("+") + chan->GetStrChanMode()));
+		AddData(RPL_CHANNELMODEIS(client.GetUinfo()[nickname], channel, string("+") + chanIt->GetStrChanMode()));
 	else if (cmd.GetMiddle().size() == 2)
 	{
-		if (cmd.GetMiddle()[1] == "b")
+		if (cmd.GetMiddle()[1].find('b') != std::string::npos)
+		{
+			cst_lst_ban	banList = chanIt->GetBanList();
+			for (lst_ban::const_iterator it = banList.begin(); it != banList.end(); ++it)
+				AddData(RPL_BANLIST(client.GetUinfo()[nickname], channel, it->GetMask(), it->GetFrom(), it->GetTime()));
 			AddData(RPL_ENDOFBANLIST(client.GetUinfo()[nickname], channel));
+		}
+	}
+	else
+	{
+		if (cmd.GetMiddle()[1] == "+b" && chanIt->IsOperator(client) == false)
+			AddData(ERR_CHANOPRIVSNEEDED(channel));
+		else if (cmd.GetMiddle()[1] == "+b" && chanIt->IsOperator(client) == true)
+		{
+			chanIt->AddToBanList(client.GetPrefix(), cmd.GetMiddle()[2]);
+			SendChannel(chanIt, "MODE " + channel + " +b "  + cmd.GetMiddle()[2] + "\r\n", client.GetPrefix());
+		}
 	}
 
 	return ;
@@ -714,13 +729,19 @@ void	Server::_Join(Command &cmd, Client &client)
 			_channels.push_back(Channel(chanparse[i][chan]));
 			--chanIt;
 		}
-		chanIt->joinChannel(client);
-		SendChannel(chanIt, string("JOIN " + chanparse[i][chan] + "\r\n"), client.GetPrefix());
-		AddData("MODE " + chanparse[i][chan] + " " + string("+") + chanIt->GetStrChanMode() + "\r\n");
-		AddData(RPL_TOPIC(client.GetPrefix(), chanIt->GetName(), chanIt->GetTopic()));
-		AddData(RPL_TOPICWHOTIME(client.GetUinfo()[nickname], chanIt->GetName(), chanIt->GetTopicStat()));
-		AddData(RPL_NAMREPLY(client.GetUinfo()[nickname], chanparse[i][chan]) + chanIt->GetLstNickname() + "\r\n");
-		AddData(RPL_ENDOFNAMES(client.GetUinfo()[nickname], chanparse[i][chan]));
+
+		if (chanIt->IsBanned(client) == true)
+			AddData(ERR_BANNEDFROMCHAN(client.GetUinfo()[nickname], chanparse[0][chan]));
+		else
+		{
+			chanIt->joinChannel(client);
+			SendChannel(chanIt, string("JOIN " + chanparse[i][chan] + "\r\n"), client.GetPrefix());
+			AddData("MODE " + chanparse[i][chan] + " " + string("+") + chanIt->GetStrChanMode() + "\r\n");
+			AddData(RPL_TOPIC(client.GetPrefix(), chanIt->GetName(), chanIt->GetTopic()));
+			AddData(RPL_TOPICWHOTIME(client.GetUinfo()[nickname], chanIt->GetName(), chanIt->GetTopicStat()));
+			AddData(RPL_NAMREPLY(client.GetUinfo()[nickname], chanparse[i][chan]) + chanIt->GetLstNickname() + "\r\n");
+			AddData(RPL_ENDOFNAMES(client.GetUinfo()[nickname], chanparse[i][chan]));
+		}
 	}
 
 	return ;

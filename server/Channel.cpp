@@ -6,7 +6,8 @@ Channel::Channel(const string &chanstring) :
 	_chanstring(chanstring),
 	_topic("Default Topic"),
 	_ctime(""),
-	_topicStat("")
+	_topicStat(""),
+	_banList()
 {
 	_ctime = _GetTime();
 	std::cout << "New channel created on " << _ctime << std::endl;
@@ -22,7 +23,8 @@ Channel::Channel(const Channel &src) :
 	_chanstring(src._chanstring),
 	_topic(src._topic),
 	_ctime(src._ctime),
-	_topicStat(src._topicStat)
+	_topicStat(src._topicStat),
+	_banList(src._banList)
 {
 }
 
@@ -37,8 +39,19 @@ Channel&	Channel::operator=(const Channel& rhs)
 	_topic = rhs._topic;
 	_ctime = rhs._ctime;
 	_topicStat = rhs._topicStat;
+	_banList = rhs._banList;
 
 	return (*this);
+}
+
+void	Channel::AddToBanList(const string &from, const string &toBan)
+{
+	_banList.push_back(Ban(toBan, from, _GetTime()));
+}
+
+cst_lst_ban	Channel::GetBanList() const
+{
+	return (_banList);
 }
 
 void	Channel::SetMemberMode(Client &client, const char c, bool status)
@@ -59,6 +72,17 @@ void	Channel::SetTopic(const string& name)
 bool	Channel::IsOperator(Client& client)
 {
 	return (_user.find(&client)->second[MEMBER_MODE.find('o')]);
+}
+
+bool	Channel::IsBanned(Client& client)
+{
+	bool isBan = false;
+	for (lst_ban::const_iterator it = _banList.begin(); it != _banList.end(); ++it)
+	{
+		if (it->GetMask().find(client.GetUinfo()[nickname]) != std::string::npos)
+			isBan = true;
+	}
+	return (isBan);
 }
 
 bool	Channel::IsOpTopicOnly() const

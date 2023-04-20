@@ -51,6 +51,9 @@ typedef const std::list< Channel >			cst_lst_chan;
 typedef std::list< Channel* >				lst_pchan;
 typedef const std::list< Channel* >			cst_lst_pchan;
 
+typedef std::list< string >					lst_str;
+typedef const std::list< string >			cst_lst_str;
+
 string	ltrim(const string &s);
 string	rtrim(const string &s);
 string 	trim(const string &s);

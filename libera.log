@@ -1,89 +1,95 @@
 << CAP LS
 << NICK julien
 << USER julien julien irc.libera.chat :Julien FRANCAIS
->> :molybdenum.libera.chat NOTICE * :*** Checking Ident
->> :molybdenum.libera.chat NOTICE * :*** Looking up your hostname...
->> :molybdenum.libera.chat NOTICE * :*** Couldn't look up your hostname
->> :molybdenum.libera.chat NOTICE * :*** No Ident response
->> :molybdenum.libera.chat CAP * LS :account-notify away-notify chghost extended-join multi-prefix sasl tls account-tag cap-notify echo-message server-time solanum.chat/identify-msg solanum.chat/oper solanum.chat/realhost
+>> :silver.libera.chat NOTICE * :*** Checking Ident
+>> :silver.libera.chat NOTICE * :*** Looking up your hostname...
+>> :silver.libera.chat NOTICE * :*** Couldn't look up your hostname
+>> :silver.libera.chat NOTICE * :*** No Ident response
+>> :silver.libera.chat CAP * LS :account-notify away-notify chghost extended-join multi-prefix sasl tls account-tag cap-notify echo-message server-time solanum.chat/identify-msg solanum.chat/oper solanum.chat/realhost
 << CAP REQ :multi-prefix
->> :molybdenum.libera.chat CAP julien ACK :multi-prefix
+>> :silver.libera.chat 433 * julien :Nickname is already in use.
+<< NICK julien_
+>> :silver.libera.chat CAP * ACK :multi-prefix
 << CAP END
->> :molybdenum.libera.chat 001 julien :Welcome to the Libera.Chat Internet Relay Chat Network julien
-<< MODE julien +i
->> :molybdenum.libera.chat 002 julien :Your host is molybdenum.libera.chat[51.161.82.214/6697], running version solanum-1.0-dev
->> :molybdenum.libera.chat 003 julien :This server was created Sat Mar 11 2023 at 21:38:07 UTC
->> :molybdenum.libera.chat 004 julien molybdenum.libera.chat solanum-1.0-dev DGMQRSZaghilopsuwz CFILMPQRSTbcefgijklmnopqrstuvz bkloveqjfI
->> :molybdenum.libera.chat 005 julien WHOX KNOCK MONITOR=100 ETRACE FNC SAFELIST ELIST=CMNTU CALLERID=g CHANTYPES=# EXCEPTS INVEX CHANMODES=eIbq,k,flj,CFLMPQRSTcgimnprstuz :are supported by this server
->> :molybdenum.libera.chat 005 julien CHANLIMIT=#:250 PREFIX=(ov)@+ MAXLIST=bqeI:100 MODES=4 NETWORK=Libera.Chat STATUSMSG=@+ CASEMAPPING=rfc1459 NICKLEN=16 MAXNICKLEN=16 CHANNELLEN=50 TOPICLEN=390 DEAF=D :are supported by this server
->> :molybdenum.libera.chat 005 julien TARGMAX=NAMES:1,LIST:1,KICK:1,WHOIS:1,PRIVMSG:4,NOTICE:4,ACCEPT:,MONITOR: EXTBAN=$,ajrxz :are supported by this server
->> :molybdenum.libera.chat 251 julien :There are 73 users and 44299 invisible on 28 servers
->> :molybdenum.libera.chat 252 julien 39 :IRC Operators online
->> :molybdenum.libera.chat 253 julien 17 :unknown connection(s)
->> :molybdenum.libera.chat 254 julien 23267 :channels formed
->> :molybdenum.libera.chat 255 julien :I have 2552 clients and 1 servers
->> :molybdenum.libera.chat 265 julien 2552 3448 :Current local users 2552, max 3448
->> :molybdenum.libera.chat 266 julien 44372 49609 :Current global users 44372, max 49609
->> :molybdenum.libera.chat 250 julien :Highest connection count: 3449 (3448 clients) (159907 connections received)
->> :molybdenum.libera.chat 375 julien :- molybdenum.libera.chat Message of the Day - 
->> :molybdenum.libera.chat 372 julien :- -[ Molybdenum ]-[ Atomic number: 42 ]-[ Chemical symbol: Mo ]-
->> :molybdenum.libera.chat 372 julien :-  
->> :molybdenum.libera.chat 372 julien :- Molybdenum has been known throughout history, though its
->> :molybdenum.libera.chat 372 julien :- properties meant that it was confused with lead ores. It was
->> :molybdenum.libera.chat 372 julien :- first identified as a distinct element in 1778, meaning our
->> :molybdenum.libera.chat 372 julien :- modern understanding of its existence reaches about as far
->> :molybdenum.libera.chat 372 julien :- back as American independence.
->> :molybdenum.libera.chat 372 julien :-  
->> :molybdenum.libera.chat 372 julien :- Molybdenum has a very high melting point, 2623°C, the fifth-
->> :molybdenum.libera.chat 372 julien :- highest temperature of any element.
->> :molybdenum.libera.chat 372 julien :-  
->> :molybdenum.libera.chat 372 julien :- While pure molybdenum is only about as strong as tooth enamel,
->> :molybdenum.libera.chat 372 julien :- it forms strong alloys that are resistant to corrosion and
->> :molybdenum.libera.chat 372 julien :- stable under varying temperatures. As a result, these alloys
->> :molybdenum.libera.chat 372 julien :- are used for metal armour plates, high-performance aircraft
->> :molybdenum.libera.chat 372 julien :- parts, and pumps for molten metal flows.
->> :molybdenum.libera.chat 372 julien :-  
->> :molybdenum.libera.chat 372 julien :- In its elemental form, it can be used as a fertiliser, and the
->> :molybdenum.libera.chat 372 julien :- isotope molybdenum-99 is used as a source of technetium-99m,
->> :molybdenum.libera.chat 372 julien :- an important medical radioisotope used for 3D bone scans and
->> :molybdenum.libera.chat 372 julien :- the investigation of blood flow when diagnosing heart disease.
->> :molybdenum.libera.chat 372 julien :-  
->> :molybdenum.libera.chat 372 julien :-  
->> :molybdenum.libera.chat 372 julien :- Welcome to Libera Chat, the IRC network for
->> :molybdenum.libera.chat 372 julien :- free & open-source software and peer directed projects.
->> :molybdenum.libera.chat 372 julien :-  
->> :molybdenum.libera.chat 372 julien :- Use of Libera Chat is governed by our network policies.
->> :molybdenum.libera.chat 372 julien :-  
->> :molybdenum.libera.chat 372 julien :- To reduce network abuses we perform open proxy checks
->> :molybdenum.libera.chat 372 julien :- on hosts at connection time.
->> :molybdenum.libera.chat 372 julien :-  
->> :molybdenum.libera.chat 372 julien :- Please visit us in #libera for questions and support.
->> :molybdenum.libera.chat 372 julien :-  
->> :molybdenum.libera.chat 372 julien :- Website and documentation:  https://libera.chat
->> :molybdenum.libera.chat 372 julien :- Webchat:                    https://web.libera.chat
->> :molybdenum.libera.chat 372 julien :- Network policies:           https://libera.chat/policies
->> :molybdenum.libera.chat 372 julien :- Email:                      support@libera.chat
->> :molybdenum.libera.chat 376 julien :End of /MOTD command.
->> :julien MODE julien :+Ziw
->> :NickServ!NickServ@services.libera.chat NOTICE julien :This nickname is registered. Please choose a different nickname, or identify via /msg NickServ IDENTIFY julien <password>
-<< PING molybdenum.libera.chat
-<< JOIN #superchannnn
->> :molybdenum.libera.chat PONG molybdenum.libera.chat :molybdenum.libera.chat
+>> :silver.libera.chat 001 julien_ :Welcome to the Libera.Chat Internet Relay Chat Network julien_
+<< MODE julien_ +i
+<< WHOIS julien
+>> :silver.libera.chat 002 julien_ :Your host is silver.libera.chat[172.106.11.86/6697], running version solanum-1.0-dev
+>> :silver.libera.chat 003 julien_ :This server was created Sun Nov 6 2022 at 03:17:56 UTC
+>> :silver.libera.chat 004 julien_ silver.libera.chat solanum-1.0-dev DGIMQRSZaghilopsuwz CFILMPQRSTbcefgijklmnopqrstuvz bkloveqjfI
+>> :silver.libera.chat 005 julien_ ETRACE FNC SAFELIST ELIST=CMNTU CALLERID=g MONITOR=100 KNOCK WHOX CHANTYPES=# EXCEPTS INVEX CHANMODES=eIbq,k,flj,CFLMPQRSTcgimnprstuz :are supported by this server
+>> :silver.libera.chat 005 julien_ CHANLIMIT=#:250 PREFIX=(ov)@+ MAXLIST=bqeI:100 MODES=4 NETWORK=Libera.Chat STATUSMSG=@+ CASEMAPPING=rfc1459 NICKLEN=16 MAXNICKLEN=16 CHANNELLEN=50 TOPICLEN=390 DEAF=D :are supported by this server
+>> :silver.libera.chat 005 julien_ TARGMAX=NAMES:1,LIST:1,KICK:1,WHOIS:1,PRIVMSG:4,NOTICE:4,ACCEPT:,MONITOR: EXTBAN=$,ajrxz :are supported by this server
+>> :silver.libera.chat 251 julien_ :There are 69 users and 42245 invisible on 28 servers
+>> :silver.libera.chat 252 julien_ 39 :IRC Operators online
+>> :silver.libera.chat 253 julien_ 108 :unknown connection(s)
+>> :silver.libera.chat 254 julien_ 23007 :channels formed
+>> :silver.libera.chat 255 julien_ :I have 2474 clients and 1 servers
+>> :silver.libera.chat 265 julien_ 2474 4526 :Current local users 2474, max 4526
+>> :silver.libera.chat 266 julien_ 42314 51827 :Current global users 42314, max 51827
+>> :silver.libera.chat 250 julien_ :Highest connection count: 4527 (4526 clients) (332459 connections received)
+>> :silver.libera.chat 375 julien_ :- silver.libera.chat Message of the Day - 
+>> :silver.libera.chat 372 julien_ :- This server is provided by Psychz Networks.
+>> :silver.libera.chat 372 julien_ :-  
+>> :silver.libera.chat 372 julien_ :- Welcome to Libera Chat, the IRC network for
+>> :silver.libera.chat 372 julien_ :- free & open-source software and peer directed projects.
+>> :silver.libera.chat 372 julien_ :-  
+>> :silver.libera.chat 372 julien_ :- Use of Libera Chat is governed by our network policies.
+>> :silver.libera.chat 372 julien_ :-  
+>> :silver.libera.chat 372 julien_ :- To reduce network abuses we perform open proxy checks
+>> :silver.libera.chat 372 julien_ :- on hosts at connection time.
+>> :silver.libera.chat 372 julien_ :-  
+>> :silver.libera.chat 372 julien_ :- Please visit us in #libera for questions and support.
+>> :silver.libera.chat 372 julien_ :-  
+>> :silver.libera.chat 372 julien_ :- Website and documentation:  https://libera.chat
+>> :silver.libera.chat 372 julien_ :- Webchat:                    https://web.libera.chat
+>> :silver.libera.chat 372 julien_ :- Network policies:           https://libera.chat/policies
+>> :silver.libera.chat 372 julien_ :- Email:                      support@libera.chat
+>> :silver.libera.chat 376 julien_ :End of /MOTD command.
+>> :julien_ MODE julien_ :+Ziw
+<< PING silver.libera.chat
+>> :silver.libera.chat 311 julien_ julien ~julien 37.167.127.107 * :Julien FRANCAIS
+--> nickfind event whois
+>> :silver.libera.chat 312 julien_ julien copper.libera.chat :Sofia, BG
+--> event empty
+>> :silver.libera.chat 671 julien_ julien :is using a secure connection
+--> event empty
+>> :silver.libera.chat 338 julien_ julien 37.167.127.107 :actually using host
+--> event empty
+>> :silver.libera.chat 318 julien_ julien :End of /WHOIS list.
+--> event empty
+>> :silver.libera.chat PONG silver.libera.chat :silver.libera.chat
 --> lag pong
->> :julien!~julien@37.167.196.249 JOIN #superchannnn
->> :molybdenum.libera.chat MODE #superchannnn +Cnst
->> :molybdenum.libera.chat 353 julien @ #superchannnn :@julien
->> :molybdenum.libera.chat 366 julien #superchannnn :End of /NAMES list.
-<< MODE #superchannnn
->> :molybdenum.libera.chat 324 julien #superchannnn +Cnst
+<< JOIN #chan42
+>> :julien_!~julien@37.167.127.107 JOIN #chan42
+>> :silver.libera.chat MODE #chan42 +Cnst
+>> :silver.libera.chat 353 julien_ @ #chan42 :@julien_
+>> :silver.libera.chat 366 julien_ #chan42 :End of /NAMES list.
+<< MODE #chan42
+>> :silver.libera.chat 324 julien_ #chan42 +Cnst
 --> chanquery mode
-<< WHO #superchannnn
->> :molybdenum.libera.chat 329 julien #superchannnn 1681991894
+<< WHO #chan42
+>> :silver.libera.chat 329 julien_ #chan42 1682046946
 --> event 329
->> :molybdenum.libera.chat 352 julien #superchannnn ~julien 37.167.196.249 molybdenum.libera.chat julien H@ :0 Julien FRANCAIS
+>> :silver.libera.chat 352 julien_ #chan42 ~julien 37.167.127.107 silver.libera.chat julien_ H@ :0 Julien FRANCAIS
 --> silent event who
->> :molybdenum.libera.chat 315 julien #superchannnn :End of /WHO list.
+>> :silver.libera.chat 315 julien_ #chan42 :End of /WHO list.
 --> chanquery who end
-<< MODE #superchannnn b
->> :molybdenum.libera.chat 368 julien #superchannnn :End of Channel Ban List
+<< MODE #chan42 b
+>> :silver.libera.chat 368 julien_ #chan42 :End of Channel Ban List
 --> chanquery ban end
+>> :julien!~julien@37.167.127.107 JOIN #chan42
+<< PING silver.libera.chat
+>> :silver.libera.chat PONG silver.libera.chat :silver.libera.chat
+--> lag pong
+<< MODE #chan42 +b *!*julien@37.167.127.*
+>> :julien_!~julien@37.167.127.107 MODE #chan42 +b *!*julien@37.167.127.*
+<< PING silver.libera.chat
+>> :silver.libera.chat PONG silver.libera.chat :silver.libera.chat
+--> lag pong
+<< PING silver.libera.chat
+>> :silver.libera.chat PONG silver.libera.chat :silver.libera.chat
+--> lag pong
+<< MODE #chan42 +b
+>> :silver.libera.chat 367 julien_ #chan42 *!*julien@37.167.127.* julien_!~julien@37.167.127.107 1682047020
+>> :silver.libera.chat 368 julien_ #chan42 :End of Channel Ban List

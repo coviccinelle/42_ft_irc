@@ -12,6 +12,7 @@ SRC		=	server/Server.cpp \
 			server/TargetParser.cpp \
 			server/ChannelParser.cpp \
 			server/Channel.cpp \
+			server/Ban.cpp \
 			utils/utils.cpp \
 			utils/irc_error.cpp \
 			main.cpp
