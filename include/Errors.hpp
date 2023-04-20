@@ -30,8 +30,8 @@
 # define RPL_TOPICWHOTIME(nick, chan, whoset) ("333 " + nick + " " + chan + " " + whoset +  "\r\n")
 # define RPL_ENDOFBANLIST(nick, chan)("368 " + nick + " " + chan + " :End of Channel Ban List\r\n")
 # define RPL_NOTOPIC(prefix, chan) ("331 " + prefix + " " + chan + " :No topic is set\r\n")
-# define TOPIC(prefix, chan, topic) (":" + prefix + " TOPIC " + chan + " :" + topic + "\n\r")
-# define RPL_TOPIC(prefix, chan, topic) ("332 " + prefix+ " " + chan + " :" + topic + "\r\n")
+# define TOPIC(nick, chan, topic) (":" + nick + " TOPIC " + chan + " :" + topic + "\n\r")
+# define RPL_TOPIC(nick, chan, topic) ("332 " + nick + " " + chan + " :" + topic + "\r\n")
 # define ERR_ALREADYREGISTERED "462 :You may not reregister\r\n"
 # define ERR_NEEDMOREPARAMS(command) (std::string("461 ") + command + " :Not enough parameters\r\n")
 # define ERR_PASSWDMISMATCH(from) "464 " + from + " :Password incorrect\r\n"
@@ -51,7 +51,7 @@
 # define RPL_INVITING(nick, user, host, invitenick, channel) ("341 " + nick + "!" + user + "@" + host + " " + invitenick + " " + channel + "\r\n")
 # define ERR_USERNOTINCHANNEL(nick, chan) ("441 " + nick + " " + chan + " :They aren't on that channel\r\n")
 # define ERR_NOTONCHANNEL(chan) ("442 " + chan + " :You're not on that channel\r\n")
-# define ERR_CHANOPRIVSNEEDED(chan) ("482 " + chan + " :You're not channel operator\r\n")
+# define ERR_CHANOPRIVSNEEDED(nick, chan) ("482 " + chan + " :You're not channel operator\r\n")
 # define ERR_INVITEONLYCHAN(nick, chan) ("473 " + nick + " " + chan + " :Cannot join channel (+i)\r\n")
 # define ERR_CANNOTSENDTOCHAN(nick, chan) ("404 " + nick + " " + chan + " :Cannot send to channel\r\n")
 # define ERR_USERSDONTMATCH(nick) ("502 " + nick + " :Cannot change mode for other users\r\n")
@@ -65,7 +65,6 @@
 # define RPL_CHANNELMODEIS(nick, chan, mode) ("324 " + nick + " " + chan + " " + mode + "\r\n")
 # define ERR_NOOPERHOST(nick) ("491 " + nick + " :No O-lines for your host\r\n")
 # define ERR_CANTKILLSERVER(from) ("483 " + from + " :You can't kill a server!\r\n")
-//⚠️ 
 # define ERR_NOORIGIN ("409 :No origin specified\r\n")
 # define ERR_NOSUCHSERVER(servername) ("402 " + servername + " :No such server\r\n")
 

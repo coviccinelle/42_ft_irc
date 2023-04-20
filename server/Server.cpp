@@ -613,9 +613,7 @@ void	Server::_ModeServer(Command &cmd, Client &client, const string &channel)
 	else if (cmd.GetMiddle().size() == 2)
 	{
 		if (cmd.GetMiddle()[1] == "b")
-		{
 			AddData(RPL_ENDOFBANLIST(client.GetUinfo()[nickname], channel));
-		}
 	}
 
 	return ;
@@ -657,7 +655,7 @@ void	Server::_Notice(Command &cmd, Client &client)
 			continue ;
 		else
 		{
-			string msg = "NOTICE " + *it + " :" + cmd.GetCinfo()[trailing ]+ "\r\n";
+			string msg = "NOTICE " + *it + " :" + cmd.GetCinfo()[trailing] + "\r\n";
 			AddData(msg);
 			SendData(receiver->GetFd());
 		}
@@ -719,17 +717,8 @@ void	Server::_Join(Command &cmd, Client &client)
 		chanIt->joinChannel(client);
 		SendChannel(chanIt, string("JOIN " + chanparse[i][chan] + "\r\n"), client.GetPrefix());
 		AddData("MODE " + chanparse[i][chan] + " " + string("+") + chanIt->GetStrChanMode() + "\r\n");
-		if (1)
-		{
-			AddData(RPL_TOPIC(client.GetPrefix(), chanIt->GetName(), chanIt->GetTopic()));
-			AddData(RPL_TOPICWHOTIME(client.GetUinfo()[nickname], chanIt->GetName(), chanIt->GetTopicStat()));
-		}
-		else
-		{
-
-//			AddData(RPL_TOPIC(client.GetPrefix(), chanIt->GetName(), chanIt->GetTopic()));
-			AddData(RPL_NOTOPIC(client.GetPrefix(), chanIt->GetName()));
-		}
+		AddData(RPL_TOPIC(client.GetPrefix(), chanIt->GetName(), chanIt->GetTopic()));
+		AddData(RPL_TOPICWHOTIME(client.GetUinfo()[nickname], chanIt->GetName(), chanIt->GetTopicStat()));
 		AddData(RPL_NAMREPLY(client.GetUinfo()[nickname], chanparse[i][chan]) + chanIt->GetLstNickname() + "\r\n");
 		AddData(RPL_ENDOFNAMES(client.GetUinfo()[nickname], chanparse[i][chan]));
 	}
@@ -769,37 +758,26 @@ void	Server::_Topic(Command &cmd, Client &client)
 	cst_vec_vec_str		chans = _WrapChannels(cmd, 0);
 	lst_chan::iterator	channel;
 
-	std::cout << "Hey I'm command Topic: to change or view topic of chan" << std::endl;
 	if (chans.empty())
-		return AddData(ERR_NEEDMOREPARAMS("TOPIC"));
-	if ((channel = _FindChannel(chans[0][chan])) == _channels.end())
-		return ; //channel doesn't exist on server
-	if (channel->findUserIter(client.GetUinfo()[nickname]) == channel->GetUsers().end())
-		return (AddData(ERR_NOTONCHANNEL(chans[0][chan])));
-	if (cmd.GetCinfo()[trailing].empty())
+		AddData(ERR_NEEDMOREPARAMS("TOPIC"));
+	else if ((channel = _FindChannel(chans[0][chan])) == _channels.end())
+		AddData(ERR_NOSUCHCHANNEL(chans[0][chan]));
+	else if (channel->findUserIter(client.GetUinfo()[nickname]) == channel->GetUsers().end())
+		AddData(ERR_NOTONCHANNEL(chans[0][chan]));
+	else if (cmd.GetCinfo()[trailing].empty())
 	{
-		//Send topic of the channel back to the client
-		if (channel->GetTopic().empty())
-			AddData(RPL_NOTOPIC(client.GetPrefix(), channel->GetName()));
-		else
-			AddData(RPL_TOPIC(client.GetPrefix(), channel->GetName(), channel->GetTopic()));
+		AddData(RPL_TOPIC(client.GetUinfo()[nickname], channel->GetName(), channel->GetTopic()), client.GetPrefix());
 		SendData(client.GetFd());
 	}
+	else if (channel->IsOpTopicOnly() == true && channel->IsOperator(client) == false)
+		AddData(ERR_CHANOPRIVSNEEDED(client.GetUinfo()[nickname], chans[0][chan]));
 	else
 	{
-		if ((channel = _FindChannel(chans[0][chan])) == _channels.end())
-			return ;
-		//check if the client is an operator of the channel
-//		if (channel->IsOperator(client) == false)
-//			return AddData(ERR_CHANOPRIVSNEEDED(chans[0][chan]));
-		//change the topic of the channel
-		if (cmd.GetCinfo()[trailing].empty())
-			channel->SetTopic("");
-		else
-			channel->SetTopic(cmd.GetCinfo()[trailing]);
-		//send the new topic to all the users of the channel
+		channel->SetTopic(cmd.GetCinfo()[trailing]);
 		SendChannel(channel, "TOPIC " + channel->GetName() + " :" + channel->GetTopic() + "\r\n", client.GetPrefix());
 	}
+
+	return ;
 }
 
 //Parameters: [ <channel> *( "," <channel> ) [ <target> ] ]

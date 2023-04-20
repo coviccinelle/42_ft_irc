@@ -56,11 +56,14 @@ void	Channel::SetTopic(const string& name)
 	_topic = name;
 }
 
-bool	Channel::IsOperator(const Client& client) const
+bool	Channel::IsOperator(Client& client)
 {
-//	return (_user.find(&client)[MEMBER_MODE.find('o')]);
-	(void)client;
-	return (0);
+	return (_user.find(&client)->second[MEMBER_MODE.find('o')]);
+}
+
+bool	Channel::IsOpTopicOnly() const
+{
+	return (_mode[CHAN_MODE.find('t')]);
 }
 
 const string &Channel::GetTopic() const

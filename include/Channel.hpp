@@ -41,7 +41,8 @@ class Channel
 		const string 				&GetTopic() const;
 
 		void						SetTopic(const string& params);
-		bool						IsOperator(const Client& client) const;
+		bool						IsOperator(Client& client);
+		bool						IsOpTopicOnly() const;
 
 		/* Public Methods */
 		void						SetChanMode(const char c, bool status);
