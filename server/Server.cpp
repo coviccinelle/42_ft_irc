@@ -773,9 +773,9 @@ void	Server::_Topic(Command &cmd, Client &client)
 	}
 	else
 	{
-		//check if the client is an operator of the channel
 		if ((channel = _FindChannel(chans[0][chan])) == _channels.end())
 			return ;
+		//check if the client is an operator of the channel
 //		if (channel->IsOperator(client) == false)
 //			return AddData(ERR_CHANOPRIVSNEEDED(chans[0][chan]));
 		//change the topic of the channel
@@ -784,7 +784,6 @@ void	Server::_Topic(Command &cmd, Client &client)
 		else
 			channel->SetTopic(cmd.GetCinfo()[trailing]);
 		//send the new topic to all the users of the channel
-//		AddData(TOPIC(client.GetPrefix(), channel->GetName(), channel->GetTopic() + "\r\n"));
 		SendChannel(channel, "TOPIC " + channel->GetName() + " :" + channel->GetTopic() + "\r\n", client.GetPrefix());
 	}
 }
@@ -803,9 +802,21 @@ void	Server::_Names(Command &cmd, Client &client)
 //           RPL_LIST                        RPL_LISTEND
 void	Server::_List(Command &cmd, Client &client)
 {
+	lst_chan::iterator	channel;
 	std::cout << "Hey I'm command List ! Nice to meet you" << std::endl;
-	(void)cmd;
-	(void)client;
+
+	//LIST all the channels and their topics on the server
+	if (cmd.GetMiddle().empty())
+	{
+		for (lst_chan::iterator it = _channels.begin(); it != _channels.end(); ++it)
+			AddData(RPL_LIST(client.GetUinfo()[nickname], (*it).GetName(), (*it).GetTopic()));
+		AddData(RPL_LISTEND(client.GetUinfo()[nickname]));
+	}
+	else
+	{
+		AddData("List: how to use : \"/list -YES\" on irssi OR \"LIST\" on netcat\r\n");
+		return ;
+	}
 }
 
 //   Parameters: <nickname> <channel>

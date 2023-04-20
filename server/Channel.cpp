@@ -55,10 +55,9 @@ void	Channel::SetTopic(const string& name)
 
 bool	Channel::IsOperator(const Client& client) const
 {
+//	return (_user.find(&client)[MEMBER_MODE.find('o')]);
 	(void)client;
-	//return (_mode[USER_MODE.find('o')]);
-	std::cout << "under construction" << std::endl;
-	return (false);
+	return (0);
 }
 
 const string &Channel::GetTopic() const
