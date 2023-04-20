@@ -25,11 +25,11 @@
 # define RPL_ENDOFWHO(nick, mask) ("315 " + nick + " " + mask + " :End of /WHO list.\r\n")
 # define RPL_WHOREPLY(nick, chan, user, host, server, realname) ("352 " + nick + " " + chan + " " + user + " " + host + " " + server + " " + nick + " " + " H@ :0 " + realname + "\r\n")
 # define RPL_CREATIONTIME(nick, chan, ctime)("329 " + nick + " " + chan + " " + ctime + "\r\n")
-# define RPL_NOTOPIC(nick, user, host, chan) ("331 " + nick + "!" + user + "@" + host + " " + chan + " :No topic is set\r\n")
-# define TOPIC(nick, user, host, chan, topic) (":" + nick + "!" + user + "@" + host + " TOPIC " + chan + " :" + topic + "\n\r")
-# define RPL_TOPIC(nick, user, host, chan, topic) ("332 " + nick + "!" + user + "@" + host + " " + chan + " :" + topic + "\r\n")
 # define RPL_TOPICWHOTIME(nick, chan, whoset) ("333 " + nick + " " + chan + " " + whoset +  "\r\n")
 # define RPL_ENDOFBANLIST(nick, chan)("368 " + nick + " " + chan + " :End of Channel Ban List\r\n")
+# define RPL_NOTOPIC(prefix, chan) ("331 " + prefix + " " + chan + " :No topic is set\r\n")
+# define TOPIC(prefix, chan, topic) (":" + prefix + " TOPIC " + chan + " :" + topic + "\n\r")
+# define RPL_TOPIC(prefix, chan, topic) ("332 " + prefix+ " " + chan + " :" + topic + "\r\n")
 # define ERR_ALREADYREGISTERED "462 :You may not reregister\r\n"
 # define ERR_NEEDMOREPARAMS(command) (std::string("461 ") + command + " :Not enough parameters\r\n")
 # define ERR_PASSWDMISMATCH(from) "464 " + from + " :Password incorrect\r\n"
