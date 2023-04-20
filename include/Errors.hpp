@@ -22,13 +22,11 @@
 # define BANNED(nick, user, host, channel, target) (":" + nick + "!" + user + "@" + host + " MODE " + channel + " +b " + target + "\r\n")
 # define KICK(nick, user, host, chan, kicked, reason) (":" + nick + "!" + user + "@" + host + " KICK " + chan + " " + kicked + " :" + reason + "\r\n")
 # define INVITE(nick, user, host, nickinvite, channel)  (":" + nick + "!" + user + "@" + host + " INVITE " + nickinvite + " " + channel + "\r\n")
-
 # define RPL_CREATIONTIME(nick, chan, ctime)("329 " + nick + " " + chan + " " + ctime + "\r\n")
 # define RPL_TOPICWHOTIME(nick, chan, whoset) ("333 " + nick + " " + chan + " " + whoset +  "\r\n")
 # define RPL_NOTOPIC(prefix, chan) ("331 " + prefix + " " + chan + " :No topic is set\r\n")
 # define TOPIC(prefix, chan, topic) (":" + prefix + " TOPIC " + chan + " :" + topic + "\n\r")
 # define RPL_TOPIC(prefix, chan, topic) ("332 " + prefix+ " " + chan + " :" + topic + "\r\n")
-
 # define ERR_ALREADYREGISTERED "462 :You may not reregister\r\n"
 # define ERR_NEEDMOREPARAMS(command) (std::string("461 ") + command + " :Not enough parameters\r\n")
 # define ERR_PASSWDMISMATCH(from) "464 " + from + " :Password incorrect\r\n"
