@@ -711,17 +711,18 @@ void	Server::_Join(Command &cmd, Client &client)
 		SendChannel(chanIt, string("JOIN " + chanparse[i][chan] + "\r\n"), client.GetPrefix());
 		if (1)
 		{
-			AddData(RPL_TOPIC(client.GetUinfo()[nickname], client.GetUinfo()[username], client.GetUinfo()[hostname], chanIt->GetName(), "todo : topic"));
+			AddData(RPL_TOPIC(client.GetPrefix(), chanIt->GetName(), "todo : topic"));
 			AddData(RPL_TOPICWHOTIME(client.GetUinfo()[nickname], chanIt->GetName(), chanIt->GetTopicStat()));
 		}
 		else
-			AddData(RPL_NOTOPIC(client.GetUinfo()[nickname], client.GetUinfo()[username], client.GetUinfo()[hostname], chanIt->GetName()));
+			AddData(RPL_NOTOPIC(client.GetPrefix(), chanIt->GetName()));
 		AddData(RPL_NAMREPLY(client.GetUinfo()[nickname], chanparse[i][chan]) + chanIt->GetLstNickname() + "\r\n");
 		AddData(RPL_ENDOFNAMES(client.GetUinfo()[nickname], chanparse[i][chan]));
 	}
 
 	return ;
 }
+
 
 void	Server::_Part(Command &cmd, Client &client)
 {
@@ -751,43 +752,41 @@ void	Server::_Part(Command &cmd, Client &client)
 //            ERR_CHANOPRIVSNEEDED            ERR_NOCHANMODES
 void	Server::_Topic(Command &cmd, Client &client)
 {
-	std::list < Channel >::iterator channel;
 	cst_vec_vec_str		chans = _WrapChannels(cmd, 0);
-	cst_vec_str			targets = _WrapTargets(cmd, 0);
+	lst_chan::iterator	channel;
 
-	(void)cmd;
-	(void)client;
-	(void)channel;
-	(void)chans;
-	(void)targets;
 	std::cout << "Hey I'm command Topic: to change or view topic of chan" << std::endl;
-//	if (chans.empty())
-//		return AddData(ERR_NEEDMOREPARAMS("TOPIC"));
-//	if ((channel = _FindChannel(chans[0][chan])) == _channels.end())
-//			continue ;
-//		if (channel->_findUserIter(client.GetUinfo()[nickname]) == channel->GetUser().end())
-//			return (AddData(ERR_NOTONCHANNEL(chans[0][chan])));
-//	if (cmd.GetMiddle().size() == 1)
-//	{
-//		//Send topic of the channel back to the client
-//		if (channel->GetTopic().empty())
-//			AddData(RPL_NOTOPIC(client.GetUinfo()[nickname], client.GetUinfo()[username], client.GetUinfo()[hostname], channel->GetName()));
-//		else
-//			AddData(RPL_TOPIC(client.GetUinfo()[nickname], client.GetUinfo()[username], client.GetUinfo()[hostname], channel->GetName(), channel->GetTopic()));
-//	}
-//	else
-//	{
-//		//check if the client is an operator of the channel
-//		if (channel->_findUserIter(client.GetUinfo()[nickname])->GetMode() != '@')
+	if (chans.empty())
+		return AddData(ERR_NEEDMOREPARAMS("TOPIC"));
+	if ((channel = _FindChannel(chans[0][chan])) == _channels.end())
+		return ; //channel doesn't exist on server
+	if (channel->findUserIter(client.GetUinfo()[nickname]) == channel->GetUsers().end())
+		return (AddData(ERR_NOTONCHANNEL(chans[0][chan])));
+	if (cmd.GetCinfo()[trailing].empty())
+	{
+		//Send topic of the channel back to the client
+		if (channel->GetTopic().empty())
+			AddData(RPL_NOTOPIC(client.GetPrefix(), channel->GetName()));
+		else
+			AddData(RPL_TOPIC(client.GetPrefix(), channel->GetName(), channel->GetTopic()));
+		SendData(client.GetFd());
+	}
+	else
+	{
+		//check if the client is an operator of the channel
+		if ((channel = _FindChannel(chans[0][chan])) == _channels.end())
+			return ;
+//		if (channel->IsOperator(client) == false)
 //			return AddData(ERR_CHANOPRIVSNEEDED(chans[0][chan]));
-//		//change the topic of the channel
-//		if (cmd.GetCinfo()[trailing].empty())
-//			channel->SetTopic("");
-//		else
-//			channel->SetTopic(cmd.GetCinfo()[trailing]);
-//		//send the new topic to all the users of the channel
-//		SendChannel(channel->GetName(), "TOPIC " + channel->GetName() + " :" + channel->GetTopic() + "\r\n");
-//	}
+		//change the topic of the channel
+		if (cmd.GetCinfo()[trailing].empty())
+			channel->SetTopic("");
+		else
+			channel->SetTopic(cmd.GetCinfo()[trailing]);
+		//send the new topic to all the users of the channel
+//		AddData(TOPIC(client.GetPrefix(), channel->GetName(), channel->GetTopic() + "\r\n"));
+		SendChannel(channel, "TOPIC " + channel->GetName() + " :" + channel->GetTopic() + "\r\n", client.GetPrefix());
+	}
 }
 
 //Parameters: [ <channel> *( "," <channel> ) [ <target> ] ]

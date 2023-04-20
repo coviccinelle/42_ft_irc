@@ -36,6 +36,12 @@ class Channel
 		Channel(const Channel& chan);
 		Channel	&operator=(const Channel& rhs);
 
+		const std::list< Client* > 	&GetUser() const;
+		const string 				&GetTopic() const;
+
+		void						SetTopic(const string& params);
+		bool						IsOperator(const Client& client) const;
+
 		/* Public Methods */
 		void						SetChanMode(const char c, bool status);
 		void						SetMemberMode(Client &client, const char c, bool status);
@@ -56,6 +62,7 @@ class Channel
 		Client						*_creator;
 		map_pcli					_user;
 		string						_chanstring;
+		string						_topic;
 		chan_mode					_mode;
 		string						_ctime;
 		string						_topicStat;

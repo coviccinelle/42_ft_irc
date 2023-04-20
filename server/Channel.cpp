@@ -47,6 +47,25 @@ void	Channel::SetChanMode(const char c, bool status)
 {
 	_mode.set(CHAN_MODE.find(c), status);
 }
+
+void	Channel::SetTopic(const string& name)
+{
+	_topic = name;
+}
+
+bool	Channel::IsOperator(const Client& client) const
+{
+	(void)client;
+	//return (_mode[USER_MODE.find('o')]);
+	std::cout << "under construction" << std::endl;
+	return (false);
+}
+
+const string &Channel::GetTopic() const
+{
+	return (_topic);
+}
+
 int	Channel::joinChannel(Client& toAccept)
 {
 	if (_creator == NULL)
