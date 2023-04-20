@@ -22,11 +22,14 @@
 # define BANNED(nick, user, host, channel, target) (":" + nick + "!" + user + "@" + host + " MODE " + channel + " +b " + target + "\r\n")
 # define KICK(nick, user, host, chan, kicked, reason) (":" + nick + "!" + user + "@" + host + " KICK " + chan + " " + kicked + " :" + reason + "\r\n")
 # define INVITE(nick, user, host, nickinvite, channel)  (":" + nick + "!" + user + "@" + host + " INVITE " + nickinvite + " " + channel + "\r\n")
+# define RPL_ENDOFWHO(nick, mask) ("315 " + nick + " " + mask + " :End of /WHO list.\r\n")
+# define RPL_WHOREPLY(nick, chan, user, host, server, realname) ("352 " + nick + " " + chan + " " + user + " " + host + " " + server + " " + nick + " " + " H@ :0 " + realname + "\r\n")
 # define RPL_CREATIONTIME(nick, chan, ctime)("329 " + nick + " " + chan + " " + ctime + "\r\n")
 # define RPL_NOTOPIC(nick, user, host, chan) ("331 " + nick + "!" + user + "@" + host + " " + chan + " :No topic is set\r\n")
 # define TOPIC(nick, user, host, chan, topic) (":" + nick + "!" + user + "@" + host + " TOPIC " + chan + " :" + topic + "\n\r")
 # define RPL_TOPIC(nick, user, host, chan, topic) ("332 " + nick + "!" + user + "@" + host + " " + chan + " :" + topic + "\r\n")
 # define RPL_TOPICWHOTIME(nick, chan, whoset) ("333 " + nick + " " + chan + " " + whoset +  "\r\n")
+# define RPL_ENDOFBANLIST(nick, chan)("368 " + nick + " " + chan + " :End of Channel Ban List\r\n")
 # define ERR_ALREADYREGISTERED "462 :You may not reregister\r\n"
 # define ERR_NEEDMOREPARAMS(command) (std::string("461 ") + command + " :Not enough parameters\r\n")
 # define ERR_PASSWDMISMATCH(from) "464 " + from + " :Password incorrect\r\n"
@@ -42,7 +45,7 @@
 # define ERR_CHANNELISFULL(nick, channel) ("471 " + nick + " " + channel + " :Cannot join channel (+l)\r\n")
 # define ERR_TOOMANYCHANNELS(nick, channel) ("405 " + nick + " " + channel + " :You have joined too many channels\r\n")
 # define RPL_NAMREPLY(nick, channel) ("353 " + nick + " = " + channel + " :")
-# define RPL_ENDOFNAMES(nick, channel) ("366 " + nick + " " + channel + " :End of NAMES list\r\n")
+# define RPL_ENDOFNAMES(nick, channel) ("366 " + nick + " " + channel + " :End of /NAMES list.\r\n")
 # define RPL_INVITING(nick, user, host, invitenick, channel) ("341 " + nick + "!" + user + "@" + host + " " + invitenick + " " + channel + "\r\n")
 # define ERR_USERNOTINCHANNEL(nick, chan) ("441 " + nick + " " + chan + " :They aren't on that channel\r\n")
 # define ERR_NOTONCHANNEL(chan) ("442 " + chan + " :You're not on that channel\r\n")

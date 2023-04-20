@@ -7,19 +7,20 @@
 #include "../utils/utils.hpp"
 #include "../include/Client.hpp"
 
-#define MEMBER_MODE string("o")
-#define CHAN_MODE string("b")
+#define MEMBER_MODE string("ob")
+#define CHAN_MODE string("t")
 
 class Client;
 
 #define CHAN_MODE_SIZE 1
 enum chanmode {
-	CHAN_BAN = 0, // b
+	CHAN_TOPIC = 0 // t
 };
 
-#define MEMBER_MODE_SIZE 1
+#define MEMBER_MODE_SIZE 2
 enum memberMode {
 	MEM_CHANOP = 0, // o
+	MEM_BAN // b
 };
 
 typedef std::map< Client*, std::bitset< MEMBER_MODE_SIZE > >		map_pcli;	

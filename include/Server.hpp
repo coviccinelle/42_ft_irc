@@ -33,6 +33,7 @@ enum CmdVal {
 	LIST,
 	INVITE,
 	KICK,
+	WHO,
 	UNKNOWN
 };
 
@@ -97,6 +98,7 @@ class Server
 		void							_List(Command &cmd, Client &client);
 		void							_Invite(Command &cmd, Client &client);
 		void							_Kick(Command &cmd, Client &client);
+		void							_Who(Command &cmd, Client &client);
 
 		std::string 					_portNumber;
 		std::string 					_password;

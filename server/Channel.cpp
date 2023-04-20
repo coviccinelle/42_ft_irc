@@ -54,7 +54,7 @@ int	Channel::joinChannel(Client& toAccept)
 		_topicStat = toAccept.GetPrefix() + " " + _GetTime();
 		_creator = &toAccept;
 		SetMemberMode(toAccept, 'o', true);
-		SetChanMode('b', true);
+		SetChanMode('t', true);
 	}
 	_user.insert(std::make_pair(&toAccept, 0));
 	toAccept.RegisterChannel(*this);

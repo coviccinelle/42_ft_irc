@@ -29,6 +29,7 @@ Server::Server(const string &port, const string &pass, const string &operPass) :
 	_funcTable.push_back(&Server::_List);
 	_funcTable.push_back(&Server::_Invite);
 	_funcTable.push_back(&Server::_Kick);
+	_funcTable.push_back(&Server::_Who);
 	_mapCmd.insert(std::make_pair(string("CAP"), CAP));
 	_mapCmd.insert(std::make_pair(string("PASS"), PASS));
 	_mapCmd.insert(std::make_pair(string("NICK"), NICK));
@@ -47,6 +48,7 @@ Server::Server(const string &port, const string &pass, const string &operPass) :
 	_mapCmd.insert(std::make_pair(string("LIST"), LIST));
 	_mapCmd.insert(std::make_pair(string("INVITE"), INVITE));
 	_mapCmd.insert(std::make_pair(string("KICK"), KICK));
+	_mapCmd.insert(std::make_pair(string("WHO"), WHO));
 }
 
 Server::~Server()
@@ -597,7 +599,7 @@ void	Server::_ModeClient(Command &cmd, Client &client, const string &target)
 		{
 			return (AddData(e.what()));
 		}
-		return (AddData(string("MODE ") + client.GetUinfo()[nickname] + " " + cmd.GetMiddle()[1] + "\r\n"));
+		return (AddData(string("MODE ") + client.GetUinfo()[nickname] + " :" + cmd.GetMiddle()[1] + "\r\n"));
 	}
 	return (AddData(RPL_UMODEIS(client.GetUinfo()[nickname], client.GetStrMode())));
 }
@@ -606,8 +608,15 @@ void	Server::_ModeServer(Command &cmd, Client &client, const string &channel)
 {
 	(void)cmd;
 	lst_chan::iterator	chan = _FindChannel(channel);
-	AddData(RPL_CHANNELMODEIS(client.GetUinfo()[nickname], channel, string("+") + chan->GetStrUserMode(client)));
-	AddData(RPL_CREATIONTIME(client.GetUinfo()[nickname], channel, chan->GetCtime()));
+	if (cmd.GetMiddle().size() == 1)
+		AddData(RPL_CHANNELMODEIS(client.GetUinfo()[nickname], channel, string("+") + chan->GetStrChanMode()));
+	else if (cmd.GetMiddle().size() == 2)
+	{
+		if (cmd.GetMiddle()[1] == "b")
+		{
+			AddData(RPL_ENDOFBANLIST(client.GetUinfo()[nickname], channel));
+		}
+	}
 
 	return ;
 }
@@ -709,6 +718,7 @@ void	Server::_Join(Command &cmd, Client &client)
 		}
 		chanIt->joinChannel(client);
 		SendChannel(chanIt, string("JOIN " + chanparse[i][chan] + "\r\n"), client.GetPrefix());
+		AddData("MODE " + chanparse[i][chan] + " " + string("+") + chanIt->GetStrChanMode() + "\r\n");
 		if (1)
 		{
 			AddData(RPL_TOPIC(client.GetUinfo()[nickname], client.GetUinfo()[username], client.GetUinfo()[hostname], chanIt->GetName(), "todo : topic"));
@@ -845,5 +855,26 @@ void	Server::_Kick(Command &cmd, Client &client)
 	{
 		SendChannel(chanIt, string("KICK ") + chanIt->GetName() + " " + toKick->first->GetUinfo()[nickname] + " :" + cmd.GetCinfo()[trailing] + "\r\n", client.GetPrefix());
 		chanIt->leaveChannel(*(toKick->first));
+	}
+}
+
+void	Server::_Who(Command &cmd, Client &client)
+{
+	cst_vec_str		targets = _WrapTargets(cmd, 0);
+	cst_vec_vec_str	chanparse = _WrapChannels(cmd, 0);
+
+	if (chanparse.empty() && targets.empty())
+		AddData(ERR_NEEDMOREPARAMS("MODE"));
+	else if (chanparse.empty())
+	{
+		;
+	}
+	else
+	{
+		string channel = chanparse[0][chan];
+		lst_chan::iterator	chan = _FindChannel(channel);
+		AddData(RPL_CREATIONTIME(client.GetUinfo()[nickname], channel, chan->GetCtime()));
+		AddData(RPL_WHOREPLY(client.GetUinfo()[nickname], channel, client.GetUinfo()[username], client.GetUinfo()[hostname], SERVER_NAME, client.GetUinfo()[realname]));
+		AddData(RPL_ENDOFWHO(client.GetUinfo()[nickname], channel));
 	}
 }
