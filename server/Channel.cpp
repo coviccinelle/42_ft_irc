@@ -80,6 +80,8 @@ int	Channel::joinChannel(Client& toAccept)
 		SetMemberMode(toAccept, 'o', true);
 		SetChanMode('t', true);
 	}
+	else if (&toAccept == _creator)
+		SetMemberMode(toAccept, 'o', true);
 	_user.insert(std::make_pair(&toAccept, 0));
 	toAccept.RegisterChannel(*this);
 

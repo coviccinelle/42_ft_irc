@@ -770,7 +770,7 @@ void	Server::_Topic(Command &cmd, Client &client)
 		SendData(client.GetFd());
 	}
 	else if (channel->IsOpTopicOnly() == true && channel->IsOperator(client) == false)
-		AddData(ERR_CHANOPRIVSNEEDED(client.GetUinfo()[nickname], chans[0][chan]));
+		AddData(ERR_CHANOPRIVSNEEDED(chans[0][chan]));
 	else
 	{
 		channel->SetTopic(cmd.GetCinfo()[trailing]);
@@ -836,13 +836,15 @@ void	Server::_Kick(Command &cmd, Client &client)
 	map_pcli::const_iterator	toKick;	
 
 	if (chanparse.empty())
-		return AddData(ERR_NEEDMOREPARAMS("JOIN"));
-	if ((chanIt = _FindChannel(chanparse[0][chan])) == _channels.end())
+		AddData(ERR_NEEDMOREPARAMS("JOIN"));
+	else if ((chanIt = _FindChannel(chanparse[0][chan])) == _channels.end())
 		AddData(ERR_NOSUCHCHANNEL(chanparse[0][chan]));
 	else if (chanIt->GetUsers().count(&client) == 0)
 		AddData(ERR_NOTONCHANNEL(chanparse[0][chan]));
 	else if ((toKick = chanIt->findUserIter(cmd.GetMiddle()[1])) == chanIt->GetUsers().end())
 		AddData(ERR_USERNOTINCHANNEL(cmd.GetMiddle()[1], chanparse[0][chan]));
+	else if (chanIt->IsOperator(client) == false)
+		AddData(ERR_CHANOPRIVSNEEDED(chanparse[0][chan]));
 	else
 	{
 		SendChannel(chanIt, string("KICK ") + chanIt->GetName() + " " + toKick->first->GetUinfo()[nickname] + " :" + cmd.GetCinfo()[trailing] + "\r\n", client.GetPrefix());
