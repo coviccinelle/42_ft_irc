@@ -166,7 +166,19 @@ void Server::ConnectionLoop()
 	}
 }
 
-void	Server::SendChannel(lst_chan::iterator chan, const string &message, const string &from, const Client *skip)
+void	Server::SendChannel(lst_pchan::const_iterator chan, const string &message, const string &from, const Client *skip)
+{
+	cst_map_pcli &clients = (*chan)->GetUsers();
+	for (map_pcli::const_iterator it = clients.begin(); it != clients.end(); ++it)
+	{
+		if (it->first == skip)
+			continue ;
+		AddData(message, from);
+		SendData(it->first->GetFd());
+	}
+}
+
+void	Server::SendChannel(lst_chan::const_iterator chan, const string &message, const string &from, const Client *skip)
 {
 	if (chan == _channels.end())
 		return ;
@@ -670,6 +682,8 @@ void	Server::_Quit(Command &cmd, Client &client)
 {
 	string msg = " 👋 \033[0;214m " + client.GetUinfo()[nickname] + " has \033[0;31mquit\033[0;37m because :" + cmd.GetCinfo()[trailing];
 	_NoticeServ(msg, client, 1);
+	for (std::list< Channel* >::const_iterator it = client.GetChannels().begin(); it != client.GetChannels().end(); ++it)
+		SendChannel(it, "QUIT " + cmd.GetCinfo()[trailing] + "\r\n", client.GetPrefix(), &client);
 	AddData(client.GetPrefix(), "ERROR :" + cmd.GetCinfo()[trailing] + "\r\n");
 	SendData(client.GetFd());
 	throw irc_error("⚠️  warning: closing connection", CLOSE_CONNECTION);

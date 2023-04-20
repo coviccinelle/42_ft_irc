@@ -48,6 +48,9 @@ typedef const std::vector< struct pollfd >	cst_vec_pfd;
 typedef std::list< Channel >				lst_chan;
 typedef const std::list< Channel >			cst_lst_chan;
 
+typedef std::list< Channel* >				lst_pchan;
+typedef const std::list< Channel* >			cst_lst_pchan;
+
 string	ltrim(const string &s);
 string	rtrim(const string &s);
 string 	trim(const string &s);

@@ -52,7 +52,8 @@ class Server
 		void 							Logs() const;
 		void 							ConnectionLoop();
 		void 							SendData(int fd);
-		void							SendChannel(lst_chan::iterator chan, const string &message, const string &from, const Client *skip = NULL);
+		void							SendChannel(lst_pchan::const_iterator chan, const string &message, const string &from, const Client *skip = NULL);
+		void							SendChannel(lst_chan::const_iterator chan, const string &message, const string &from, const Client *skip = NULL);
 		void							AddData(const string &message, const string &from = SERVER_NAME);
 
 	private: 
