@@ -5,6 +5,8 @@
 # define RPL_YOURHOST(nick, servername, version) ("002 " + nick + " :Your host is " + servername + ", running version " + version + "\r\n")
 # define RPL_CREATED(nick, date) ("003 " + nick + " :This server was created " + date + "\r\n")
 # define RPL_MYINFO(nick, servername, version, umode, cmode, pmode) ("004 " + nick + " " + servername + " " + version + " " + umode + " " + cmode + " " + pmode + "\r\n")
+# define RPL_LIST(nick, channel, topic) ("322 " + nick + " " + channel + " #visible" + " :" + topic + "\r\n")
+# define RPL_LISTEND(nick) ("323 " + nick + " :End of LIST\r\n")
 
 # define PING(localhost) ("PING " + localhost + "\r\n")
 # define PONG(localhost) ("PONG " + localhost + "\r\n")

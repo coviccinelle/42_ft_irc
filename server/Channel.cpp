@@ -4,6 +4,7 @@ Channel::Channel(const string &chanstring) :
 	_creator(NULL),
 	_user(),
 	_chanstring(chanstring),
+	_topic("Default Topic"),
 	_ctime(""),
 	_topicStat("")
 {
@@ -19,6 +20,7 @@ Channel::Channel(const Channel &src) :
 	_creator(src._creator),
 	_user(src._user),
 	_chanstring(src._chanstring),
+	_topic(src._topic),
 	_ctime(src._ctime),
 	_topicStat(src._topicStat)
 {
@@ -32,6 +34,7 @@ Channel&	Channel::operator=(const Channel& rhs)
 	_creator = rhs._creator;
 	_user = rhs._user;
 	_chanstring = rhs._chanstring;
+	_topic = rhs._topic;
 	_ctime = rhs._ctime;
 	_topicStat = rhs._topicStat;
 
@@ -55,10 +58,9 @@ void	Channel::SetTopic(const string& name)
 
 bool	Channel::IsOperator(const Client& client) const
 {
+//	return (_user.find(&client)[MEMBER_MODE.find('o')]);
 	(void)client;
-	//return (_mode[USER_MODE.find('o')]);
-	std::cout << "under construction" << std::endl;
-	return (false);
+	return (0);
 }
 
 const string &Channel::GetTopic() const
