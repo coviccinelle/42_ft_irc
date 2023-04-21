@@ -15,7 +15,9 @@
 # define NICK(old_nick, nick) (":" + old_nick + " NICK " + nick + "\r\n")
 # define NICK_INFORM(old_nick, user, host, nick) (":" + old_nick + "!" + user + "@" + host + " NICK " + nick + "\r\n")
 # define JOIN(nick, user, host, chan) (":" + nick + "!" + user + "@" + host  + " JOIN " + chan + "\r\n")
+
 # define PRIVMSG(nick, user, host, dest, str) (":" + nick + "!" + user + "@" + host + " PRIVMSG " + dest + " :" + str + "\r\n") //dest cest le nom du channel
+																																//
 # define NOTICE(nick, user, host, chan, str) (":" + nick + "!" + user + "@" + host + " NOTICE " + chan + " :" + str + "\r\n")
 # define PART(nick, user, host, chan) (":" + nick + "!" + user + "@" + host + " PART " + chan + "\r\n")
 # define PART_REASON(nick, user, host, chan, reason) (":" + nick + "!" + user + "@" + host + " PART " + chan + " :" + reason + "\r\n")
@@ -57,7 +59,7 @@
 # define ERR_INVITEONLYCHAN(nick, chan) ("473 " + nick + " " + chan + " :Cannot join channel (+i)\r\n")
 # define ERR_CANNOTSENDTOCHAN(nick, chan) ("404 " + nick + " " + chan + " :Cannot send to channel\r\n")
 # define ERR_USERSDONTMATCH(nick) ("502 " + nick + " :Cannot change mode for other users\r\n")
-# define ERR_USERONCHANNEL(nick, invitenick, chan) ("443 " + nick + " " + invitenick + " " + chan + ":is already on channel\r\n")
+# define ERR_USERONCHANNEL(invitenick, chan) ("443 " + chan + " " + invitenick + " :is already on channel\r\n")
 # define ERR_NORECIPIENT(command) ("411 :No recipient given " + command + "\r\n") 
 # define ERR_NOTEXTTOSEND "412 :No text to send\r\n"
 # define ERR_NOSUCHNICK(invitenick) ("401 " + invitenick + " :No such nick/channel\r\n")
