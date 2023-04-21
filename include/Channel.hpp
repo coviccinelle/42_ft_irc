@@ -68,6 +68,8 @@ class Channel
 		void						AddToBanList(const string &from, const string &toBan);
 		void						RemoveFromBanList(const string &deBan);
 		cst_lst_ban					GetBanList() const;
+		Client						*GetCreator() const;
+		void						ToggleTopicMode(bool mode);
 	private:
 		class BanFinder {
 			public:

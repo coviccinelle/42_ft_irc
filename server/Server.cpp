@@ -606,19 +606,34 @@ void	Server::_ModeClient(Command &cmd, Client &client, const string &target)
 
 void	Server::_ModeServer(Command &cmd, Client &client, const string &channel)
 {
-	(void)cmd;
-	lst_chan::iterator	chanIt = _FindChannel(channel);
-	if (cmd.GetMiddle().size() == 1)
+	lst_chan::iterator	chanIt;
+	if ((chanIt = _FindChannel(channel)) == _channels.end())
+		AddData(ERR_NOSUCHCHANNEL(channel));
+	else if (cmd.GetMiddle().size() == 1)
 		AddData(RPL_CHANNELMODEIS(client.GetUinfo()[nickname], channel, string("+") + chanIt->GetStrChanMode()));
 	else if (cmd.GetMiddle().size() == 2)
 	{
-		if (cmd.GetMiddle()[1].find('b') != std::string::npos)
+		if (cmd.GetMiddle()[1] == "b" || cmd.GetMiddle()[1] == "+b")
 		{
 			cst_lst_ban	banList = chanIt->GetBanList();
 			for (lst_ban::const_iterator it = banList.begin(); it != banList.end(); ++it)
 				AddData(RPL_BANLIST(client.GetUinfo()[nickname], channel, it->GetMask(), it->GetFrom(), it->GetTime()));
 			AddData(RPL_ENDOFBANLIST(client.GetUinfo()[nickname], channel));
 		}
+		else if ((cmd.GetMiddle()[1] == "-t" || cmd.GetMiddle()[1] == "+t") && chanIt->IsOperator(client) == false)
+			AddData(ERR_CHANOPRIVSNEEDED(channel));
+		else if (cmd.GetMiddle()[1] == "-t")
+		{
+			chanIt->ToggleTopicMode(false);
+			SendChannel(chanIt, "MODE " + channel + " -t " + "\r\n", client.GetPrefix());
+		}
+		else if (cmd.GetMiddle()[1] == "+t")
+		{
+			chanIt->ToggleTopicMode(true);
+			SendChannel(chanIt, "MODE " + channel + " +t " + "\r\n", client.GetPrefix());
+		}
+		else
+			AddData(ERR_UNKNOWNMODE(cmd.GetMiddle()[1], channel));
 	}
 	else
 	{
@@ -634,6 +649,8 @@ void	Server::_ModeServer(Command &cmd, Client &client, const string &channel)
 			chanIt->RemoveFromBanList(cmd.GetMiddle()[2]);
 			SendChannel(chanIt, "MODE " + channel + " -b "  + cmd.GetMiddle()[2] + "\r\n", client.GetPrefix());
 		}
+		else
+			AddData(ERR_UNKNOWNMODE(cmd.GetMiddle()[1], channel));
 	}
 
 	return ;

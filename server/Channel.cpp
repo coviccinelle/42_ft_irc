@@ -200,3 +200,13 @@ string Channel::_GetTime() const
 	ss << secs;
 	return (ss.str());
 }
+
+Client	*Channel::GetCreator() const
+{
+	return (_creator);
+}
+
+void	Channel::ToggleTopicMode(bool mode)
+{
+	_mode[CHAN_MODE.find('t')] = mode;
+}
