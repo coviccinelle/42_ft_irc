@@ -79,6 +79,16 @@ bool	Channel::IsOperator(Client& client)
 	return (_user.find(&client)->second[MEMBER_MODE.find('o')]);
 }
 
+bool	Channel::IsVoiced(Client& client)
+{
+	return (_user.find(&client)->second[MEMBER_MODE.find('v')]);
+}
+
+bool	Channel::IsModerated() const
+{
+	return (_mode[CHAN_MODE.find('m')]);
+}
+
 bool	Channel::IsBanned(Client& client)
 {
 	bool isBan = false;
@@ -204,9 +214,4 @@ string Channel::_GetTime() const
 Client	*Channel::GetCreator() const
 {
 	return (_creator);
-}
-
-void	Channel::ToggleTopicMode(bool mode)
-{
-	_mode[CHAN_MODE.find('t')] = mode;
 }

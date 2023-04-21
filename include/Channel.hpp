@@ -8,20 +8,22 @@
 #include "../include/Client.hpp"
 #include "../include/Ban.hpp"
 
-#define MEMBER_MODE string("ob")
-#define CHAN_MODE string("t")
+#define MEMBER_MODE string("obv")
+#define CHAN_MODE string("tm")
 
 class Client;
 
-#define CHAN_MODE_SIZE 1
+#define CHAN_MODE_SIZE 2
 enum chanmode {
-	CHAN_TOPIC = 0 // t
+	CHAN_TOPIC = 0, // t
+	CHAN_MODERATE // m
 };
 
-#define MEMBER_MODE_SIZE 2
+#define MEMBER_MODE_SIZE 3
 enum memberMode {
 	MEM_CHANOP = 0, // o
-	MEM_BAN // b
+	MEM_BAN, // b
+	MEM_VOICE // v
 };
 
 typedef std::map< Client*, std::bitset< MEMBER_MODE_SIZE > >		map_pcli;	
@@ -48,7 +50,9 @@ class Channel
 
 		bool						IsBanned(Client& client);
 		bool						IsOperator(Client& client);
+		bool						IsVoiced(Client& client);
 		bool						IsOpTopicOnly() const;
+		bool						IsModerated() const;
 
 		/* Public Methods */
 		void						SetChanMode(const char c, bool status);
@@ -69,7 +73,10 @@ class Channel
 		void						RemoveFromBanList(const string &deBan);
 		cst_lst_ban					GetBanList() const;
 		Client						*GetCreator() const;
+
 		void						ToggleTopicMode(bool mode);
+		void						ToggleModerateMode(bool mode);
+		void						ToggleVoice(Client &client, bool mode);
 	private:
 		class BanFinder {
 			public:

@@ -579,6 +579,8 @@ void	Server::_PrivMsg(Command &cmd, Client &client)
 			AddData(ERR_NOSUCHCHANNEL(chanparse[0][chan]));
 		else if (chanIt->GetUsers().count(&client) == 0) 
 			AddData(ERR_NOTONCHANNEL(chanIt->GetName()));
+		else if (chanIt->IsBanned(client) || (chanIt->IsModerated() && chanIt->IsVoiced(client) == false))
+			AddData(ERR_CANNOTSENDTOCHAN(client.GetUinfo()[nickname], chanparse[0][chan]));
 		else
 			SendChannel(chanIt, "PRIVMSG " + chanparse[0][chan] + " :" + cmd.GetCinfo()[trailing]+ "\r\n", client.GetPrefix(), &client);
 	}
@@ -620,34 +622,73 @@ void	Server::_ModeServer(Command &cmd, Client &client, const string &channel)
 				AddData(RPL_BANLIST(client.GetUinfo()[nickname], channel, it->GetMask(), it->GetFrom(), it->GetTime()));
 			AddData(RPL_ENDOFBANLIST(client.GetUinfo()[nickname], channel));
 		}
-		else if ((cmd.GetMiddle()[1] == "-t" || cmd.GetMiddle()[1] == "+t") && chanIt->IsOperator(client) == false)
+		else if ((cmd.GetMiddle()[1] == "-t" ||
+				cmd.GetMiddle()[1] == "+t" ||
+				cmd.GetMiddle()[1] == "+m" ||
+				cmd.GetMiddle()[1] == "-m")
+			&& chanIt->IsOperator(client) == false)
 			AddData(ERR_CHANOPRIVSNEEDED(channel));
 		else if (cmd.GetMiddle()[1] == "-t")
 		{
-			chanIt->ToggleTopicMode(false);
+			chanIt->SetChanMode('t', false);
 			SendChannel(chanIt, "MODE " + channel + " -t " + "\r\n", client.GetPrefix());
 		}
 		else if (cmd.GetMiddle()[1] == "+t")
 		{
-			chanIt->ToggleTopicMode(true);
+			chanIt->SetChanMode('t', true);
 			SendChannel(chanIt, "MODE " + channel + " +t " + "\r\n", client.GetPrefix());
+		}
+		else if (cmd.GetMiddle()[1] == "-m")
+		{
+			chanIt->SetChanMode('m', false);
+			SendChannel(chanIt, "MODE " + channel + " -m " + "\r\n", client.GetPrefix());
+		}
+		else if (cmd.GetMiddle()[1] == "+m")
+		{
+			chanIt->SetChanMode('m', true);
+			SendChannel(chanIt, "MODE " + channel + " +m " + "\r\n", client.GetPrefix());
 		}
 		else
 			AddData(ERR_UNKNOWNMODE(cmd.GetMiddle()[1], channel));
 	}
 	else
 	{
-		if (cmd.GetMiddle()[1] == "+b" && chanIt->IsOperator(client) == false)
+		if ((cmd.GetMiddle()[1] == "+b" ||
+			cmd.GetMiddle()[1] == "+v" ||
+			cmd.GetMiddle()[1] == "-v")
+			&& chanIt->IsOperator(client) == false)
 			AddData(ERR_CHANOPRIVSNEEDED(channel));
-		else if (cmd.GetMiddle()[1] == "+b" && chanIt->IsOperator(client) == true)
+		else if (cmd.GetMiddle()[1] == "+b")
 		{
 			chanIt->AddToBanList(client.GetPrefix(), cmd.GetMiddle()[2]);
 			SendChannel(chanIt, "MODE " + channel + " +b "  + cmd.GetMiddle()[2] + "\r\n", client.GetPrefix());
 		}
-		else if (cmd.GetMiddle()[1] == "-b" && chanIt->IsOperator(client) == true)
+		else if (cmd.GetMiddle()[1] == "-b")
 		{
 			chanIt->RemoveFromBanList(cmd.GetMiddle()[2]);
 			SendChannel(chanIt, "MODE " + channel + " -b "  + cmd.GetMiddle()[2] + "\r\n", client.GetPrefix());
+		}
+		else if (cmd.GetMiddle()[1] == "+v")
+		{
+			Client *toVoice = _FindNickname(cmd.GetMiddle()[2]);
+			if (toVoice == NULL)
+				AddData(ERR_USERNOTINCHANNEL(cmd.GetMiddle()[2], channel));
+			else
+			{
+				chanIt->SetMemberMode(*toVoice, 'v', true);
+				SendChannel(chanIt, "MODE " + channel + " +v "  + cmd.GetMiddle()[2] + "\r\n", client.GetPrefix());
+			}
+		}
+		else if (cmd.GetMiddle()[1] == "-v")
+		{
+			Client *unVoice = _FindNickname(cmd.GetMiddle()[2]);
+			if (unVoice == NULL)
+				AddData(ERR_USERNOTINCHANNEL(cmd.GetMiddle()[2], channel));
+			else
+			{
+				chanIt->SetMemberMode(*unVoice, 'v', false);
+				SendChannel(chanIt, "MODE " + channel + " -v "  + cmd.GetMiddle()[2] + "\r\n", client.GetPrefix());
+			}
 		}
 		else
 			AddData(ERR_UNKNOWNMODE(cmd.GetMiddle()[1], channel));
