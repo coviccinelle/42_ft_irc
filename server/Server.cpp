@@ -412,18 +412,6 @@ void	Server::_CapLs(Command &cmd, Client &client)
 {
 	(void)cmd;
 	(void)client;
-	/*
-	if (cmd.size() != 2 || cmd[1] != "LS")
-	{
-		std::cout << "CAP LS invalid" << std::endl;
-		return ;
-	}
-	else
-	{
-		std::cout << "CAP LS ok" << std::endl;
-		return ;
-	}
-	*/
 }
 
 void Server::_Oper(Command &cmd, Client &client)
@@ -512,7 +500,6 @@ void	Server::_User(Command &cmd, Client &client)
 	}
 	if (cmd.GetMiddle().size() == 0)
 		return AddData(ERR_NEEDMOREPARAMS(cmd.GetCinfo()[command]));
-	//TODO: SendData(ERR_ALREADYREGISTERED);
 	if (cmd.GetMiddle().size() < 3 || cmd.GetCinfo()[trailing].empty() == true)
 	{
 		std::cout << "Invalid param" << std::endl;
@@ -541,16 +528,10 @@ void	Server::_Pong(Command &cmd, Client &client)
 
 	if (targets.empty())
 		return ;
-	//409    ERR_NOORIGIN ":No origin specified"
-	//402    ERR_NOSUCHSERVER "<server name> :No such server"
 	AddData("PONG " + targets[0] + " irc\r\n", client.GetPrefix());
 	SendData(client.GetFd());
 }
 
-//      ok   ERR_NORECIPIENT           ok    ERR_NOTEXTTOSEND
-//           ERR_CANNOTSENDTOCHAN            ERR_NOTOPLEVEL
-//           ERR_WILDTOPLEVEL                ERR_TOOMANYTARGETS
-//      ok   ERR_NOSUCHNICK			         RPL_AWAY
 // Parameters: <msgtarget> <text to be sent>
 void	Server::_PrivMsg(Command &cmd, Client &client)
 {
@@ -880,17 +861,44 @@ void	Server::_Topic(Command &cmd, Client &client)
 }
 
 //Parameters: [ <channel> *( "," <channel> ) [ <target> ] ]
-//            ERR_TOOMANYMATCHES              ERR_NOSUCHSERVER
+//            ERR_TOOMANYMATCHES              
 //            RPL_NAMREPLY                    RPL_ENDOFNAMES
 void	Server::_Names(Command &cmd, Client &client)
 {
-	(void)cmd;
-	(void)client;
+	lst_chan::iterator	chanIt;
+	cst_vec_vec_str		chans = _WrapChannels(cmd, 0);
+
+	if (chans.empty() && cmd.GetMiddle().empty() && cmd.GetCinfo()[trailing].empty())
+	{
+		for (lst_chan::iterator it = _channels.begin(); it != _channels.end(); ++it)
+		{
+			AddData(RPL_NAMREPLY(client.GetUinfo()[nickname], (*it).GetName()) + (*it).GetLstNickname() + "\r\n");
+			AddData(RPL_ENDOFNAMES(client.GetUinfo()[nickname], (*it).GetName()));
+		}
+		return ;
+	}
+	else if (chans.size() > 0 && cmd.GetCinfo()[trailing].empty())
+	{
+		for (size_t i = 0; i < chans.size(); ++i)
+		{
+			if ((chanIt = _FindChannel(chans[i][chan])) == _channels.end())
+				AddData(ERR_NOSUCHCHANNEL(chans[i][chan]));
+			else
+			{
+				AddData(RPL_NAMREPLY(client.GetUinfo()[nickname], chanIt->GetName()) + chanIt->GetLstNickname() + "\r\n");
+				AddData(RPL_ENDOFNAMES(client.GetUinfo()[nickname], chanIt->GetName()));
+			}
+		}
+		return ;
+	}
+	else
+	{
+		AddData("NAMES: Parameters: [ <channel> *( \",\" <channel> )\r\n");
+		return ;
+	}
 }
 
 //Parameters: [ <channel> *( "," <channel> ) [ <target> ] ]
-//           ERR_TOOMANYMATCHES              ERR_NOSUCHSERVED
-//           RPL_LIST                        RPL_LISTEND
 void	Server::_List(Command &cmd, Client &client)
 {
 	lst_chan::iterator	channel;
