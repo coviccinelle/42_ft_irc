@@ -661,6 +661,8 @@ void	Server::_ModeServer(Command &cmd, Client &client, const string &channel)
 		{
 			chanIt->SetChanMode('a', false);
 			SendChannel(chanIt, "MODE " + channel + " -a " + "\r\n", chanIt->GetOrigin(client));
+			SendChannel(chanIt, RPL_NAMREPLY(client.GetUinfo()[nickname], channel) + chanIt->GetLstNickname() + "\r\n", SERVER_NAME);
+			SendChannel(chanIt, RPL_ENDOFNAMES(client.GetUinfo()[nickname], channel), SERVER_NAME);
 		}
 		else if (cmd.GetMiddle()[1] == "+i")
 		{
@@ -933,16 +935,16 @@ void	Server::_Invite(Command &cmd, Client &client)
 {
 	cst_vec_vec_str	chanparse = _WrapChannels(cmd, 1);
 	lst_chan::iterator			chanIt;
-	Client						*toInvite;
 
+	(void)client;
 	if (cmd.GetMiddle().size() < 2)
 		AddData(ERR_NEEDMOREPARAMS("INVITE"));
 	else if ((chanIt = _FindChannel(chanparse[0][chan])) == _channels.end())
 		return ;
 	map_pcli::iterator It = chanIt->findUserIter(cmd.GetMiddle()[2]);
 	if (It == chanIt->GetUsers().end())
-		AddData(ERR_USERNOTINCHANNEL(cmd.GetMiddle()[2], channel));
-		AddData(ERR_NOTONCHANNEL(chanparse[0][chan]));
+		;
+	//	AddData(ERR_USERNOTINCHANNEL(cmd.GetMiddle()[2], channel));
 }
 
 //   Parameters: <channel> *( "," <channel> ) <user> *( "," <user> )

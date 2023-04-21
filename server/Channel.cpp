@@ -180,7 +180,10 @@ string	Channel::GetLstNickname() const
 	{
 		if (it->second[MEM_CHANOP])
 			res += "@";
-		res = res + it->first->GetUinfo()[nickname];
+		if (IsAnon())
+			res += "anonymous";
+		else
+			res += it->first->GetUinfo()[nickname];
 		if (it != _user.end())
 			res += " ";
 	}
