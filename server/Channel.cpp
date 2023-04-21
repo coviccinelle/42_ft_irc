@@ -7,7 +7,8 @@ Channel::Channel(const string &chanstring) :
 	_topic("Default Topic"),
 	_ctime(""),
 	_topicStat(""),
-	_banList()
+	_banList(),
+	_inviteList()
 {
 	_ctime = _GetTime();
 	std::cout << "New channel created on " << _ctime << std::endl;
@@ -24,7 +25,8 @@ Channel::Channel(const Channel &src) :
 	_topic(src._topic),
 	_ctime(src._ctime),
 	_topicStat(src._topicStat),
-	_banList(src._banList)
+	_banList(src._banList),
+	_inviteList(src._inviteList)
 {
 }
 
@@ -40,6 +42,7 @@ Channel&	Channel::operator=(const Channel& rhs)
 	_ctime = rhs._ctime;
 	_topicStat = rhs._topicStat;
 	_banList = rhs._banList;
+	_inviteList = rhs._inviteList;
 
 	return (*this);
 }
@@ -47,6 +50,11 @@ Channel&	Channel::operator=(const Channel& rhs)
 void	Channel::AddToBanList(const string &from, const string &toBan)
 {
 	_banList.push_back(Ban(toBan, from, _GetTime()));
+}
+
+void	Channel::AddToInviteList(const string &from, const string &toBan)
+{
+	_inviteList.push_back(Ban(toBan, from, _GetTime()));
 }
 
 void	Channel::RemoveFromBanList(const string &deBan)
@@ -79,9 +87,16 @@ bool	Channel::IsOperator(Client& client)
 	return (_user.find(&client)->second[MEMBER_MODE.find('o')]);
 }
 
+
+
 bool	Channel::IsVoiced(Client& client)
 {
 	return (_user.find(&client)->second[MEMBER_MODE.find('v')]);
+}
+
+bool	Channel::IsInvite() const
+{
+	return (_mode[CHAN_MODE.find('i')]);
 }
 
 bool	Channel::IsModerated() const
@@ -170,6 +185,16 @@ string	Channel::GetLstNickname() const
 			res += " ";
 	}
 	return (res);
+}
+
+map_pcli::iterator	Channel::findUserIter(const string &toFind)
+{
+	for (map_pcli::iterator it = _user.begin(); it != _user.end(); ++it)
+	{
+		if (it->first->GetUinfo()[nickname] == toFind)
+			return (it);
+	}
+	return (_user.end());
 }
 
 map_pcli::const_iterator	Channel::findUserIter(const string &toFind) const

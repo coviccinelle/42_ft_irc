@@ -13,10 +13,11 @@
 
 class Client;
 
-#define CHAN_MODE_SIZE 3
+#define CHAN_MODE_SIZE 4
 enum chanmode {
 	CHAN_TOPIC = 0, // t
 	CHAN_MODERATE, // m
+	CHAN_INVITE, // i
 	CHAN_ANONYMOUS // a
 };
 
@@ -54,6 +55,7 @@ class Channel
 		bool						IsVoiced(Client& client);
 		bool						IsOpTopicOnly() const;
 		bool						IsModerated() const;
+		bool						IsInvite() const;
 		bool						IsAnon() const;
 
 		string						GetOrigin(Client &client);
@@ -65,6 +67,7 @@ class Channel
 		int							joinChannel(Client& toAccept);
 		void						leaveChannel(Client& toRemove);
 		map_pcli::const_iterator	findUserIter(const string &toFind) const;
+		map_pcli::iterator			findUserIter(const string &toFind);
 
 		cst_map_pcli				&GetUsers() const;
 		const string				&GetName() const;
@@ -74,6 +77,7 @@ class Channel
 		const string				&GetCtime() const;
 		const string				&GetTopicStat() const;
 		void						AddToBanList(const string &from, const string &toBan);
+		void						AddToInviteList(const string &from, const string &toBan);
 		void						RemoveFromBanList(const string &deBan);
 		cst_lst_ban					GetBanList() const;
 		Client						*GetCreator() const;
@@ -100,6 +104,7 @@ class Channel
 		string						_ctime;
 		string						_topicStat;
 		lst_ban						_banList;
+		lst_ban						_inviteList;
 };
 
 #endif

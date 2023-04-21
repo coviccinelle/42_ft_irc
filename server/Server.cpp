@@ -624,6 +624,10 @@ void	Server::_ModeServer(Command &cmd, Client &client, const string &channel)
 		}
 		else if ((cmd.GetMiddle()[1] == "-t" ||
 				cmd.GetMiddle()[1] == "+t" ||
+				cmd.GetMiddle()[1] == "+a" ||
+				cmd.GetMiddle()[1] == "-a" ||
+				cmd.GetMiddle()[1] == "+i" ||
+				cmd.GetMiddle()[1] == "-i" ||
 				cmd.GetMiddle()[1] == "+m" ||
 				cmd.GetMiddle()[1] == "-m")
 			&& chanIt->IsOperator(client) == false)
@@ -658,6 +662,16 @@ void	Server::_ModeServer(Command &cmd, Client &client, const string &channel)
 			chanIt->SetChanMode('a', false);
 			SendChannel(chanIt, "MODE " + channel + " -a " + "\r\n", chanIt->GetOrigin(client));
 		}
+		else if (cmd.GetMiddle()[1] == "+i")
+		{
+			chanIt->SetChanMode('i', true);
+			SendChannel(chanIt, "MODE " + channel + " +i " + "\r\n", chanIt->GetOrigin(client));
+		}
+		else if (cmd.GetMiddle()[1] == "-i")
+		{
+			chanIt->SetChanMode('i', false);
+			SendChannel(chanIt, "MODE " + channel + " -i " + "\r\n", chanIt->GetOrigin(client));
+		}
 		else
 			AddData(ERR_UNKNOWNMODE(cmd.GetMiddle()[1], channel));
 	}
@@ -680,12 +694,12 @@ void	Server::_ModeServer(Command &cmd, Client &client, const string &channel)
 		}
 		else if (cmd.GetMiddle()[1] == "+v")
 		{
-			Client *toVoice = _FindNickname(cmd.GetMiddle()[2]);
-			if (toVoice == NULL)
+			map_pcli::iterator It = chanIt->findUserIter(cmd.GetMiddle()[2]);
+			if (It == chanIt->GetUsers().end())
 				AddData(ERR_USERNOTINCHANNEL(cmd.GetMiddle()[2], channel));
 			else
 			{
-				chanIt->SetMemberMode(*toVoice, 'v', true);
+				chanIt->SetMemberMode(*(It->first), 'v', true);
 				SendChannel(chanIt, "MODE " + channel + " +v "  + cmd.GetMiddle()[2] + "\r\n", chanIt->GetOrigin(client));
 			}
 		}
@@ -917,9 +931,18 @@ void	Server::_List(Command &cmd, Client &client)
 //	            RPL_INVITING                    RPL_AWAY
 void	Server::_Invite(Command &cmd, Client &client)
 {
-	std::cout << "Hey I'm command Invite ! Nice to meet you" << std::endl;
-	(void)cmd;
-	(void)client;
+	cst_vec_vec_str	chanparse = _WrapChannels(cmd, 1);
+	lst_chan::iterator			chanIt;
+	Client						*toInvite;
+
+	if (cmd.GetMiddle().size() < 2)
+		AddData(ERR_NEEDMOREPARAMS("INVITE"));
+	else if ((chanIt = _FindChannel(chanparse[0][chan])) == _channels.end())
+		return ;
+	map_pcli::iterator It = chanIt->findUserIter(cmd.GetMiddle()[2]);
+	if (It == chanIt->GetUsers().end())
+		AddData(ERR_USERNOTINCHANNEL(cmd.GetMiddle()[2], channel));
+		AddData(ERR_NOTONCHANNEL(chanparse[0][chan]));
 }
 
 //   Parameters: <channel> *( "," <channel> ) <user> *( "," <user> )
