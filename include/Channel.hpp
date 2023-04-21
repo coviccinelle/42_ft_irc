@@ -66,8 +66,21 @@ class Channel
 		const string				&GetCtime() const;
 		const string				&GetTopicStat() const;
 		void						AddToBanList(const string &from, const string &toBan);
+		void						RemoveFromBanList(const string &deBan);
 		cst_lst_ban					GetBanList() const;
 	private:
+		class BanFinder {
+			public:
+				BanFinder(const std::string& deBan) : _deBan(deBan) {}
+
+				bool operator()(const Ban& b) const {
+					return b.GetMask().find(_deBan) != std::string::npos;
+				}
+
+			private:
+				const std::string& _deBan;
+		};
+
 		string						_GetTime() const;
 		Client						*_creator;
 		map_pcli					_user;

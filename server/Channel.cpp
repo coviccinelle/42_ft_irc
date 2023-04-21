@@ -49,6 +49,11 @@ void	Channel::AddToBanList(const string &from, const string &toBan)
 	_banList.push_back(Ban(toBan, from, _GetTime()));
 }
 
+void	Channel::RemoveFromBanList(const string &deBan)
+{
+	_banList.remove_if(BanFinder(deBan));
+}
+
 cst_lst_ban	Channel::GetBanList() const
 {
 	return (_banList);

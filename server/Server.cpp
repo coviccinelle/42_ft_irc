@@ -629,6 +629,11 @@ void	Server::_ModeServer(Command &cmd, Client &client, const string &channel)
 			chanIt->AddToBanList(client.GetPrefix(), cmd.GetMiddle()[2]);
 			SendChannel(chanIt, "MODE " + channel + " +b "  + cmd.GetMiddle()[2] + "\r\n", client.GetPrefix());
 		}
+		else if (cmd.GetMiddle()[1] == "-b" && chanIt->IsOperator(client) == true)
+		{
+			chanIt->RemoveFromBanList(cmd.GetMiddle()[2]);
+			SendChannel(chanIt, "MODE " + channel + " -b "  + cmd.GetMiddle()[2] + "\r\n", client.GetPrefix());
+		}
 	}
 
 	return ;
