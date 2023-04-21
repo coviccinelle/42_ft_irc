@@ -89,6 +89,11 @@ bool	Channel::IsModerated() const
 	return (_mode[CHAN_MODE.find('m')]);
 }
 
+bool Channel::IsAnon() const
+{
+	return (_mode[CHAN_MODE.find('a')]);
+}
+
 bool	Channel::IsBanned(Client& client)
 {
 	bool isBan = false;
@@ -103,6 +108,14 @@ bool	Channel::IsBanned(Client& client)
 bool	Channel::IsOpTopicOnly() const
 {
 	return (_mode[CHAN_MODE.find('t')]);
+}
+
+string Channel::GetOrigin(Client &client)
+{
+	if (IsAnon())
+		return client.GetAnonymous();
+	else 
+		return client.GetPrefix();
 }
 
 const string &Channel::GetTopic() const

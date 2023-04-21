@@ -109,6 +109,11 @@ string	Client::GetPrefix() const
 	return (prefix);
 }
 
+string Client::GetAnonymous() const
+{
+	return (string("anonymous!anonymous@anonymous"));
+}
+
 const std::list< Command >	&Client::GetCmds() const
 {
 	return (_cmds);

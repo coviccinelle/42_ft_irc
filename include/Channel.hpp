@@ -9,14 +9,15 @@
 #include "../include/Ban.hpp"
 
 #define MEMBER_MODE string("obv")
-#define CHAN_MODE string("tm")
+#define CHAN_MODE string("tma")
 
 class Client;
 
-#define CHAN_MODE_SIZE 2
+#define CHAN_MODE_SIZE 3
 enum chanmode {
 	CHAN_TOPIC = 0, // t
-	CHAN_MODERATE // m
+	CHAN_MODERATE, // m
+	CHAN_ANONYMOUS // a
 };
 
 #define MEMBER_MODE_SIZE 3
@@ -53,6 +54,9 @@ class Channel
 		bool						IsVoiced(Client& client);
 		bool						IsOpTopicOnly() const;
 		bool						IsModerated() const;
+		bool						IsAnon() const;
+
+		string						GetOrigin(Client &client);
 
 		/* Public Methods */
 		void						SetChanMode(const char c, bool status);
@@ -74,9 +78,6 @@ class Channel
 		cst_lst_ban					GetBanList() const;
 		Client						*GetCreator() const;
 
-		void						ToggleTopicMode(bool mode);
-		void						ToggleModerateMode(bool mode);
-		void						ToggleVoice(Client &client, bool mode);
 	private:
 		class BanFinder {
 			public:
