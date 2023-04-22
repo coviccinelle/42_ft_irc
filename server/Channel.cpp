@@ -20,6 +20,10 @@ Channel::Channel(const string &chanstring) :
 	_banList(),
 	_inviteList()
 {
+	_mode.set(CHAN_TOPIC, false);
+	_mode.set(CHAN_MODERATE, false);
+	_mode.set(CHAN_INVITE, false);
+	_mode.set(CHAN_ANONYMOUS, false);
 }
 
 Channel::~Channel()
@@ -94,29 +98,32 @@ void	Channel::SetTopic(const string& name)
 
 bool	Channel::IsOperator(Client& client)
 {
-	return (_user.find(&client)->second[MEMBER_MODE.find('o')]);
+	return (_user.find(&client)->second[MEM_CHANOP]);
 }
-
-
 
 bool	Channel::IsVoiced(Client& client)
 {
-	return (_user.find(&client)->second[MEMBER_MODE.find('v')]);
+	return (_user.find(&client)->second[MEM_VOICE]);
 }
 
 bool	Channel::IsInvite() const
 {
-	return (_mode[CHAN_MODE.find('i')]);
+	return (_mode[CHAN_INVITE]);
 }
 
 bool	Channel::IsModerated() const
 {
-	return (_mode[CHAN_MODE.find('m')]);
+	return (_mode[CHAN_MODERATE]);
 }
 
 bool Channel::IsAnon() const
 {
-	return (_mode[CHAN_MODE.find('a')]);
+	return (_mode[CHAN_ANONYMOUS]);
+}
+
+bool	Channel::IsOpTopicOnly() const
+{
+	return (_mode[CHAN_TOPIC]);
 }
 
 bool	Channel::IsBanned(Client& client)
@@ -128,11 +135,6 @@ bool	Channel::IsBanned(Client& client)
 			isBan = true;
 	}
 	return (isBan);
-}
-
-bool	Channel::IsOpTopicOnly() const
-{
-	return (_mode[CHAN_MODE.find('t')]);
 }
 
 string Channel::GetOrigin(Client &client)

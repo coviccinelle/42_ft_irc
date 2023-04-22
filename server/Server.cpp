@@ -935,14 +935,14 @@ void	Server::_Invite(Command &cmd, Client &client)
 	(void)client;
 	if (cmd.GetMiddle().size() < 2)
 		AddData(ERR_NEEDMOREPARAMS("INVITE"));
-	else if (chanIt->IsInvite() && chanIt->IsOperator(client) == false)
-		AddData(ERR_CHANOPRIVSNEEDED(cmd.GetMiddle()[1]));
 	else if (chanparse.empty() || chanparse[0].empty())
 		AddData(ERR_NOTONCHANNEL(cmd.GetMiddle()[1]));
 	else if ((chanIt = _FindChannel(chanparse[0][chan])) == _channels.end())
 		AddData(ERR_NOSUCHCHANNEL(chanparse[0][chan]));
 	else if (chanIt->findUserIter(client.GetUinfo()[nickname]) == chanIt->GetUsers().end())
 		AddData(ERR_NOTONCHANNEL(chanIt->GetName()));
+	else if (chanIt->IsInvite() && chanIt->IsOperator(client) == false)
+		AddData(ERR_CHANOPRIVSNEEDED(cmd.GetMiddle()[1]));
 	else if (_FindNickname(cmd.GetMiddle()[0], &client) == NULL)
 		AddData(ERR_NOSUCHNICK(cmd.GetMiddle()[0]));
 	else if ((inviteIt = chanIt->findUserIter(cmd.GetMiddle()[0])) != chanIt->GetUsers().end())
