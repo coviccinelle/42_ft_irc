@@ -935,7 +935,7 @@ void	Server::_Invite(Command &cmd, Client &client)
 	(void)client;
 //	if (chanIt->IsInvite() && chanIt->IsOperator(client) == false)
 //		AddData(ERR_CHANOPRIVSNEEDED(chanparse[0][chan]));
-	else if (cmd.GetMiddle().size() < 2)
+	if (cmd.GetMiddle().size() < 2)
 		AddData(ERR_NEEDMOREPARAMS("INVITE"));
 	else if (chanparse.empty() || chanparse[0].empty())
 		AddData(ERR_NOTONCHANNEL(cmd.GetMiddle()[1]));
