@@ -50,7 +50,6 @@ class Client
 		const string					&GetIp() const;
 		cst_vec_str						&GetUinfo() const;
 		string							GetPrefix() const;
-		string							GetAnonymous() const;
 		const std::list< Command >		&GetCmds() const;
 		const std::bitset< MODE_SIZE >	&GetMode() const;
 		string							GetStrMode() const;

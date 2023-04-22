@@ -59,7 +59,8 @@ class Channel
 		bool						IsInvite() const;
 		bool						IsAnon() const;
 
-		string						GetOrigin(Client &client);
+		string						GetOrigin(const Client &client) const;
+		string						GetNickname(const Client &client) const; 
 
 		/* Public Methods */
 		void						SetChanMode(const char c, bool status);

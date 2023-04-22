@@ -150,12 +150,24 @@ bool	Channel::IsBanned(Client& client)
 	return (isBan);
 }
 
-string Channel::GetOrigin(Client &client)
+string Channel::GetOrigin(const Client &client) const
 {
+	string ret;
 	if (IsAnon())
-		return client.GetAnonymous();
+		ret = "anonymous!anonymous@anonymous";
 	else 
-		return client.GetPrefix();
+		ret = client.GetPrefix();
+	return (ret);
+}
+
+string Channel::GetNickname(const Client &client) const
+{
+	string ret;
+	if (IsAnon())
+		ret = "anonymous";
+	else 
+		ret = client.GetUinfo()[nickname];
+	return (ret);
 }
 
 const string &Channel::GetTopic() const
@@ -204,10 +216,7 @@ string	Channel::GetLstNickname() const
 	{
 		if (it->second[MEM_CHANOP])
 			res += "@";
-		if (IsAnon())
-			res += "anonymous";
-		else
-			res += it->first->GetUinfo()[nickname];
+		res += GetNickname(*(it->first));
 		if (it != _user.end())
 			res += " ";
 	}
