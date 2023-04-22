@@ -826,6 +826,8 @@ void	Server::_Join(Command &cmd, Client &client)
 
 		if (chanIt->IsBanned(client) == true)
 			AddData(ERR_BANNEDFROMCHAN(client.GetUinfo()[nickname], chanparse[0][chan]));
+		else if  (chanIt->IsInvited(client) == false)
+			AddData(ERR_INVITEONLYCHAN(client.GetUinfo()[nickname], chanparse[0][chan]));
 		else
 		{
 			chanIt->joinChannel(client);

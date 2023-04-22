@@ -106,6 +106,19 @@ bool	Channel::IsVoiced(Client& client)
 	return (_user.find(&client)->second[MEM_VOICE]);
 }
 
+bool	Channel::IsInvited(Client& client)
+{
+	bool status = false;
+	if (IsInvite() == false)
+		status = true;
+	for (lst_ban::const_iterator it = _inviteList.begin(); it != _inviteList.end(); ++it)
+	{
+		if (it->GetMask().find(client.GetUinfo()[nickname]) != std::string::npos)
+			status = true;
+	}
+	return (status);
+}
+
 bool	Channel::IsInvite() const
 {
 	return (_mode[CHAN_INVITE]);

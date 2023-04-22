@@ -53,6 +53,7 @@ class Channel
 		bool						IsBanned(Client& client);
 		bool						IsOperator(Client& client);
 		bool						IsVoiced(Client& client);
+		bool						IsInvited(Client& client);
 		bool						IsOpTopicOnly() const;
 		bool						IsModerated() const;
 		bool						IsInvite() const;
