@@ -9,7 +9,7 @@
 #include "../include/Ban.hpp"
 
 #define MEMBER_MODE string("obv")
-#define CHAN_MODE string("tma")
+#define CHAN_MODE string("tmia")
 
 class Client;
 
@@ -95,7 +95,6 @@ class Channel
 				const std::string& _deBan;
 		};
 
-		string						_GetTime() const;
 		Client						*_creator;
 		map_pcli					_user;
 		string						_chanstring;

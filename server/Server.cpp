@@ -933,10 +933,10 @@ void	Server::_Invite(Command &cmd, Client &client)
 	map_pcli::iterator 			inviteIt;
 
 	(void)client;
-//	if (chanIt->IsInvite() && chanIt->IsOperator(client) == false)
-//		AddData(ERR_CHANOPRIVSNEEDED(chanparse[0][chan]));
 	if (cmd.GetMiddle().size() < 2)
 		AddData(ERR_NEEDMOREPARAMS("INVITE"));
+	else if (chanIt->IsInvite() && chanIt->IsOperator(client) == false)
+		AddData(ERR_CHANOPRIVSNEEDED(cmd.GetMiddle()[1]));
 	else if (chanparse.empty() || chanparse[0].empty())
 		AddData(ERR_NOTONCHANNEL(cmd.GetMiddle()[1]));
 	else if ((chanIt = _FindChannel(chanparse[0][chan])) == _channels.end())

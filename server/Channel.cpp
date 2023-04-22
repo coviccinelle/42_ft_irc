@@ -1,17 +1,25 @@
 #include "../include/Channel.hpp"
 
+// Tools
+string _GetTime()
+{
+	time_t secs = std::time(0);
+	std::stringstream ss;
+	ss << secs;
+	return (ss.str());
+}
+
 Channel::Channel(const string &chanstring) : 
 	_creator(NULL),
 	_user(),
 	_chanstring(chanstring),
 	_topic("Default Topic"),
-	_ctime(""),
+	_mode(),
+	_ctime(_GetTime()),
 	_topicStat(""),
 	_banList(),
 	_inviteList()
 {
-	_ctime = _GetTime();
-	std::cout << "New channel created on " << _ctime << std::endl;
 }
 
 Channel::~Channel()
@@ -23,6 +31,7 @@ Channel::Channel(const Channel &src) :
 	_user(src._user),
 	_chanstring(src._chanstring),
 	_topic(src._topic),
+	_mode(src._mode),
 	_ctime(src._ctime),
 	_topicStat(src._topicStat),
 	_banList(src._banList),
@@ -39,6 +48,7 @@ Channel&	Channel::operator=(const Channel& rhs)
 	_user = rhs._user;
 	_chanstring = rhs._chanstring;
 	_topic = rhs._topic;
+	_mode = rhs._mode;
 	_ctime = rhs._ctime;
 	_topicStat = rhs._topicStat;
 	_banList = rhs._banList;
@@ -145,7 +155,6 @@ int	Channel::joinChannel(Client& toAccept)
 		_topicStat = toAccept.GetPrefix() + " " + _GetTime();
 		_creator = &toAccept;
 		SetMemberMode(toAccept, 'o', true);
-		SetChanMode('t', true);
 	}
 	else if (&toAccept == _creator)
 		SetMemberMode(toAccept, 'o', true);
@@ -242,14 +251,6 @@ const string	&Channel::GetCtime() const
 const string	&Channel::GetTopicStat() const
 {
 	return (_topicStat);
-}
-
-string Channel::_GetTime() const
-{
-	time_t secs = std::time(0);
-	std::stringstream ss;
-	ss << secs;
-	return (ss.str());
 }
 
 Client	*Channel::GetCreator() const
