@@ -477,7 +477,7 @@ void	Server::_Nick(Command &cmd, Client &client)
 	client.SetUinfo(ui);
 	string data;
 	if (client.IsRegistd() == true)
-		AddData(from, "NICK " + ui[nickname] + "\r\n");
+		AddData("NICK " + ui[nickname] + "\r\n", from);
 	if (client.IsRegistd() == false && ui[username].empty() == false)
 	{
 		client.SetRegistd();
@@ -807,6 +807,8 @@ void	Server::_Join(Command &cmd, Client &client)
 
 		if (chanIt->IsBanned(client) == true)
 			AddData(ERR_BANNEDFROMCHAN(client.GetUinfo()[nickname], chanparse[0][chan]));
+		else if  (chanIt->IsInvited(client) == false)
+			AddData(ERR_INVITEONLYCHAN(client.GetUinfo()[nickname], chanparse[0][chan]));
 		else
 		{
 			chanIt->joinChannel(client);
@@ -934,33 +936,37 @@ void	Server::_List(Command &cmd, Client &client)
 	}
 }
 
-//   Parameters: <nickname> <channel>
-//              ERR_NEEDMOREPARAMS              ERR_NOSUCHNICK
-//	            ERR_NOTONCHANNEL                ERR_USERONCHANNEL
-//	            ERR_CHANOPRIVSNEEDED
-//	            RPL_INVITING                    RPL_AWAY
 void	Server::_Invite(Command &cmd, Client &client)
 {
 	cst_vec_vec_str	chanparse = _WrapChannels(cmd, 1);
 	lst_chan::iterator			chanIt;
+	Client						*toInvite;
 
-	(void)client;
 	if (cmd.GetMiddle().size() < 2)
 		AddData(ERR_NEEDMOREPARAMS("INVITE"));
+	else if (chanparse.empty() || chanparse[0].empty())
+		AddData(ERR_NOTONCHANNEL(cmd.GetMiddle()[1]));
 	else if ((chanIt = _FindChannel(chanparse[0][chan])) == _channels.end())
-		return ;
-	map_pcli::iterator It = chanIt->findUserIter(cmd.GetMiddle()[2]);
-	if (It == chanIt->GetUsers().end())
-		;
-	//	AddData(ERR_USERNOTINCHANNEL(cmd.GetMiddle()[2], channel));
+		AddData(ERR_NOSUCHCHANNEL(chanparse[0][chan]));
+	else if (chanIt->findUserIter(client.GetUinfo()[nickname]) == chanIt->GetUsers().end())
+		AddData(ERR_NOTONCHANNEL(chanIt->GetName()));
+	else if (chanIt->IsInvite() && chanIt->IsOperator(client) == false)
+		AddData(ERR_CHANOPRIVSNEEDED(cmd.GetMiddle()[1]));
+	else if ((toInvite = _FindNickname(cmd.GetMiddle()[0], &client)) == NULL)
+		AddData(ERR_NOSUCHNICK(cmd.GetMiddle()[0]));
+	else if (chanIt->findUserIter(cmd.GetMiddle()[0]) != chanIt->GetUsers().end())
+		AddData(ERR_USERONCHANNEL(cmd.GetMiddle()[0], chanparse[0][chan]));
+	else
+	{
+		chanIt->AddToInviteList(client.GetUinfo()[nickname], cmd.GetMiddle()[0]);
+		string toSend = RPL_INVITING(client.GetPrefix(), cmd.GetMiddle()[0], chanparse[0][chan]);
+		AddData(toSend);
+		SendData(client.GetFd());
+		AddData(toSend);
+		SendData(toInvite->GetFd());
+	}
 }
 
-//   Parameters: <channel> *( "," <channel> ) <user> *( "," <user> )
-//               [<comment>]
-//
-//           ERR_NEEDMOREPARAMS              ERR_NOSUCHCHANNEL
-//           ERR_BADCHANMASK                 ERR_CHANOPRIVSNEEDED
-//           ERR_USERNOTINCHANNEL            ERR_NOTONCHANNEL
 void	Server::_Kick(Command &cmd, Client &client)
 {
 	cst_vec_vec_str	chanparse = _WrapChannels(cmd, 0);

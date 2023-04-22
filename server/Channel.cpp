@@ -1,17 +1,29 @@
 #include "../include/Channel.hpp"
 
+// Tools
+string _GetTime()
+{
+	time_t secs = std::time(0);
+	std::stringstream ss;
+	ss << secs;
+	return (ss.str());
+}
+
 Channel::Channel(const string &chanstring) : 
 	_creator(NULL),
 	_user(),
 	_chanstring(chanstring),
 	_topic("Default Topic"),
-	_ctime(""),
+	_mode(),
+	_ctime(_GetTime()),
 	_topicStat(""),
 	_banList(),
 	_inviteList()
 {
-	_ctime = _GetTime();
-	std::cout << "New channel created on " << _ctime << std::endl;
+	_mode.set(CHAN_TOPIC, false);
+	_mode.set(CHAN_MODERATE, false);
+	_mode.set(CHAN_INVITE, false);
+	_mode.set(CHAN_ANONYMOUS, false);
 }
 
 Channel::~Channel()
@@ -23,6 +35,7 @@ Channel::Channel(const Channel &src) :
 	_user(src._user),
 	_chanstring(src._chanstring),
 	_topic(src._topic),
+	_mode(src._mode),
 	_ctime(src._ctime),
 	_topicStat(src._topicStat),
 	_banList(src._banList),
@@ -39,6 +52,7 @@ Channel&	Channel::operator=(const Channel& rhs)
 	_user = rhs._user;
 	_chanstring = rhs._chanstring;
 	_topic = rhs._topic;
+	_mode = rhs._mode;
 	_ctime = rhs._ctime;
 	_topicStat = rhs._topicStat;
 	_banList = rhs._banList;
@@ -52,9 +66,9 @@ void	Channel::AddToBanList(const string &from, const string &toBan)
 	_banList.push_back(Ban(toBan, from, _GetTime()));
 }
 
-void	Channel::AddToInviteList(const string &from, const string &toBan)
+void	Channel::AddToInviteList(const string &from, const string &toInvite)
 {
-	_inviteList.push_back(Ban(toBan, from, _GetTime()));
+	_inviteList.push_back(Ban(toInvite, from, _GetTime()));
 }
 
 void	Channel::RemoveFromBanList(const string &deBan)
@@ -84,29 +98,45 @@ void	Channel::SetTopic(const string& name)
 
 bool	Channel::IsOperator(Client& client)
 {
-	return (_user.find(&client)->second[MEMBER_MODE.find('o')]);
+	return (_user.find(&client)->second[MEM_CHANOP]);
 }
-
-
 
 bool	Channel::IsVoiced(Client& client)
 {
-	return (_user.find(&client)->second[MEMBER_MODE.find('v')]);
+	return (_user.find(&client)->second[MEM_VOICE]);
+}
+
+bool	Channel::IsInvited(Client& client)
+{
+	bool status = false;
+	if (IsInvite() == false)
+		status = true;
+	for (lst_ban::const_iterator it = _inviteList.begin(); it != _inviteList.end(); ++it)
+	{
+		if (it->GetMask().find(client.GetUinfo()[nickname]) != std::string::npos)
+			status = true;
+	}
+	return (status);
 }
 
 bool	Channel::IsInvite() const
 {
-	return (_mode[CHAN_MODE.find('i')]);
+	return (_mode[CHAN_INVITE]);
 }
 
 bool	Channel::IsModerated() const
 {
-	return (_mode[CHAN_MODE.find('m')]);
+	return (_mode[CHAN_MODERATE]);
 }
 
 bool Channel::IsAnon() const
 {
-	return (_mode[CHAN_MODE.find('a')]);
+	return (_mode[CHAN_ANONYMOUS]);
+}
+
+bool	Channel::IsOpTopicOnly() const
+{
+	return (_mode[CHAN_TOPIC]);
 }
 
 bool	Channel::IsBanned(Client& client)
@@ -118,11 +148,6 @@ bool	Channel::IsBanned(Client& client)
 			isBan = true;
 	}
 	return (isBan);
-}
-
-bool	Channel::IsOpTopicOnly() const
-{
-	return (_mode[CHAN_MODE.find('t')]);
 }
 
 string Channel::GetOrigin(Client &client)
@@ -145,7 +170,6 @@ int	Channel::joinChannel(Client& toAccept)
 		_topicStat = toAccept.GetPrefix() + " " + _GetTime();
 		_creator = &toAccept;
 		SetMemberMode(toAccept, 'o', true);
-		SetChanMode('t', true);
 	}
 	else if (&toAccept == _creator)
 		SetMemberMode(toAccept, 'o', true);
@@ -242,14 +266,6 @@ const string	&Channel::GetCtime() const
 const string	&Channel::GetTopicStat() const
 {
 	return (_topicStat);
-}
-
-string Channel::_GetTime() const
-{
-	time_t secs = std::time(0);
-	std::stringstream ss;
-	ss << secs;
-	return (ss.str());
 }
 
 Client	*Channel::GetCreator() const

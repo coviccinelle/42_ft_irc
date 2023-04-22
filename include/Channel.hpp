@@ -9,7 +9,7 @@
 #include "../include/Ban.hpp"
 
 #define MEMBER_MODE string("obv")
-#define CHAN_MODE string("tma")
+#define CHAN_MODE string("tmia")
 
 class Client;
 
@@ -53,6 +53,7 @@ class Channel
 		bool						IsBanned(Client& client);
 		bool						IsOperator(Client& client);
 		bool						IsVoiced(Client& client);
+		bool						IsInvited(Client& client);
 		bool						IsOpTopicOnly() const;
 		bool						IsModerated() const;
 		bool						IsInvite() const;
@@ -77,7 +78,7 @@ class Channel
 		const string				&GetCtime() const;
 		const string				&GetTopicStat() const;
 		void						AddToBanList(const string &from, const string &toBan);
-		void						AddToInviteList(const string &from, const string &toBan);
+		void						AddToInviteList(const string &from, const string &toInvite);
 		void						RemoveFromBanList(const string &deBan);
 		cst_lst_ban					GetBanList() const;
 		Client						*GetCreator() const;
@@ -95,7 +96,6 @@ class Channel
 				const std::string& _deBan;
 		};
 
-		string						_GetTime() const;
 		Client						*_creator;
 		map_pcli					_user;
 		string						_chanstring;

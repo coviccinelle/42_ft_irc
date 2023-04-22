@@ -107,7 +107,9 @@ class Server
 		int 							_listener;
 
 		map_int_cli						_clients;
+
 		vec_pfd							_pollfds;
+
 		int								_poll_count;
 		std::map< string, CmdVal >		_mapCmd; // mapping between cmd names and integer; used for switch case.
 		std::vector< Fn >				_funcTable;
