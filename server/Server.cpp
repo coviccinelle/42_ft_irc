@@ -958,12 +958,10 @@ void	Server::_Invite(Command &cmd, Client &client)
 		AddData(ERR_USERONCHANNEL(cmd.GetMiddle()[0], chanparse[0][chan]));
 	else
 	{
-		chanIt->AddToInviteList(client.GetUinfo()[nickname], cmd.GetMiddle()[0]);
-		string toSend = RPL_INVITING(client.GetPrefix(), cmd.GetMiddle()[0], chanparse[0][chan]);
-		AddData(toSend);
-		SendData(client.GetFd());
-		AddData(toSend);
+		AddData(string("INVITE ") + toInvite->GetUinfo()[nickname] + " " + chanIt->GetName() + "\r\n", client.GetPrefix());
 		SendData(toInvite->GetFd());
+		chanIt->AddToInviteList(client.GetUinfo()[nickname], cmd.GetMiddle()[0]);
+		AddData(RPL_INVITING(client.GetPrefix(), cmd.GetMiddle()[0], chanparse[0][chan]));
 	}
 }
 
