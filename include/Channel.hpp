@@ -78,7 +78,7 @@ class Channel
 		const string				&GetCtime() const;
 		const string				&GetTopicStat() const;
 		void						AddToBanList(const string &from, const string &toBan);
-		void						AddToInviteList(const string &from, const string &toBan);
+		void						AddToInviteList(const string &from, const string &toInvite);
 		void						RemoveFromBanList(const string &deBan);
 		cst_lst_ban					GetBanList() const;
 		Client						*GetCreator() const;

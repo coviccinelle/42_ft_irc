@@ -52,7 +52,7 @@
 # define ERR_TOOMANYCHANNELS(nick, channel) ("405 " + nick + " " + channel + " :You have joined too many channels\r\n")
 # define RPL_NAMREPLY(nick, channel) ("353 " + nick + " = " + channel + " :")
 # define RPL_ENDOFNAMES(nick, channel) ("366 " + nick + " " + channel + " :End of /NAMES list.\r\n")
-# define RPL_INVITING(nick, user, host, invitenick, channel) ("341 " + nick + "!" + user + "@" + host + " " + invitenick + " " + channel + "\r\n")
+# define RPL_INVITING(prefix, invitenick, channel) ("341 " + prefix + " " + invitenick + " " + channel + "\r\n")
 # define ERR_USERNOTINCHANNEL(nick, chan) ("441 " + nick + " " + chan + " :They aren't on that channel\r\n")
 # define ERR_NOTONCHANNEL(chan) ("442 " + chan + " :You're not on that channel\r\n")
 # define ERR_CHANOPRIVSNEEDED(chan) ("482 " + chan + " :You're not channel operator\r\n")

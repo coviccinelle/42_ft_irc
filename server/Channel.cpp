@@ -66,9 +66,9 @@ void	Channel::AddToBanList(const string &from, const string &toBan)
 	_banList.push_back(Ban(toBan, from, _GetTime()));
 }
 
-void	Channel::AddToInviteList(const string &from, const string &toBan)
+void	Channel::AddToInviteList(const string &from, const string &toInvite)
 {
-	_inviteList.push_back(Ban(toBan, from, _GetTime()));
+	_inviteList.push_back(Ban(toInvite, from, _GetTime()));
 }
 
 void	Channel::RemoveFromBanList(const string &deBan)

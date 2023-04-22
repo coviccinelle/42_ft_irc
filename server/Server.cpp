@@ -489,7 +489,7 @@ void	Server::_Nick(Command &cmd, Client &client)
 	client.SetUinfo(ui);
 	string data;
 	if (client.IsRegistd() == true)
-		AddData(from, "NICK " + ui[nickname] + "\r\n");
+		AddData("NICK " + ui[nickname] + "\r\n", from);
 	if (client.IsRegistd() == false && ui[username].empty() == false)
 	{
 		client.SetRegistd();
@@ -932,9 +932,8 @@ void	Server::_Invite(Command &cmd, Client &client)
 {
 	cst_vec_vec_str	chanparse = _WrapChannels(cmd, 1);
 	lst_chan::iterator			chanIt;
-	map_pcli::iterator 			inviteIt;
+	Client						*toInvite;
 
-	(void)client;
 	if (cmd.GetMiddle().size() < 2)
 		AddData(ERR_NEEDMOREPARAMS("INVITE"));
 	else if (chanparse.empty() || chanparse[0].empty())
@@ -945,10 +944,19 @@ void	Server::_Invite(Command &cmd, Client &client)
 		AddData(ERR_NOTONCHANNEL(chanIt->GetName()));
 	else if (chanIt->IsInvite() && chanIt->IsOperator(client) == false)
 		AddData(ERR_CHANOPRIVSNEEDED(cmd.GetMiddle()[1]));
-	else if (_FindNickname(cmd.GetMiddle()[0], &client) == NULL)
+	else if ((toInvite = _FindNickname(cmd.GetMiddle()[0], &client)) == NULL)
 		AddData(ERR_NOSUCHNICK(cmd.GetMiddle()[0]));
-	else if ((inviteIt = chanIt->findUserIter(cmd.GetMiddle()[0])) != chanIt->GetUsers().end())
+	else if (chanIt->findUserIter(cmd.GetMiddle()[0]) != chanIt->GetUsers().end())
 		AddData(ERR_USERONCHANNEL(cmd.GetMiddle()[0], chanparse[0][chan]));
+	else
+	{
+		chanIt->AddToInviteList(client.GetUinfo()[nickname], cmd.GetMiddle()[0]);
+		string toSend = RPL_INVITING(client.GetPrefix(), cmd.GetMiddle()[0], chanparse[0][chan]);
+		AddData(toSend);
+		SendData(client.GetFd());
+		AddData(toSend);
+		SendData(toInvite->GetFd());
+	}
 }
 
 void	Server::_Kick(Command &cmd, Client &client)
