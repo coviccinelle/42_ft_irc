@@ -1,5 +1,0 @@
-PASS toto
-NICK toto
-USER toto toto localhost :Toto
-JOIN #chan1,#chan2,!ADFDFfadsf
-

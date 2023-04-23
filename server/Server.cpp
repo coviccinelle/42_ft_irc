@@ -477,7 +477,11 @@ void	Server::_Nick(Command &cmd, Client &client)
 	client.SetUinfo(ui);
 	string data;
 	if (client.IsRegistd() == true)
+	{
+		for (lst_pchan::const_iterator it = client.GetChannels().begin(); it != client.GetChannels().end(); ++it)
+			SendChannel(it, "NICK " + ui[nickname] + "\r\n", from, &client);
 		AddData("NICK " + ui[nickname] + "\r\n", from);
+	}
 	if (client.IsRegistd() == false && ui[username].empty() == false)
 	{
 		client.SetRegistd();

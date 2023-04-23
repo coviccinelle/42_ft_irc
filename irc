@@ -1,0 +1,14 @@
+#!/bin/bash
+
+if [ "$#" -eq 0 ]; then
+	./ircserv 5544 toto
+	exit 0
+fi
+
+if  [ $1 == "-d" ] || [ $1 == "--debug" ]; then
+	gdb -tui --args ./ircserv 5544 toto
+	exit 0
+fi
+
+echo "Unknown argument"
+exit 1
