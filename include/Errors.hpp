@@ -44,7 +44,7 @@
 # define ERR_NOSUCHNICK(invitenick) ("401 " + invitenick + " :No such nick/channel\r\n")
 # define ERR_NOSUCHCHANNEL(channel) ("403 " + channel + " :No such channel\r\n")
 # define RPL_YOUREOPER(nick) ("381 " + nick + " :You are now an IRC operator\r\n")
-# define ERR_UNKNOWNMODE(ch, chan) ("472 " + ch + " :is unknown mode char to me for" + chan + "\r\n")
+# define ERR_UNKNOWNMODE(nick, ch) ("472 " + nick + " " + ch + " :is unknown mode char to me\r\n")
 # define ERR_BADCHANMASK(channel) ("476 " + channel + " :Bad Channel Mask\r\n")
 # define ERR_NOPRIVILEGES "481 :Permission Denied- You're not an IRC operator\r\n"
 # define ERR_BANNEDFROMCHAN(nick, channel) ( "474 " + nick + " " + channel + " :Cannot join channel (+b)\r\n")

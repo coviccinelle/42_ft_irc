@@ -610,6 +610,9 @@ void	Server::_ModeServer(Command &cmd, Client &client, const string &channel)
 	else if (cmd.GetMiddle().size() == 2)
 	{
 		bool status = false;
+		string	modeA;
+		string	modeR;
+		string mode;
 
 		for (string::const_iterator it = cmd.GetMiddle()[1].begin(); it != cmd.GetMiddle()[1].end(); ++it)
 		{
@@ -618,11 +621,29 @@ void	Server::_ModeServer(Command &cmd, Client &client, const string &channel)
 			else if (*it == '-')
 				status = false;
 			else if (CHAN_MODE.find(*it) != string::npos)
+			{
+				if (*it == 'a')
+				{
+					if (status == false)
+						continue ;
+					for (map_pcli::const_iterator it = chanIt->GetUsers().begin(); it != chanIt->GetUsers().end(); ++it)
+						SendChannel(chanIt, "NICK anonymous\r\n", it->first->GetPrefix(), it->first);
+				}
+				if (status)
+					modeA += *it;
+				else
+					modeR += *it;
 				chanIt->SetChanMode(*it, status);
+			}
 			else
-				AddData(ERR_UNKNOWNMODE(string(1, *it), channel));
+				AddData(ERR_UNKNOWNMODE(client.GetUinfo()[nickname], string(1, *it)));
 		}
-		SendChannel(chanIt, "MODE " + channel + " +" + chanIt->GetStrChanMode() + " \r\n", chanIt->GetOrigin(client));
+		if (modeA.empty() == false)
+			mode += (modeA.empty() ? "" : "+" ) + modeA;
+		if (modeR.empty() == false)
+			mode += (modeR.empty() ? "" : "-" ) + modeR;
+		if (mode.empty() == false)
+			SendChannel(chanIt, "MODE " + channel + " " + mode + " \r\n", chanIt->GetOrigin(client));
 	}
 	else
 	{
@@ -803,7 +824,7 @@ void	Server::_Part(Command &cmd, Client &client)
 		{
 			chanIt->leaveChannel(client);
 			SendChannel(chanIt, string("PART ") + chanIt->GetName() + (cmd.GetCinfo()[trailing].empty() ? string("") : string(" :") + cmd.GetCinfo()[trailing]) + "\r\n", chanIt->GetOrigin(client));
-			AddData(string("PART ") + chanIt->GetName() + (cmd.GetCinfo()[trailing].empty() ? string("") : string(" :") + cmd.GetCinfo()[trailing]) + "\r\n", chanIt->GetOrigin(client));
+			AddData(string("PART ") + chanIt->GetName() + (cmd.GetCinfo()[trailing].empty() ? string("") : string(" :") + cmd.GetCinfo()[trailing]) + "\r\n", client.GetPrefix());
 		}
 	}
 }
