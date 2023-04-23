@@ -98,7 +98,13 @@ void	Channel::SetTopic(const string& name)
 
 bool	Channel::IsOperator(Client& client)
 {
-	return (_user.find(&client)->second[MEM_CHANOP]);
+	bool status = false;
+
+	if (_user.find(&client) != _user.end())
+		status = _user.find(&client)->second[MEM_CHANOP];
+	if (status == false)
+		status = client.isOperator();
+	return (status);
 }
 
 bool	Channel::IsVoiced(Client& client)

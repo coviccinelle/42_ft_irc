@@ -597,7 +597,7 @@ void	Server::_ModeServer(Command &cmd, Client &client, const string &channel)
 	if ((chanIt = _FindChannel(channel)) == _channels.end())
 		AddData(ERR_NOSUCHCHANNEL(channel));
 	else if (cmd.GetMiddle().size() == 1)
-		AddData(RPL_CHANNELMODEIS(chanIt->GetNickname(client), channel, string("+") + chanIt->GetStrChanMode()));
+		AddData(RPL_CHANNELMODEIS(chanIt->GetNickname(client), channel, (chanIt->GetStrChanMode().empty() ? "" : "+") + chanIt->GetStrChanMode()));
 	else if (cmd.GetMiddle().size() == 2 && (cmd.GetMiddle()[1] == "b" || cmd.GetMiddle()[1] == "+b"))
 	{
 		cst_lst_ban	banList = chanIt->GetBanList();
