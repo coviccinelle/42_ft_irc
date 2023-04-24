@@ -848,6 +848,9 @@ void	Server::_Join(Command &cmd, Client &client)
 			AddData(RPL_TOPICWHOTIME(chanIt->GetNickname(client), chanIt->GetName(), chanIt->GetTopicStat()));
 			AddData(RPL_NAMREPLY(chanIt->GetNickname(client), chanparse[i][chan]) + chanIt->GetLstNickname() + "\r\n");
 			AddData(RPL_ENDOFNAMES(chanIt->GetNickname(client), chanparse[i][chan]));
+			SendData(client.GetFd());
+			if (chanIt->IsOperator(client))
+				SendChannel(chanIt, "MODE " + chanIt->GetName() + " +o "  + chanIt->GetNickname(client) + "\r\n", chanIt->GetOrigin(client), &client);
 		}
 	}
 
