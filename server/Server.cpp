@@ -270,7 +270,6 @@ void	Server::_ReceiveData(struct pollfd &pfd)
 	{
 		int ret;
 		char buf[512];
-		std::cout << "buf [" << buf << "]"<< std::endl;
 		pfd.events = POLLIN;
 		memset(&buf, 0, sizeof(buf));
 		ret = recv(pfd.fd, buf, sizeof buf, 0); 
