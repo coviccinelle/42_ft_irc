@@ -6,6 +6,7 @@
 #include "../include/Command.hpp"
 #include "../include/Channel.hpp"
 #include "../include/Errors.hpp"
+#include <algorithm>
 
 // Size of InfoClient enum below
 #define INF_CLI_SIZE 6
@@ -14,6 +15,8 @@ class Channel;
 
 #define USER_MODE string("iwos")
 #define MODE_SIZE 4
+
+#define EOT 0x04
 
 // List of infos on a client
 enum InfoClient {
@@ -74,6 +77,7 @@ class Client
 	private:
 		/* Private Methods */
 		void							_ParseBuf(const string &buf);
+		string							_Sanitize(string buf);
 
 		/* Connection Info */
 		int								_fd; // Connection socket
