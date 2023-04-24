@@ -270,6 +270,7 @@ void	Server::_ReceiveData(struct pollfd &pfd)
 	{
 		int ret;
 		char buf[512];
+		std::cout << "buf [" << buf << "]"<< std::endl;
 		pfd.events = POLLIN;
 		memset(&buf, 0, sizeof(buf));
 		ret = recv(pfd.fd, buf, sizeof buf, 0); 
@@ -735,26 +736,23 @@ void	Server::_Notice(Command &cmd, Client &client)
 	(void)client;
 	Client			*receiver;
 	cst_vec_str		targets = _WrapTargets(cmd, 0);
+	lst_chan::iterator	chanIt;
+	
 
-	if (targets.empty())
+	if (cmd.GetCinfo()[trailing].empty() || cmd.GetMiddle().size() != 1)
 		return ;
-	if (cmd.GetCinfo()[trailing].empty()) //no text to send
-		return ;
-	for (std::vector<string>::const_iterator it = targets.begin(); it != targets.end(); ++it)
+	if (cmd.GetMiddle()[0] == SERVER_NAME)
+		_NoticeServ(cmd.GetCinfo()[trailing], client);
+	else if ((receiver = _FindNickname(cmd.GetMiddle()[0])) != NULL)
 	{
-		if (*it == SERVER_NAME)
-		{
-			_NoticeServ(cmd.GetCinfo()[trailing], client);
-			continue ;
-		}
-		else if ((receiver = _FindNickname(*it)) == NULL)
-			continue ;
-		else
-		{
-			string msg = "NOTICE " + *it + " :" + cmd.GetCinfo()[trailing] + "\r\n";
-			AddData(msg);
-			SendData(receiver->GetFd());
-		}
+		string msg = "NOTICE " + cmd.GetMiddle()[0]+ " :" + cmd.GetCinfo()[trailing] + "\r\n";
+		AddData(msg, client.GetPrefix());
+		SendData(receiver->GetFd());
+	}
+	else if ((chanIt = _FindChannel(cmd.GetMiddle()[0])) != _channels.end())
+	{
+		string msg = "NOTICE " + cmd.GetMiddle()[0] + " :" + cmd.GetCinfo()[trailing] + "\r\n";
+		SendChannel(chanIt, msg, chanIt->GetOrigin(client), &client);
 	}
 }
 

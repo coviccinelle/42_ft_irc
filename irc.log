@@ -1,0 +1,46 @@
+<< CAP LS
+<< PASS toto
+<< NICK jfrancai
+<< USER jfrancai jfrancai localhost :Julien FRANCAIS
+>> :irc 433 * jfrancai :Nickname is already in use
+<< NICK jfrancai_
+>> :irc 433 * jfrancai_ :Nickname is already in use
+<< NICK jfrancai1
+>> :irc 001 jfrancai1 :Welcome to the Internet Relay Network jfrancai1!jfrancai@localhost
+<< MODE jfrancai1 +i
+<< WHOIS jfrancai
+>> :irc 002 jfrancai1 :Your host is irc, running version 0.0.1
+>> :irc 003 jfrancai1 :This server was created Mon Mar 2023 at 15:11:00 UTC
+>> :irc 004 jfrancai1 irc 0.0.1 iwos obv tmia
+>> :irc MODE jfrancai1 :+i
+<< JOIN #chan
+>> :jfrancai1!jfrancai@localhost JOIN #chan
+>> :irc MODE #chan +
+>> :irc 332 jfrancai1!jfrancai@localhost #chan :Default Topic
+>> :irc 333 jfrancai1 #chan jfrancai_!jfrancai@localhost 1682323132
+>> :irc 353 jfrancai1 = #chan :@jfrancai_ jfrancai1 
+>> :irc 366 jfrancai1 #chan :End of /NAMES list.
+<< MODE #chan
+>> :irc 324 jfrancai1 #chan 
+--> chanquery mode
+<< WHO #chan
+>> :irc 329 jfrancai1 #chan 1682323132
+--> event 329
+>> :irc 352 jfrancai1 #chan jfrancai localhost irc jfrancai1  H@ :0 Julien FRANCAIS
+--> silent event who
+>> :irc 315 jfrancai1 #chan :End of /WHO list.
+--> chanquery who end
+<< MODE #chan b
+>> :irc 368 jfrancai1 #chan :End of Channel Ban List
+--> chanquery ban end
+>> :jfrancai!jfrancai@localhost NOTICE #chan :coucou
+<< PING irc
+>> :jfrancai1!jfrancai@localhost PONG irc irc
+--> lag pong
+>> :jfrancai!jfrancai@localhost NOTICE #chan :coucou
+>> :jfrancai!jfrancai@localhost NOTICE #chan :jfrancai_ coucou
+>> :jfrancai!jfrancai@localhost NOTICE #chan :adfasdf jfrancai_ coucou
+<< PING irc
+>> :jfrancai1!jfrancai@localhost PONG irc irc
+--> FAILED whois
+--> lag pong
