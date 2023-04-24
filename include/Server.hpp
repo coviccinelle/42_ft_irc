@@ -73,6 +73,9 @@ class Server
 		void							_NoticeServ(const string str, Client &client, int q = 0);
 		cst_vec_str						&_WrapTargets(Command &cmd, size_t pos);
 		cst_vec_vec_str					&_WrapChannels(Command &cmd, size_t pos);
+		void							_LeaveAllChans(Client& client);
+		void							_LeaveChannel(lst_chan::iterator chanIt, Client &client);
+		void							_LeaveChannel(lst_pchan::const_iterator pIt, Client &client);
 
 		// *** SERVER COMMANDS *** //
 		void 							_CapLs(Command &cmd, Client &client);

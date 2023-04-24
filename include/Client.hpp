@@ -63,7 +63,6 @@ class Client
 
 		void							RegisterChannel(Channel &chan);
 		void							DeregisterChannel(Channel &chan);
-		void							LeaveAllChans();
 		const std::list< Channel* >		&GetChannels() const;
 
 		// User Mode info

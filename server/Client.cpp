@@ -276,9 +276,3 @@ vec_str	Split(const string &str, const string delimiter)
 		res.push_back(str.substr(start, end - start));
 	return (res);
 }
-
-void	Client::LeaveAllChans()
-{
-	while (_channels.empty() == false)
-		(*_channels.begin())->leaveChannel(*this);
-}

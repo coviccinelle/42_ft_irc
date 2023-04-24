@@ -208,6 +208,35 @@ void	Server::AddData(const string &message, const string &from)
 	_data += ":" + from + " " + message;
 }
 
+void	Server::_LeaveAllChans(Client &client)
+{
+	while (client.GetChannels().empty() == false)
+		_LeaveChannel(client.GetChannels().begin(), client);
+}
+
+void	Server::_LeaveChannel(lst_pchan::const_iterator pIt, Client &client)
+{
+	(*pIt)->leaveChannel(client);
+	if (((*pIt)->GetUsers()).empty())
+	{
+		for (lst_chan::iterator chanIt = _channels.begin(); chanIt != _channels.end(); ++chanIt)
+		{
+			if (&*chanIt == *pIt)
+			{
+				_channels.erase(chanIt);
+				break;
+			}
+		}
+	}
+}
+
+void	Server::_LeaveChannel(lst_chan::iterator chanIt, Client &client)
+{
+	chanIt->leaveChannel(client);
+	if (chanIt->GetUsers().empty())
+		_channels.erase(chanIt);
+}
+
 				//------------------------------------//
 				//	 *** 		PRIVATE 		***   //
 				//------------------------------------//
@@ -276,7 +305,7 @@ void	Server::_ReceiveData(struct pollfd &pfd)
 void	Server::_CloseConnection(struct pollfd &pfd)
 {
 	std::cout << "ℹ️  irc server:\033[0;31m connection close \033[0;37mfrom " << _clients[pfd.fd].GetIp() << " on socket " << pfd.fd << std::endl;
-	_clients[pfd.fd].LeaveAllChans();
+	_LeaveAllChans(_clients[pfd.fd]);
 	_clients.erase(pfd.fd);
 	close(pfd.fd);
 	_pollfds.erase(vec_pfd::iterator(&pfd));
@@ -285,7 +314,7 @@ void	Server::_CloseConnection(struct pollfd &pfd)
 void	Server::_CloseConnection(Client &client)
 {
 	std::cout << "ℹ️  irc server:\033[0;31m connection close \033[0;37mfor "<< client.GetUinfo()[nickname] << " on socket " << client.GetFd() << std::endl;
-	client.LeaveAllChans();
+	_LeaveAllChans(client);
 	_clients.erase(client.GetFd());
 	close(client.GetFd());
 	_pollfds.erase(_GetPfdFromFd(client.GetFd()));
@@ -763,7 +792,7 @@ void	Server::_Quit(Command &cmd, Client &client)
 		else
 			SendChannel(it, "QUIT " + cmd.GetCinfo()[trailing] + "\r\n", (*it)->GetOrigin(client), &client);
 	}
-	AddData(client.GetPrefix(), "ERROR :" + cmd.GetCinfo()[trailing] + "\r\n");
+	AddData("ERROR :" + cmd.GetCinfo()[trailing] + "\r\n", client.GetPrefix());
 	SendData(client.GetFd());
 	throw irc_error("⚠️  warning: closing connection", CLOSE_CONNECTION);
 }
@@ -822,7 +851,7 @@ void	Server::_Part(Command &cmd, Client &client)
 			AddData(ERR_NOTONCHANNEL(chanIt->GetName()));
 		else
 		{
-			chanIt->leaveChannel(client);
+			_LeaveChannel(chanIt, client);
 			SendChannel(chanIt, string("PART ") + chanIt->GetName() + (cmd.GetCinfo()[trailing].empty() ? string("") : string(" :") + cmd.GetCinfo()[trailing]) + "\r\n", chanIt->GetOrigin(client));
 			AddData(string("PART ") + chanIt->GetName() + (cmd.GetCinfo()[trailing].empty() ? string("") : string(" :") + cmd.GetCinfo()[trailing]) + "\r\n", client.GetPrefix());
 		}
@@ -962,7 +991,7 @@ void	Server::_Kick(Command &cmd, Client &client)
 	else
 	{
 		SendChannel(chanIt, string("KICK ") + chanIt->GetName() + " " + toKick->first->GetUinfo()[nickname] + " :" + cmd.GetCinfo()[trailing] + "\r\n", chanIt->GetOrigin(client));
-		chanIt->leaveChannel(*(toKick->first));
+		_LeaveChannel(chanIt, *(toKick->first));
 	}
 }
 
