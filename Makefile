@@ -53,7 +53,7 @@ TITLE:
 	printf "${CYELLOW}| '--------------' || '--------------' || '--------------' || '--------------' || '--------------' || '--------------' |\n"
 	printf "${CCYAN} '----------------'  '----------------'  '----------------'  '----------------'  '----------------'  '----------------' \n${CGREEN}"
 	printf "${CYELLOW}Clumsy ${CPURPLE}${NAME}${CYELLOW}is on the way!\n"
-	printf "${CGREEN}Made with 💌${CRED}l${CYELLOW}o${CCYAN}v${CGRIS}e${CGREEN}💌 by ___ @jfrancai @qbornet and @thi-phng ___\n"
+	printf "${CGREEN}Made with 💌${CRED}l${CYELLOW}o${CCYAN}v${CGRIS}e${CGREEN}💌 by ___ }@jfrancai @qbornet and @thi-phng ___\n"
 
 
 
@@ -71,6 +71,10 @@ endef
 $(NAME): $(OBJ)
 	@$(CC) $(CFLAGS) $(OBJ) -o $(NAME)
 	@printf "${B}${CWHITE}]\n"
+
+bonus:
+	@pip install -r ./requirements.txt
+	@python3 bot.py
 
 ${OBJDIR}/%.o:${SRCDIR}%.cpp
 	@mkdir -p $(dir $@)
@@ -93,4 +97,4 @@ fclean:			clean
 
 re:				fclean all
 
-.PHONY:			all clean fclean re launch
+.PHONY:			all clean fclean re launch bonus

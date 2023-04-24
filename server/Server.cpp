@@ -270,7 +270,6 @@ void	Server::_ReceiveData(struct pollfd &pfd)
 	{
 		int ret;
 		char buf[512];
-		std::cout << "buf [" << buf << "]"<< std::endl;
 		pfd.events = POLLIN;
 		memset(&buf, 0, sizeof(buf));
 		ret = recv(pfd.fd, buf, sizeof buf, 0); 
@@ -707,6 +706,28 @@ void	Server::_ModeServer(Command &cmd, Client &client, const string &channel)
 			{
 				chanIt->SetMemberMode(*unVoice, 'v', false);
 				SendChannel(chanIt, "MODE " + channel + " -v "  + cmd.GetMiddle()[2] + "\r\n", chanIt->GetOrigin(client));
+			}
+		}
+		else if (cmd.GetMiddle()[1] == "-o")
+		{
+			Client *unOp = _FindNickname(cmd.GetMiddle()[2]);
+			if (unOp == NULL)
+				AddData(ERR_USERNOTINCHANNEL(cmd.GetMiddle()[2], channel));
+			else
+			{
+				chanIt->SetMemberMode(*unOp, 'o', false);
+				SendChannel(chanIt, "MODE " + channel + " -o "  + cmd.GetMiddle()[2] + "\r\n", chanIt->GetOrigin(client));
+			}
+		}
+		else if (cmd.GetMiddle()[1] == "+o")
+		{
+			Client *unOp = _FindNickname(cmd.GetMiddle()[2]);
+			if (unOp == NULL)
+				AddData(ERR_USERNOTINCHANNEL(cmd.GetMiddle()[2], channel));
+			else
+			{
+				chanIt->SetMemberMode(*unOp, 'o', true);
+				SendChannel(chanIt, "MODE " + channel + " +o "  + cmd.GetMiddle()[2] + "\r\n", chanIt->GetOrigin(client));
 			}
 		}
 		else
