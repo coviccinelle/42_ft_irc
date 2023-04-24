@@ -179,12 +179,22 @@ void	Client::SetStrMode(const string &mode)
 	}
 }
 
+string	Client::_Sanitize(string buf)
+{
+	for (string::iterator it = buf.begin(); it != buf.end(); ++it)
+	{
+		if (*it == EOT)
+			it = buf.erase(it);
+	}
+	return (buf);
+}
+
 void	Client::_ParseBuf(const string &buf)
 {
 	vec_str	raw_cmds;
 
 	size_t pos;
-	_buf += buf;
+	_buf += _Sanitize(buf);
 	if ((pos = _buf.find_last_of("\n")) == string::npos)
 		return ;
 	raw_cmds = Split(string(_buf.begin(), _buf.begin() + pos), "\r\n");
