@@ -708,6 +708,28 @@ void	Server::_ModeServer(Command &cmd, Client &client, const string &channel)
 				SendChannel(chanIt, "MODE " + channel + " -v "  + cmd.GetMiddle()[2] + "\r\n", chanIt->GetOrigin(client));
 			}
 		}
+		else if (cmd.GetMiddle()[1] == "-o")
+		{
+			Client *unOp = _FindNickname(cmd.GetMiddle()[2]);
+			if (unOp == NULL)
+				AddData(ERR_USERNOTINCHANNEL(cmd.GetMiddle()[2], channel));
+			else
+			{
+				chanIt->SetMemberMode(*unOp, 'o', false);
+				SendChannel(chanIt, "MODE " + channel + " -o "  + cmd.GetMiddle()[2] + "\r\n", chanIt->GetOrigin(client));
+			}
+		}
+		else if (cmd.GetMiddle()[1] == "+o")
+		{
+			Client *unOp = _FindNickname(cmd.GetMiddle()[2]);
+			if (unOp == NULL)
+				AddData(ERR_USERNOTINCHANNEL(cmd.GetMiddle()[2], channel));
+			else
+			{
+				chanIt->SetMemberMode(*unOp, 'o', true);
+				SendChannel(chanIt, "MODE " + channel + " +o "  + cmd.GetMiddle()[2] + "\r\n", chanIt->GetOrigin(client));
+			}
+		}
 		else
 			AddData(ERR_UNKNOWNMODE(cmd.GetMiddle()[1], channel));
 	}
