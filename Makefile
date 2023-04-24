@@ -40,13 +40,21 @@ all: TITLE launch $(NAME)
 	@printf "\n$(B)$(CCYAN)$(NAME) compiled$(D)\n\n"
 
 TITLE:
-	printf "${CRED}  _   ${CGRIS} _     ${CYELLOW}_  ${CGREEN}    ${CCYAN}       ${CBLUE} _     ${CPURPLE}     ${CRED}      \n"
-	printf "${CRED} | |_ ${CGRIS}| |_  ${CYELLOW}(_)${CGREEN} ___ ${CCYAN} _ __  ${CBLUE}| |_   ${CPURPLE}_ _  ${CRED} __ _ \n"
-	printf "${CRED} |  _|${CGRIS}| ' \\ ${CYELLOW}| |${CGREEN}|___|${CCYAN}| '_ \\ ${CBLUE}| ' \\ ${CPURPLE}| ' \\ ${CRED}/ _\` |\n"
-	printf "${CRED}  \__|${CGRIS}|_||_|${CYELLOW}|_|${CGREEN}     ${CCYAN}| .__/ ${CBLUE}|_||_|${CPURPLE}|_||_|${CRED}\\__, |\n"
-	printf "${CRED}      ${CGRIS}      ${CYELLOW}   ${CGREEN}     ${CCYAN}|_|     ${CBLUE}     ${CPURPLE}      ${CRED}|___/ \n"
-	printf "${CYELLOW}"
-	@echo Clumsy ${NAME} is on the way!
+
+	printf "${CRED}.----------------.  .----------------.  .----------------.  .----------------.  .----------------.  .----------------. \n"
+	printf "${CGRIS}| .--------------. || .--------------. || .--------------. || .--------------. || .--------------. || .--------------. |\n"
+	printf "${CWHITE}| |  _________   | || |  _________   | || |              | || |     _____    | || |  _______     | || |     ______   | |\n"
+	printf "${CYELLOW}| | |_   ___  |  | || | |  _   _  |  | || |              | || |    |_   _|   | || | |_   __ \    | || |   .' ___  |  | |\n"
+	printf "${CGREEN}| |   | |_  \_|  | || | |_/ | | \_|  | || |              | || |      | |     | || |   | |__) |   | || |  / .'   \_|  | |\n"
+	printf "${CCYAN}| |   |  _|      | || |     | |      | || |              | || |      | |     | || |   |  __ /    | || |  | |         | |\n"
+	printf "${CBLUE}| |  _| |_       | || |    _| |_     | || |              | || |     _| |_    | || |  _| |  \ \_  | || |  \ \`.___.'\  | |\n"
+	printf "${CPURPLE}| | |_____|      | || |   |_____|    | || |   _______    | || |    |_____|   | || | |____| |___| | || |   \`._____.'  | |\n"
+	printf "${CRED}| |              | || |              | || |  |_______|   | || |              | || |              | || |              | |\n"
+	printf "${CYELLOW}| '--------------' || '--------------' || '--------------' || '--------------' || '--------------' || '--------------' |\n"
+	printf "${CCYAN} '----------------'  '----------------'  '----------------'  '----------------'  '----------------'  '----------------' \n${CGREEN}"
+	printf "${CYELLOW}Clumsy ${CPURPLE}${NAME}${CYELLOW}is on the way!\n"
+	printf "${CGREEN}Made with 💌${CRED}l${CYELLOW}o${CCYAN}v${CGRIS}e${CGREEN}💌 by ___ @jfrancai @qbornet and @thi-phng ___\n"
+
 
 
  # ******************************************************************************* #
@@ -72,11 +80,6 @@ ${OBJDIR}/%.o:${SRCDIR}%.cpp
 test: $(OBJ)
 	@$(CC) $(CFLAGS) $(OBJ) $(TESTFLAGS) -o $(NAME)
 	@printf "${B}${CWHITE}]\n"
-
-thao: $(OBJ_PARSED)
-	@$(CC) $(CFLAGS) $(OBJ_PARSED) -o $(NAME)
-	@printf "${B}${CGREEN}ircserv compiled\n"
-	# @./$(NAME) 6667 hihitest
 
 launch:
 	$(call progress_bar)
