@@ -53,7 +53,7 @@ TITLE:
 	printf "${CYELLOW}| '--------------' || '--------------' || '--------------' || '--------------' || '--------------' || '--------------' |\n"
 	printf "${CCYAN} '----------------'  '----------------'  '----------------'  '----------------'  '----------------'  '----------------' \n${CGREEN}"
 	printf "${CYELLOW}Clumsy ${CPURPLE}${NAME}${CYELLOW}is on the way!\n"
-	printf "${CGREEN}Made with 💌${CRED}l${CYELLOW}o${CCYAN}v${CGRIS}e${CGREEN}💌 by ___ }@jfrancai @qbornet and @thi-phng ___\n"
+	printf "${CGREEN}Made with 💌${CRED}l${CYELLOW}o${CCYAN}v${CGRIS}e${CGREEN}💌 by ___ @jfrancai @qbornet and @thi-phng ___\n"
 
 
 
