@@ -11,9 +11,11 @@ Your executable will be run as follows:
 
 You can communicate with the server by downloading a client (ex: irssi).
 Example command for irssi: 
+
 `/connect localhost <port> <password>`
 
-For more information about the protocol, please go take a look in the document right here (if I recall it correctly) ^^ 
+For more information about the protocol, please go take a look at the document right here (if I recall it correctly) ^^ 
+
 `https://www.rfc-editor.org/rfc/rfc1459.html`
 
 Current Version: 6
