@@ -5,8 +5,9 @@
 This project involves creating your own IRC (Internet Relay Chat) server. The server interacts with IRC clients, allowing users to engage in real-time messaging, both publicly and privately. Users can exchange direct messages and join group channels. The project emphasizes adherence to solid standards and protocols that govern computer interactions on the internet.
 
 ### _How to use:_
+
 Your executable will be run as follows:
-./ircserv <port> <password>
+`./ircserv <port> <password>`
 
 Current Version: 6
 
