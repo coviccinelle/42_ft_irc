@@ -4,6 +4,9 @@
 
 This project involves creating your own IRC (Internet Relay Chat) server. The server interacts with IRC clients, allowing users to engage in real-time messaging, both publicly and privately. Users can exchange direct messages and join group channels. The project emphasizes adherence to solid standards and protocols that govern computer interactions on the Internet.
 
+![image](https://github.com/coviccinelle/42_ft_irc/assets/51762886/047382fd-88ef-44c6-a1d5-ce395c613e91)
+
+
 ### _How to use:_
 
 Your executable will be run as follows:
