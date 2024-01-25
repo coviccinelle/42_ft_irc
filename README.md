@@ -2,12 +2,19 @@
 
 ## Summary
 
-This project involves creating your own IRC (Internet Relay Chat) server. The server interacts with IRC clients, allowing users to engage in real-time messaging, both publicly and privately. Users can exchange direct messages and join group channels. The project emphasizes adherence to solid standards and protocols that govern computer interactions on the internet.
+This project involves creating your own IRC (Internet Relay Chat) server. The server interacts with IRC clients, allowing users to engage in real-time messaging, both publicly and privately. Users can exchange direct messages and join group channels. The project emphasizes adherence to solid standards and protocols that govern computer interactions on the Internet.
 
 ### _How to use:_
 
 Your executable will be run as follows:
 `./ircserv <port> <password>`
+
+You can communicate with the server by downloading a client (ex: irssi).
+Example command for irssi: 
+`/connect localhost <port> <password>`
+
+For more information about the protocol, please go take a look in the document right here (if I recall it correctly) ^^ 
+`https://www.rfc-editor.org/rfc/rfc1459.html`
 
 Current Version: 6
 
