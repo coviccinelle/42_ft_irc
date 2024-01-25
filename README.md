@@ -23,6 +23,10 @@ For more information about the protocol, please go take a look at the document r
 
 Current Version: 6
 
+![image](https://github.com/coviccinelle/42_ft_irc/assets/51762886/3ec17b20-13cd-42c5-8661-9055583666f5)
+
+
+
 ## Contents
 
 1. [Introduction](#chapter-i-introduction)
